@@ -14,3 +14,9 @@ Developers:
             Mel Joseph Paredes
 
 QA-Tester/Unit tester: Vince Borgy Espina
+
+
+
+TO RUN install node JS:
+
+# npm install
