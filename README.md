@@ -19,4 +19,8 @@ QA-Tester/Unit tester: Vince Borgy Espina
 
 TO RUN install node JS:
 
+download nodeJS
+
 # npm install
+
+# npm run dev
