@@ -14,3 +14,11 @@ Developers:
             Mel Joseph Paredes
 
 QA-Tester/Unit tester: Vince Borgy Espina
+
+install all libraries
+
+create and activate virtual environment
+# python -m venv env
+# .\env\Scripts\activate
+# pip install -r requirements.txt
+# flask run
