@@ -8,7 +8,7 @@ CORS(app)
 
 def connect_to_mongodb():
     try:
-        client = MongoClient("mongodb+srv://mediahubserp:loremipsum1234@cluster0.horknch.mongodb.net/?retryWrites=true&w=majority")
+        client = MongoClient("mongodb+srv://psumhserp:loremipsum1234@cluster0.leaajze.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
         client.admin.command('ismaster')
         return True
     except ConnectionFailure:
