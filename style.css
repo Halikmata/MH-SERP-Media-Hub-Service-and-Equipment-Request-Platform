@@ -16,8 +16,8 @@
 :root {
     --red-color: red;
     --light-red-color: tomato;
-    --orange-color: orange;
-    --light-orange-color: #ff7e00;
+    --orange-color: #ff7e00;
+    --light-orange-color: orange;
     --text-color: #1a2428;
     --bg-color: white;
 }
@@ -54,9 +54,10 @@ header {
 }
 
 /* Profile styling */
+
 .profile {
     display: flex;
-    align-items: var(--bg-color);
+    align-items: center;
     column-gap: 0.5rem;
     cursor: pointer;
 }
@@ -101,7 +102,7 @@ header {
 }
 
 .navbar a:hover, .navbar .home-active {
-    background: var(--light-orange-color);
+    background: var(--orange-color);
     border-radius: 5rem;
     color: var(--bg-color);
     transition: background 0.5s;
@@ -139,8 +140,101 @@ header {
 }
 
 .home-text span {
+    font-size: 2rem;
     font-weight: 400;
     text-transform: uppercase;
-    color: var(--light-orange-color);
+    color: var(--text-color);
 }
 
+.home-text h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--orange-color);
+}
+
+/* Login & Signup button  */
+.login-btn {
+    border: none;
+    padding: 0.6rem 1rem;
+    background: var(--orange-color);
+    color: var(--bg-color);
+    font-weight: 400;
+    border-radius: 5rem;
+    max-width: 200px;
+    margin-right: 5px;
+}
+
+.login-btn:hover {
+    background: var(--light-orange-color);
+    transition: 0.3s ease;
+}
+
+.signup-btn {
+    border: none;
+    padding: 0.6rem 1rem;
+    background: var(--orange-color);
+    color: var(--bg-color);
+    font-weight: 400;
+    border-radius: 5rem;
+    max-width: 200px;
+}
+
+.signup-btn:hover {
+    background: var(--light-orange-color);
+    transition: 0.3s ease;
+}
+
+
+/* Get Started Now! button styling */
+.btn {
+    padding: 0.6rem 1rem;
+    background: var(--orange-color);
+    color: var(--bg-color);
+    font-weight: 400;
+    border-radius: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 0.5rem;
+    max-width: 200px;
+}
+
+.btn .bx {
+    padding: 2px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-radius: 1rem;
+    font-size: 20px;
+    margin: auto;
+}
+
+.btn:hover {
+    background: var(--light-orange-color);
+    transition: 0.3s ease;
+}
+
+/* Swiper button styling */
+.swiper-button-next {
+    /* background: url(); */
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center;
+    margin-right: 20px;
+}
+
+/* .swiper-button-next::after {
+    display: none;
+} */
+
+.swiper-button-prev {
+    /* background: url(); */
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center;
+    margin-left: 20px;
+}
+
+/* .swiper-button-prev::after {
+    display: none;
+} */

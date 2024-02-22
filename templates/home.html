@@ -17,31 +17,32 @@
   <!-- Navbar -->
   <header>
     <!-- Logo -->
-    <a href="index.html" class="logo"><img class="logo" src="img/logo.png" alt="logo">PSU Media Hub</a>
+    <a href="index.html" class="logo"><img class="logo" src="/img/logo.png" alt="logo">PSU Media Hub</a>
 
     <!-- Menu icon -->
     <div class="bx bx-menu" id="menu-icon"></div>
 
     <!-- Nav list -->
     <ul class="navbar">
-      <li><a href="#index.html">Home</a></li>
+      <li><a href="#index.html" class="home-active">Home</a></li>
       <li><a href="#request.html">Request</a></li>
       <li><a href="#equipment.html">Equipment</a></li>
       <li><a href="#services.html">Services</a></li>
       <li><a href="#about.html">About Us</a></li>
     </ul>
 
-    <!-- Login & Sign up button -->
-    <div>
-        <a href="templates/login.html" class="login-btn">Login</a>
-        <a href="templates/request.html" class="signup-btn">Sign Up</a>
+    <!-- Profile (FOR DISPLAY ONLY) -->
+    <div class="profile">
+      <img src="/img/harry.jpg" alt="">
+      <span>Harry Cabrera</span>
+      <i class="bx bx-caret-down"></i>
     </div>
-  
+
   </header>
 
   <!-- HOME -->
-  <!-- <section class="home swiper" id="home">
-    <div class="swiper-wrapper"> -->
+  <section class="home swiper" id="home">
+    <div class="swiper-wrapper">
 
       <!-- Slide 1 -->
       <div class="swiper-slide" id="container">
@@ -51,7 +52,7 @@
           <a href="#" class="btn">Get Started Now!<i class='bx bx-right-arrow-alt'></i></a>
         </div>
         <img src="/img/mhpic1.png" alt="">
-      </div><br>
+      </div>
 
       <!-- Slide 2 -->
       <div class="swiper-slide" id="container">
@@ -61,7 +62,7 @@
           <a href="#" class="btn">Get Started Now!<i class='bx bx-right-arrow-alt'></i></a>
         </div>
         <img src="/img/mhpic2.png" alt="">
-      </div><br>
+      </div>
 
       <!-- Slide 3 -->
       <div class="swiper-slide" id="container">
@@ -73,10 +74,9 @@
         <img src="/img/mhpic3.png" alt="">
       </div>
 
-    <!-- </div> -->
-
-    <!-- <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div> -->
+    </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
   </section>
 
   
@@ -85,6 +85,6 @@
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
   <!-- link to javascript -->
-  <script src="main.js"></script>
+  <script src="/main.js"></script>
 </body>
 </html>
