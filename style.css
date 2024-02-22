@@ -238,3 +238,62 @@ header {
 /* .swiper-button-prev::after {
     display: none;
 } */
+
+
+/* -----------------------CSS FOR REQUEST PAGE-------------------------------------- */
+
+.request{
+    display: grid;
+    place-items: center;
+}
+.request-form{
+    display: flex;
+    flex-direction: column;
+    width: clamp(300px, 50%, 550px);
+    height: fit-content;
+    padding: clamp(10px, 5%, 20px);
+    background-color: var(--light-orange-color);
+    border: none;   
+    border-radius: 5px;
+}
+.request-form input[type="text"],
+.request-form input[type="date"],
+.request-form input[type="submit"],
+.request-form input[type="time"] {
+    border-radius: 5px;
+    border: 1px solid #00000066;
+    height: 35px;
+}
+
+.request-form input[type="submit"]{
+    background-color: rgb(255, 255, 255);
+}
+
+.request-form input[type="submit"]:hover{
+    background-color: rgb(255, 239, 229);
+}
+
+.time_picker{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    justify-items: center;
+}
+
+.status{
+    height: 30px ;
+    padding: 0 10px;
+    border-radius: 15px;
+}
+
+.approved{
+    background-color: #99FF00;
+}
+.pending{
+    background-color: #ffa200;
+}
+.declined{
+    background-color: #ff5757;
+}
+.returned{
+    background-color: #bababa;
+}
