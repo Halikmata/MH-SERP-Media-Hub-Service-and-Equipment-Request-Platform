@@ -114,23 +114,23 @@ header {
     display: none;
 }
 
-.container {
+#container {
     position: relative;
     width: 100%;
     min-height: 640px;
     display: flex;
     align-items: center;
-    background: url(img/mediahub.png);
+    background: url(img/bg.jpg);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
     overflow: hidden;
 }
 
-.container img {
+#container img {
     width: 400px;
     position: absolute;
-    bottom: -500px;
+    bottom: 50px;
     right: 200px;
 }
 
