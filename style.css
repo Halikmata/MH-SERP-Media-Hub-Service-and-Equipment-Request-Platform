@@ -16,8 +16,8 @@
 :root {
     --red-color: red;
     --light-red-color: tomato;
-    --orange-color: orange;
-    --light-orange-color: #ff7e00;
+    --orange-color: #ff7e00;
+    --light-orange-color: orange;
     --text-color: #1a2428;
     --bg-color: white;
 }
@@ -54,9 +54,10 @@ header {
 }
 
 /* Profile styling */
+
 .profile {
     display: flex;
-    align-items: var(--bg-color);
+    align-items: center;
     column-gap: 0.5rem;
     cursor: pointer;
 }
@@ -101,7 +102,7 @@ header {
 }
 
 .navbar a:hover, .navbar .home-active {
-    background: var(--light-orange-color);
+    background: var(--orange-color);
     border-radius: 5rem;
     color: var(--bg-color);
     transition: background 0.5s;
@@ -139,10 +140,107 @@ header {
 }
 
 .home-text span {
+    font-size: 2rem;
     font-weight: 400;
     text-transform: uppercase;
-    color: var(--light-orange-color);
+    color: var(--text-color);
 }
+
+.home-text h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--orange-color);
+}
+
+/* Login & Signup button  */
+.login-btn {
+    border: none;
+    padding: 0.6rem 1rem;
+    background: var(--orange-color);
+    color: var(--bg-color);
+    font-weight: 400;
+    border-radius: 5rem;
+    max-width: 200px;
+    margin-right: 5px;
+}
+
+.login-btn:hover {
+    background: var(--light-orange-color);
+    transition: 0.3s ease;
+}
+
+.signup-btn {
+    border: none;
+    padding: 0.6rem 1rem;
+    background: var(--orange-color);
+    color: var(--bg-color);
+    font-weight: 400;
+    border-radius: 5rem;
+    max-width: 200px;
+}
+
+.signup-btn:hover {
+    background: var(--light-orange-color);
+    transition: 0.3s ease;
+}
+
+
+/* Get Started Now! button styling */
+.btn {
+    padding: 0.6rem 1rem;
+    background: var(--orange-color);
+    color: var(--bg-color);
+    font-weight: 400;
+    border-radius: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 0.5rem;
+    max-width: 200px;
+}
+
+.btn .bx {
+    padding: 2px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-radius: 1rem;
+    font-size: 20px;
+    margin: auto;
+}
+
+.btn:hover {
+    background: var(--light-orange-color);
+    transition: 0.3s ease;
+}
+
+/* Swiper button styling */
+.swiper-button-next {
+    /* background: url(); */
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center;
+    margin-right: 20px;
+}
+
+/* .swiper-button-next::after {
+    display: none;
+} */
+
+.swiper-button-prev {
+    /* background: url(); */
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center;
+    margin-left: 20px;
+}
+
+/* .swiper-button-prev::after {
+    display: none;
+} */
+
+
+/* -----------------------CSS FOR REQUEST PAGE-------------------------------------- */
 
 .request{
     display: grid;
@@ -198,4 +296,118 @@ header {
 }
 .returned{
     background-color: #bababa;
+}
+
+
+/* ----------------EQUIPMENT PAGE------------------------ */
+
+.equipment {
+    padding: 50px 20px;
+    background-color: #f4f4f4;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.equipment-card {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    width: 300px;
+}
+
+.equipment-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 2px solid #f4f4f4;
+}
+
+.equipment-details {
+    padding: 20px;
+}
+
+.equipment-details h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.equipment-details p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+
+/* -----------SERVICES PAGE--------------------------------- */
+
+.services {
+    padding: 4.5rem 0;
+}
+
+.service-card {
+    width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+}
+
+.service-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+}
+
+.service-details {
+    padding: 1.5rem;
+}
+
+.service-details h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.service-details p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.notif{
+    width: clamp(600px, 50vw, 1000px);
+    display: grid;
+    grid-template-columns: 1fr;
+    border-radius: 10px;
+    background-color: #DDDDDD66;
+    padding: 10PX;
+}
+.notif_row{
+    display: grid;
+    grid-template-columns: 1fr 1fr 100px;
+    height: 30px;
+    align-items: center;
+    padding: 0 10px;
+    background-color: #aaaaaa1b;
+}
+.nr_date{
+    margin-top:20px;
+    height: 20px;
+    font-size: 0.8rem;
+}
+.unread{
+    background-color: #AAAAAA66;
 }

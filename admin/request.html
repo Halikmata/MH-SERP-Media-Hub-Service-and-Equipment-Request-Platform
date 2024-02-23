@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MH-SERP PROTOTYPE</title>
+  <!-- link to css -->
+  <link rel="stylesheet" href="/style.css">
+  <!-- link to box icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+  <!-- link Swiper's CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+</head>
+
+<body>
+  <!-- Navbar -->
+  <header>
+    <!-- Logo -->
+    <a href="index.html" class="logo"><img class="logo" src="/img/logo.png" alt="logo">PSU Media Hub</a>
+
+    <!-- Menu icon -->
+    <div class="bx bx-menu" id="menu-icon"></div>
+
+    <!-- Nav list -->
+    <ul class="navbar">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="request.html" class="home-active">Request</a></li>
+      <li><a href="equipment.html">Equipment</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="about.html">About Us</a></li>
+    </ul>
+
+    <!-- Profile (FOR DISPLAY ONLY) -->
+    <div class="profile">
+      <img src="/img/harry.jpg" alt="">
+      <span>ADMIN</span>
+      <i class="bx bx-caret-down"></i>
+    </div>
+
+  </header>
+  <br><br><br><br><br>
+  <!-- REQUEST -->
+  <section class="request" id="home">
+    <br>
+    <div style="display: flex; gap: 15px; justify-content: space-between;">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="aproved">Aproved</option>
+            <option value="declined">Declined</option>
+        </select>
+
+        <label for="order">Order by</label>
+        <select id="order" name="order">
+            <option value="default">Default</option>
+            <option value="request_date" selected>Request Date</option>
+            <option value="event_date">Event Date</option>
+            <option value="quantity">Quantity</option>
+        </select>
+        <label><input type="checkbox" value="equipment" checked>Equipment</label>
+        <label><input type="checkbox" value="equipment" checked>Services</label>
+    </div>
+    <br>
+    <h3>Requests</h3><br>
+    <table>
+        <tr>
+            <th>Name</th>            
+            <th>Organization</th>
+            <th>Event</th>
+            <th>Date</th>
+            <th>Equipments</th>
+            <th>Services</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>Cletus Blas</td>
+            <td>CAH-CSG</td>
+            <td>Binturungan</td>
+            <td>
+                <ul>
+                    <li>04-22-2024</li>
+                    <li>to</li>
+                    <li>04-25-2024</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Drone</li>
+                </ul>
+            </td>
+            <td>Videography</td>
+            <td><p class="status pending">Pending</p></td>
+        </tr>
+        <tr>
+            <td>Emmanuel Juanich</td>
+            <td>CS-CSG</td>
+            <td>Binturungan</td>
+            <td>
+                <ul>
+                    <li>04-22-2024</li>
+                    <li>to</li>
+                    <li>04-25-2024</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Mirrorless Camera</li>
+                    <li>Tripod</li>
+                    <li>Drone</li>
+                </ul>
+            </td>
+            <td>None</td>
+            <td><p class="status pending">Pending</p></td>
+        </tr>
+        <tr>
+            <td>Harry Cabrera</td>
+            <td>ACS</td>
+            <td>Aquaintance Party</td>
+            <td>
+                <li>03-15-2024</li>
+            </td>
+            <td>
+                <ul>
+                    <li>2 Mirrorless Camera</li>
+                    <li>2 Lenses</li>
+                </ul>
+            </td>
+            <td>Livestream</td>
+            <td><p class="status approved">Approved</p></td>
+        </tr>
+        <tr>
+            <td>Vince Espina</td>
+            <td>PICE</td>
+            <td>Hard Hatting Ceremony</td>
+            <td>
+                <li>03-04-2024</li>
+            </td>
+            <td>
+                <ul>
+                    <li>HD Camera</li>
+                    <li>Tripod</li>
+                </ul>
+            </td>
+            <td>Livestream</td>
+            <td><p class="status pending">Pending</p></td>
+        </tr>
+        <tr>
+            <td>Maverick Serencio</td>
+            <td>CS-Compendium</td>
+            <td>Binturungan</td>
+            <td>
+                <li>04-24-2024</li>
+            </td>
+            <td>
+                <ul>
+                    <li>Drone</li>
+                </ul>
+            </td>
+            <td>None</td>
+            <td><p class="status approved">Approved</p></td>
+        </tr>
+        <tr>
+            <td>Mel Paredes</td>
+            <td>ACS</td>
+            <td>ACS Day</td>
+            <td>
+                <li>03-14-2024</li>
+            </td>
+            <td>
+                <ul>
+                    <li>Mirrorless Camera</li>
+                    <li>Gimbal</li>
+                </ul>
+            </td>
+            <td>None</td>
+            <td><p class="status declined">Declined</p></td>
+        </tr>
+        <tr>
+            <td>Harry Cabrera</td>
+            <td>ACS</td>
+            <td>General Assembly</td>
+            <td>03-05-2024</td>
+            <td>
+                <ul>
+                    <li>2 Mirrorless Camera</li>
+                    <li>Tripod</li>
+                    <li>Gimbal</li>
+                </ul>
+            </td>
+            <td>None</td>
+            <td><p class="status returned">Returned</p></td>
+        </tr>
+    </table>
+
+    <style>
+        table, tr, th, td{
+            border: 1px solid #888888FF;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+    </style>
+
+  </section>
+
+  <!-- link to Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+  <!-- link to javascript -->
+  <script src="/main.js"></script>
+</body>
+</html>

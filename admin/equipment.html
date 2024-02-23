@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MH-SERP PROTOTYPE</title>
+  <!-- link to css -->
+  <link rel="stylesheet" href="/style.css">
+  <!-- link to box icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+  <!-- link Swiper's CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+</head>
+
+<body>
+    <!-- Navbar -->
+    <header>
+      <!-- Logo -->
+      <a href="index.html" class="logo"><img class="logo" src="/img/logo.png" alt="logo">PSU Media Hub</a>
+  
+      <!-- Menu icon -->
+      <div class="bx bx-menu" id="menu-icon"></div>
+  
+      <!-- Nav list -->
+      <ul class="navbar">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="request.html">Request</a></li>
+        <li><a href="equipment.html" class="home-active">Equipment</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="about.html">About Us</a></li>
+      </ul>
+  
+      <!-- Profile (FOR DISPLAY ONLY) -->
+      <div class="profile">
+        <img src="/img/harry.jpg" alt="">
+        <span>Harry Cabrera</span>
+        <i class="bx bx-caret-down"></i>
+      </div>
+  
+    </header>
+
+    <br><br><br><br><br>
+    <section class="equipment">
+      <select>
+        <option>All</option>
+        <option>Camera</option>
+        <option>Lens</option>
+        <option>Acessories</option>
+      </select>
+      <br>
+      <table>
+        <tr>
+          <th>id</th>
+          <th>Brand</th>
+          <th>Model</th>
+          <th>Type</th>
+          <th>Cost</th>
+          <th>Quantity</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+        <tr>
+          <td>PSU MEDIA HUB 1 85</td>
+          <td>Sony</td>
+          <td>A7 II</td>
+          <td>Mirrorless Camera</td>
+          <td>50,000 php</td>
+          <td>2</td>
+          <td>Available</td>
+          <td>
+            <button class="btn_edit">Edit</button>
+            <button class="btn_del">Delete</button>
+          </td>
+        </tr>
+        <tr>
+          <td>PSU MEDIA HUB 1 86</td>
+          <td>Panasonic</td>
+          <td>G23</td>
+          <td>HD Camera</td>
+          <td>100,000 php</td>
+          <td>2</td>
+          <td>Available</td>
+          <td>
+            <button class="btn_edit">Edit</button>
+            <button class="btn_del">Delete</button>
+          </td>
+        </tr>
+        <tr>
+          <td>PSU MEDIA HUB 1 87</td>
+          <td>K F Concept</td>
+          <td>TR45</td>
+          <td>Tripod</td>
+          <td>6,000 php</td>
+          <td>5</td>
+          <td>Available</td>
+          <td>
+            <button class="btn_edit">Edit</button>
+            <button class="btn_del">Delete</button>
+          </td>
+        </tr>
+        <tr>
+          <td>PSU MEDIA HUB 1 88</td>
+          <td>Sony</td>
+          <td>master 85mm f1.4</td>
+          <td>Lens</td>
+          <td>50,000 php</td>
+          <td>1</td>
+          <td>Available</td>
+          <td>
+            <button class="btn_edit">Edit</button>
+            <button class="btn_del">Delete</button>
+          </td>
+        </tr>
+        <tr>
+          <td>PSU MEDIA HUB 1 89</td>
+          <td>Canon</td>
+          <td>M50</td>
+          <td>Mirrorless Camera</td>
+          <td>20,000 php</td>
+          <td>1</td>
+          <td>Available</td>
+          <td>
+            <button class="btn_edit">Edit</button>
+            <button class="btn_del">Delete</button>
+          </td>
+        </tr>
+      </table>
+      <style>
+        table, tr, th, td{
+            border: 1px solid #888888FF;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+        .equipment{
+          display: grid;
+          place-items: center;
+        }
+
+        .btn_del{
+          background-color: rgb(255, 132, 132);
+          border: none;
+          padding: 5px;
+        }
+
+        
+        .btn_edit{
+          background-color: rgb(153, 153, 153);
+          border: none;
+          padding: 5px;
+        }
+    </style>
+    </section>
+
+  <!-- link to Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+  <!-- link to javascript -->
+  <script src="main.js"></script>
+
+</body>
+</html>
