@@ -297,3 +297,92 @@ header {
 .returned{
     background-color: #bababa;
 }
+
+
+/* ----------------EQUIPMENT PAGE------------------------ */
+
+.equipment {
+    padding: 50px 20px;
+    background-color: #f4f4f4;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.equipment-card {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    width: 300px;
+}
+
+.equipment-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 2px solid #f4f4f4;
+}
+
+.equipment-details {
+    padding: 20px;
+}
+
+.equipment-details h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.equipment-details p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+
+/* -----------SERVICES PAGE--------------------------------- */
+
+.services {
+    padding: 4.5rem 0;
+}
+
+.service-card {
+    width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+}
+
+.service-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+}
+
+.service-details {
+    padding: 1.5rem;
+}
+
+.service-details h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.service-details p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
