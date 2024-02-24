@@ -21,6 +21,11 @@ TO RUN install node JS:
 
 download nodeJS
 
+install vite globally:
+# npm install -g vite
+
+install package:
 # npm install
 
+start server:
 # npm run dev
