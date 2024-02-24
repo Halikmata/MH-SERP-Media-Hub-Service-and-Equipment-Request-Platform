@@ -31,3 +31,31 @@ function App() {
 }
 
 export default App;
+
+/*
+App.jsx
+header
+body
+  switch:
+    if logged in:  
+      home
+    else:
+      landing
+    equipment
+    services
+    about
+footer
+
+
+
+equipment.jsx
+  for i in equipment:
+    card
+      image
+      brand
+      model
+      description
+
+  pagination
+
+*/
