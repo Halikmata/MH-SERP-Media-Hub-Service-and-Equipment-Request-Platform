@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import Equipment from './pages/equipment';
+
 function App() {
   const [data, setData] = useState([]);
 
@@ -26,6 +28,9 @@ function App() {
           // Assuming your API returns an array of objects with a 'name' property
         ))}
       </ul>
+
+      <Equipment></Equipment>
+
     </div>
   );
 }

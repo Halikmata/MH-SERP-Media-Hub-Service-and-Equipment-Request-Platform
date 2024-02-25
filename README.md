@@ -21,6 +21,12 @@ TO RUN install node JS:
 
 download nodeJS
 
+
+To get the dummy API for testing:
+# npm run start-json-server
+
+
+
 install vite globally:
 # npm install -g vite
 
@@ -29,3 +35,5 @@ install package:
 
 start server:
 # npm run dev
+
+
