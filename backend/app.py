@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb+srv://elsidpanolino:ELSID62mdb@cluster0.xzw6t37.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 mongodb_client = MongoClient(app.config["MONGO_URI"])
-db = mongodb_client['mediahubdb'] # rename to the database
+db = mongodb_client['mh-serp'] 
 
 CORS(app)
 
