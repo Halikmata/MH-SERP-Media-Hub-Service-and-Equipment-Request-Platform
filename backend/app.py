@@ -1,33 +1,28 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
-from utils import verify_collection
+from bson.objectid import ObjectId
+# from pymongo.errors import ConnectionFailure
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb+srv://elsidpanolino:ELSID62mdb@cluster0.xzw6t37.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 mongodb_client = MongoClient(app.config["MONGO_URI"])
-db = mongodb_client['mediahubdb']
+db = mongodb_client['mediahubdb'] # rename to the database
 
 CORS(app)
 
-# security and login not yet implemented.
-
-"""def connect_to_mongodb():
-    try:
-        client = MongoClient("mongodb+srv://kenlorenz420:rUcyg9bQRMmsDisJ@testdb.fp6ebdj.mongodb.net/?retryWrites=true&w=majority&appName=testDB")
-        client.admin.command('ismaster')
-        return True
-    except ConnectionFailure:
+def print_collections():
+    collections = db.list_collection_names()
+    print(f'Collections from database: {collections}')
+    
+def verify_collection(x):
+    collections = db.list_collection_names()
+    if x not in collections:
         return False
+    return True
 
-@app.route('/testdb')
-def index():
-    if connect_to_mongodb():
-        return jsonify({"status": "Connected to MongoDB"})
-    else:
-        return jsonify({"status": "Failed to connect to MongoDB"})"""
+# security and login not yet implemented.
 
 @app.route('/<collection>', methods=['GET'])
 def index(collection):
@@ -45,25 +40,22 @@ def index(collection):
     for x in rows_list:
         x['_id'] = str(x['_id'])
         
-    return render_template('.html', rows_list=rows_list)
+    return jsonify(rows_list), 200
 
-@app.route('/<collection>/add', methods=["GET","POST"])
-def add_row():   
+@app.route('/<collection>/add', methods=["POST"])
+def add_row(collection):   
     if not verify_collection(collection):
         return jsonify({"message": "Unknown URL"}), 404
     else:
         collection = db[collection]
         
-    if request.method == "POST":
-        json_input = request.get_json()
-        result = collection.insert_one(json_input)
-        return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)})
-    elif request.method == "GET":
-        return render_template('.html')
+    json_input = request.get_json()
+    result = collection.insert_one(json_input)
+    return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
     
-from bson.objectid import ObjectId
-@app.route('/update/<id>', methods=['GET','POST'])
-def update_row(id):
+
+@app.route('/<collection>/update/<id>', methods=['GET','POST'])
+def update_row(collection, id):
     
     if not verify_collection(collection):
         return jsonify({"message": "Unknown URL"}), 404
@@ -76,18 +68,20 @@ def update_row(id):
         result = collection.update_one({'_id':ObjectId(id)}, {'$set': json_input})
           
         if result.modified_count >  0:
-            return jsonify({"message": "Updated successfully", "id": id})
+            return jsonify({"message": "Updated successfully", "id": id}), 201
         else:
             return jsonify({"message": "No row found with the given ID"}), 404
         
     elif request.method == "GET":
-        # load specific instance and throw to a page.
-        # load specific ID for update page.
-        return render_template('.html')
+
+        result = collection.find_one({'_id': ObjectId(id)})
+        
+        for x in result:
+            x['_id'] = str(x['_id'])
+        return jsonify(result), 200
     
-    
-@app.route('/delete/<id>', methods=['POST'])
-def delete_row(id):
+@app.route('/<collection>/delete/<id>', methods=['POST'])
+def delete_row(collection, id):
     
     if not verify_collection(collection):
         return jsonify({"message": "Unknown URL"}), 404
@@ -97,10 +91,10 @@ def delete_row(id):
     result = collection.delete_one({'_id': ObjectId(id)})
     
     if result.deleted_count > 0:
-        return jsonify({"message": "Deleted successfully", "id": id})
+        return jsonify({"message": "Deleted successfully", "id": id}), 201
     else:
         return jsonify({"message": "No row found with the given ID"}), 404
-    # return render_template()
 
 if __name__ == "__main__":
+    print_collections() # debugger
     app.run(debug=True)
