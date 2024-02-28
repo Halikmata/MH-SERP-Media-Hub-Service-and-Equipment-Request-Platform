@@ -5,7 +5,7 @@ from pymongo.errors import ConnectionFailure
 from utils import verify_collection
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb+srv://kenlorenz420:rUcyg9bQRMmsDisJ@testdb.fp6ebdj.mongodb.net/?retryWrites=true&w=majority&appName=testDB"
+app.config["MONGO_URI"] = "mongodb+srv://elsidpanolino:ELSID62mdb@cluster0.xzw6t37.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 mongodb_client = MongoClient(app.config["MONGO_URI"])
 db = mongodb_client['mediahubdb']
@@ -14,7 +14,7 @@ CORS(app)
 
 # security and login not yet implemented.
 
-def connect_to_mongodb():
+"""def connect_to_mongodb():
     try:
         client = MongoClient("mongodb+srv://kenlorenz420:rUcyg9bQRMmsDisJ@testdb.fp6ebdj.mongodb.net/?retryWrites=true&w=majority&appName=testDB")
         client.admin.command('ismaster')
@@ -27,7 +27,7 @@ def index():
     if connect_to_mongodb():
         return jsonify({"status": "Connected to MongoDB"})
     else:
-        return jsonify({"status": "Failed to connect to MongoDB"})
+        return jsonify({"status": "Failed to connect to MongoDB"})"""
 
 @app.route('/<collection>', methods=['GET'])
 def index(collection):
