@@ -1,0 +1,29 @@
+{
+    "equipment":[
+        {
+            "id": "202002",
+            "brand": "Sony",
+            "model": "A7"
+        },
+        {
+            "id": "202302",
+            "brand": "Sony",
+            "model": "G Master 50MM F1.8"
+        },
+        {
+            "id": "223302",
+            "brand": "Sony",
+            "model": "G Master 85MM F1.4"
+        },
+        {
+            "id": "267602",
+            "brand": "Sony",
+            "model": "G Master"
+        },
+        {
+            "id": "204502",
+            "brand": "Sony",
+            "model": "G Master"
+        }
+    ]
+}
