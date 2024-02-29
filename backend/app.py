@@ -94,7 +94,7 @@ def index(collection):
     if(int(page) < 1): # avoids negatives.
         page = 1
     
-    limit_rows = 2 # change total rows in a page here.
+    limit_rows = 20 # change total rows in a page here.
     offset = (page - 1) * limit_rows
     rows = collection.find().skip(offset).limit(limit_rows) # ඞ
     
