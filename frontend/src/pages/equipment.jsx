@@ -5,7 +5,7 @@ const Equipment = () => {
   const [equipment, setEquipment] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:3001/equipment')
+    axios.get('http://127.0.0.1:5000/equipment')
       .then(response => {
         setEquipment(response.data);
       })
@@ -23,14 +23,22 @@ const Equipment = () => {
             <th>ID</th>
             <th>Brand</th>
             <th>Model</th>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Unit Cost</th>
           </tr>
         </thead>
         <tbody>
           {equipment.map(item => (
             <tr key={item.id}>
-              <td>{item.id}</td>
+              <td>{item.idequipment}</td>
               <td>{item.brand}</td>
               <td>{item.model}</td>
+              <td>{item.description}</td>
+              <td>{item.equipment_type}</td>
+              <td>{item.equipment_location}</td>
+              <td>{item.unit_cost}</td>
             </tr>
           ))}
         </tbody>

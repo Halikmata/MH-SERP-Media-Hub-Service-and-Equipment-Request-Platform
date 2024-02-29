@@ -33,7 +33,7 @@ function Header() {
         <nav>
           <ul style={navStyle}>
             <li><Link style={liStyle} to="/">Home</Link></li>
-            <li><Link style={liStyle} to="/request">Request</Link></li>
+            <li><Link style={liStyle} to="/requests">Requests</Link></li>
             <li><Link style={liStyle} to="/equipment">Equipment</Link></li>
             <li><Link style={liStyle} to="/services">Services</Link></li>
             <li><Link style={liStyle} to="/about">About Us</Link></li>
