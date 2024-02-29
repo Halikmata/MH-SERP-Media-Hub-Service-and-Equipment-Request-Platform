@@ -4,13 +4,47 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 # from pymongo.errors import ConnectionFailure
 
+#security related libraries -- jwt currently has issues.
+# import jwt
+from functools import wraps
+from faker import Faker
+
+fake = Faker() # rechanges secret key every server restart
+
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb+srv://elsidpanolino:ELSID62mdb@cluster0.xzw6t37.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+# app.config['SECRET_KEY'] = fake.bothify(text='??????#####') # not used yet.
 
 mongodb_client = MongoClient(app.config["MONGO_URI"])
 db = mongodb_client['mh-serp'] 
 
 CORS(app)
+
+
+
+# ------------------------ Tara Tekken 7
+
+# security and login not yet implemented.
+# Checks availability of token in the received header
+"""def check_token(f):
+    @wraps(f)
+    def get_header_token(*args, **kwargs):
+        token = request.headers.get('token-access')
+      
+        if not token:
+            return jsonify({"message":"Authorization denied"}), 403
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY']) # refer to flask jwt documentation.
+            
+        except jwt.ExpiredSignatureError:
+            return jsonify({"message":"Expired session"}), 401
+        
+        except jwt.InvalidTokenError:
+            return jsonify({"message":"Invalid session"}), 401
+
+        return f(*args, **kwargs)
+
+    return get_header_token"""
 
 def print_collections():
     collections = db.list_collection_names()
@@ -22,7 +56,29 @@ def verify_collection(x):
         return False
     return True
 
-# security and login not yet implemented.
+# ------------------------
+acc = {'teststatic420@gmail.com':{'password':'648221'}} # temporary, will be connected to accounts table.
+"""@app.route("/login",methods=["POST"])
+def login():
+    
+    data = request.get_json()
+    
+    if 'email' not in data or 'password' not in data:
+        return jsonify("Missing Email or Password"), 400
+
+    email = data['email']
+    password = data['password']
+    
+    if acc.get(email, None) is not None and acc[email]['password'] == password:
+        
+        token = jwt.encode({'email': email}, app.config['SECRET_KEY'], algorithm='HS256')
+        
+        response = token.decode('UTF-8')
+        
+        return jsonify({"token":f"{response}"}), 200 # returns the token if account is in accounts collection.
+    else:
+        return jsonify({"message":"Wrong Credentials."}),401"""
+    
 
 @app.route('/<collection>', methods=['GET'])
 def index(collection):
@@ -31,13 +87,44 @@ def index(collection):
     else:
         collection = db[collection]
     
-    rows = collection.find()
+    # URL inputs.
+    page = request.args.get('page', default=1)
+    column = request.args.get('field',default=None)
+    search = request.args.get('search',default=None)
+    
+    
+    if(int(page) < 1): # avoids negatives.
+        page = 1
+    
+    offset = (int(page) - 1) * 20 # pagination, 20 is the row total limit
+    
+    if search != None and column != None:
+        rows = collection.aggregate([
+            {
+                "$match":{f"{column}": f"{search}"}
+            },
+            {
+                "$skip": offset
+            },
+            {
+                "$limit": page
+            }
+        ])
+    elif search == None and column == None:
+        rows = collection.aggregate([
+            {
+                "$skip": offset
+            },
+            {
+                "$limit": page
+            }
+        ])
+    else:
+        return jsonify({'message: May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
+    
     rows_list = list(rows)
     
-    for x in rows_list:
-        print(x)
-    
-    for x in rows_list:
+    for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
         x['_id'] = str(x['_id'])
         
     return jsonify(rows_list), 200
