@@ -3,12 +3,19 @@
   margin: 0;
 }
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 100;
-
   color-scheme: light dark;
   color: #242424;
   background-color: #ffffff;
+
+
+  --red-color: red;
+  --light-red-color: tomato;
+  --orange-color: #ff7e00;
+  --light-orange-color: orange;
+  --text-color: #1a2428;
+  --bg-color: white;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
