@@ -4,8 +4,11 @@ import axios from 'axios';
 const Equipment = () => {
   const [equipment, setEquipment] = useState([]);
 
+  var fake_api = 'http://127.0.0.1:3001/equipment'
+  var backend_api = 'http://127.0.0.1:5000/equipment'
+
   useEffect(() => {
-    axios.get('http://127.0.0.1:5000/equipment')
+    axios.get(fake_api)
       .then(response => {
         setEquipment(response.data);
       })

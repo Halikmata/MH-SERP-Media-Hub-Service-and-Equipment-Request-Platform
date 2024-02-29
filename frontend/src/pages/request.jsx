@@ -4,8 +4,11 @@ import axios from 'axios';
 const Requests = () => {
   const [requests, setRequest] = useState([]);
 
+  var fake_api = 'http://127.0.0.1:3001/requests'
+  var backend_api = 'http://127.0.0.1:5000/requests'
+
   useEffect(() => {
-    axios.get('http://127.0.0.1:5000/requests')
+    axios.get(fake_api)
       .then(response => {
         setRequest(response.data);
       })

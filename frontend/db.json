@@ -1,29 +1,292 @@
 {
     "equipment":[
         {
-            "id": "202002",
-            "brand": "Sony",
-            "model": "A7"
-        },
+            "_id": "65e06530b7506a0d8fcc10dd",
+            "brand": "PANASONIC",
+            "description": "UHD 4K Proffesional Camcorder.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "1",
+            "idequipment": "PSU_MEDIA_HUB_1_01",
+            "image": "",
+            "model": "AG-UX90",
+            "unit_cost": "144,900.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10de",
+            "brand": "PANASONIC",
+            "description": "UHD 4K Proffesional Camcorder.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "1",
+            "idequipment": "PSU_MEDIA_HUB_1_02",
+            "image": "",
+            "model": "AG-UX90",
+            "unit_cost": "144,900.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10df",
+            "brand": "PANASONIC",
+            "description": "UHD 4K Proffesional Camcorder.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "1",
+            "idequipment": "PSU_MEDIA_HUB_1_03",
+            "image": "",
+            "model": "AG-UX90",
+            "unit_cost": "144,900.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e0",
+            "brand": "AVMATRIX",
+            "description": "6-Channel multi-format video switcher.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "8",
+            "idequipment": "PSU_MEDIA_HUB_1_04",
+            "image": "",
+            "model": "PVS0615",
+            "unit_cost": "168,690.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e1",
+            "brand": "ZOOM",
+            "description": "12-channel Digital Mixer & Multitrack Recorder.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "13",
+            "idequipment": "PSU_MEDIA_HUB_1_05",
+            "image": "",
+            "model": "LIVE TRACK L-12",
+            "unit_cost": "72,500.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e2",
+            "brand": "FEELWORLD",
+            "description": "USB 3.0 Multi-Format Video Mixer & Switcher with 4x HDMI Inputs for Multi Camera Productions for Real-Time Live Streaming.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "13",
+            "idequipment": "PSU_MEDIA_HUB_1_06",
+            "image": "",
+            "model": "LIVEPRO L1",
+            "unit_cost": "19,625.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e3",
+            "brand": "FEELWORLD",
+            "description": "USB 3.0 Multi-Format Video Mixer & Switcher with 4x HDMI Inputs for Multi Camera Productions for Real-Time Live Streaming.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "13",
+            "idequipment": "PSU_MEDIA_HUB_1_07",
+            "image": "",
+            "model": "LIVEPRO L1",
+            "unit_cost": "19,625.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e4",
+            "brand": "PRESONUS STUDIOLIVE",
+            "description": "Professional Audio Interface.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "12",
+            "idequipment": "PSU_MEDIA_HUB_1_08",
+            "image": "",
+            "model": "AR8C",
+            "unit_cost": "43,500.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e5",
+            "brand": "KRK",
+            "description": "BiAmped Powered Studio Monitor Speaker.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "3",
+            "idequipment": "PSU_MEDIA_HUB_1_09",
+            "image": "",
+            "model": "ROKIT_8",
+            "unit_cost": "21,875.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e6",
+            "brand": "KRK",
+            "description": "BiAmped Powered Studio Monitor Speaker.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "3",
+            "idequipment": "PSU_MEDIA_HUB_1_10",
+            "image": "",
+            "model": "ROKIT_9",
+            "unit_cost": "21,875.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e7",
+            "brand": "STELLAR",
+            "description": "6\" Wall Mounted Public Address Speaker with Bass Reflex.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "3",
+            "idequipment": "PSU_MEDIA_HUB_1_11",
+            "image": "",
+            "model": "CWS-620S",
+            "unit_cost": "3,125.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e8",
+            "brand": "STELLAR",
+            "description": "6\" Wall Mounted Public Address Speaker with Bass Reflex.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "3",
+            "idequipment": "PSU_MEDIA_HUB_1_12",
+            "image": "",
+            "model": "CWS-620S",
+            "unit_cost": "3,125.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10e9",
+            "brand": "STELLAR",
+            "description": "6\" Wall Mounted Public Address Speaker with Bass Reflex.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "3",
+            "idequipment": "PSU_MEDIA_HUB_1_13",
+            "image": "",
+            "model": "CWS-620S",
+            "unit_cost": "3,125.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10ea",
+            "brand": "STELLAR",
+            "description": "6\" Wall Mounted Public Address Speaker with Bass Reflex.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "3",
+            "idequipment": "PSU_MEDIA_HUB_1_14",
+            "image": "",
+            "model": "CWS-620S",
+            "unit_cost": "3,125.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10eb",
+            "brand": "KEVLER",
+            "description": "Multizone Mixing PA Amplifier.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "21",
+            "idequipment": "PSU_MEDIA_HUB_1_15",
+            "image": "",
+            "model": "BGM-500UB",
+            "unit_cost": "15,650.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10ec",
+            "brand": "LOGITEC",
+            "description": "Advanced 5.1 Speaker System.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "3",
+            "idequipment": "PSU_MEDIA_HUB_1_16",
+            "image": "",
+            "model": "Z906",
+            "unit_cost": "29,990.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10ed",
+            "brand": "APEX SIMAR",
+            "description": "Professional TV Broadcast Teleporter 22''.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "22",
+            "idequipment": "PSU_MEDIA_HUB_1_17",
+            "image": "",
+            "model": "APX_8734",
+            "unit_cost": "122,500.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10ee",
+            "brand": "SONY",
+            "description": "Camera Lens.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "18",
+            "idequipment": "PSU_MEDIA_HUB_1_18",
+            "image": "",
+            "model": "E 18-200 mm F3.5-6.3 OSS LE",
+            "unit_cost": "57,500.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10ef",
+            "brand": "VILTROX",
+            "description": "Professional Full-frame Wide Angle Lens Prime Lens FE-20mm/F1.8 E-mount MF Manual Focus Large Aperture Camera Lens.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "18",
+            "idequipment": "PSU_MEDIA_HUB_1_19",
+            "image": "",
+            "model": "PFU RBMH",
+            "unit_cost": "24,990.00"
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10f0",
+            "brand": "VILTROX",
+            "description": "Professional Full-frame Wide Angle Lens Prime Lens FE-20mm/F1.8 E-mount MF Manual Focus Large Aperture Camera Lens.",
+            "equipment_location": "LIBRARY (IMC)",
+            "equipment_type": "18",
+            "idequipment": "PSU_MEDIA_HUB_1_20",
+            "image": "",
+            "model": "PFU RBMH",
+            "unit_cost": "24,990.00"
+          }
+    ],
+    "requests":[
         {
-            "id": "202302",
-            "brand": "Sony",
-            "model": "G Master 50MM F1.8"
-        },
-        {
-            "id": "223302",
-            "brand": "Sony",
-            "model": "G Master 85MM F1.4"
-        },
-        {
-            "id": "267602",
-            "brand": "Sony",
-            "model": "G Master"
-        },
-        {
-            "id": "204502",
-            "brand": "Sony",
-            "model": "G Master"
-        }
+            "_id": "65e00342dde1224cad62353a",
+            "equipment": [
+              "PSU_MEDIA_HUB_1_01",
+              "PSU_MEDIA_HUB_1_02",
+              "PSU_MEDIA_HUB_1_03",
+              "PSU_MEDIA_HUB_1_06",
+              "PSU_MEDIA_HUB_1_121",
+              "PSU_MEDIA_HUB_1_122",
+              "PSU_MEDIA_HUB_1_123"
+            ],
+            "event_affiliation": "Bureau of Fire Protection",
+            "event_details": "lorem ipsum",
+            "event_location": "Gymnasium",
+            "event_name": "Fire Protection Month forum",
+            "idrequests": "1",
+            "request_end": "03-08-2024",
+            "request_start": "03-08-2024",
+            "request_status": "1",
+            "requester_affiliation": "Compendium",
+            "requester_full_name": "Jason Maverick D Serencio",
+            "requester_gmail": "202180383@psu.palawan.edu.ph",
+            "requester_phone_number": "09070123473",
+            "requester_status": "ALLOWED",
+            "service": ""
+          },
+          {
+            "_id": "65e00342dde1224cad62353b",
+            "equipment": [
+              "PSU_MEDIA_HUB_1_08"
+            ],
+            "event_affiliation": "Association of Computer Scientists",
+            "event_details": "lorem ipsum",
+            "event_location": "PAC",
+            "event_name": "ACS General Assembly",
+            "idrequests": "2",
+            "request_end": "02-16-2024",
+            "request_start": "02-16-2024",
+            "request_status": "2",
+            "requester_affiliation": "Association of Computer Scientists",
+            "requester_full_name": "Vince Borgy E Espina",
+            "requester_gmail": "202180167@psu.palawan.edu.ph",
+            "requester_phone_number": "09070123473",
+            "requester_status": "ALLOWED",
+            "service": ""
+          },
+          {
+            "_id": "65e00342dde1224cad62353c",
+            "equipment": [
+              "PSU_MEDIA_HUB_1_17"
+            ],
+            "event_affiliation": "College of Sciences",
+            "event_details": "lorem ipsum",
+            "event_location": "Gymnasium",
+            "event_name": "Mr and Ms CS",
+            "idrequests": "3",
+            "request_end": "09-28-2023",
+            "request_start": "09-27-2023",
+            "request_status": "3",
+            "requester_affiliation": "Collge of Sciences CSG",
+            "requester_full_name": "Jason Maverick D Serencio",
+            "requester_gmail": "202180383@psu.palawan.edu.ph",
+            "requester_phone_number": "09070123473",
+            "requester_status": "HAS IR",
+            "service": ""
+          }
     ]
 }
