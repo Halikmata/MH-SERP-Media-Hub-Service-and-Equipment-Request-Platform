@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from pymongo import MongoClient
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 from bson.objectid import ObjectId
 # from pymongo.errors import ConnectionFailure
 
@@ -15,12 +16,10 @@ app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb+srv://elsidpanolino:ELSID62mdb@cluster0.xzw6t37.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 # app.config['SECRET_KEY'] = fake.bothify(text='??????#####') # not used yet.
 
-mongodb_client = MongoClient(app.config["MONGO_URI"])
+mongodb_client = MongoClient(app.config["MONGO_URI"], server_api=ServerApi('1'))
 db = mongodb_client['mh-serp'] 
 
 CORS(app)
-
-
 
 # ------------------------ Tara Tekken 7
 
@@ -78,7 +77,6 @@ def login():
         return jsonify({"token":f"{response}"}), 200 # returns the token if account is in accounts collection.
     else:
         return jsonify({"message":"Wrong Credentials."}),401"""
-    
 
 @app.route('/<collection>', methods=['GET'])
 def index(collection):
@@ -88,37 +86,24 @@ def index(collection):
         collection = db[collection]
     
     # URL inputs.
-    page = request.args.get('page', default=1)
-    column = request.args.get('field',default=None)
+    page = int(request.args.get('page', default=1))
+    column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
     
     
     if(int(page) < 1): # avoids negatives.
         page = 1
     
-    offset = (int(page) - 1) * 20 # pagination, 20 is the row total limit
+    limit_rows = 2 # change total rows in a page here.
+    offset = (page - 1) * limit_rows
+    rows = collection.find().skip(offset).limit(limit_rows)
     
     if search != None and column != None:
-        rows = collection.aggregate([
-            {
-                "$match":{f"{column}": f"{search}"}
-            },
-            {
-                "$skip": offset
-            },
-            {
-                "$limit": page
-            }
-        ])
+        rows = collection.find({f"{column}": f"{search}"}).skip(offset).limit(limit_rows)
+        
     elif search == None and column == None:
-        rows = collection.aggregate([
-            {
-                "$skip": offset
-            },
-            {
-                "$limit": page
-            }
-        ])
+        rows = collection.find().skip(offset).limit(limit_rows)
+        
     else:
         return jsonify({'message: May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
     
@@ -126,7 +111,7 @@ def index(collection):
     
     for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
         x['_id'] = str(x['_id'])
-        
+
     return jsonify(rows_list), 200
 
 @app.route('/<collection>/add', methods=["POST"])
@@ -184,4 +169,4 @@ def delete_row(collection, id):
 
 if __name__ == "__main__":
     print_collections() # debugger
-    app.run(debug=True)
+    app.run(debug=True,host="127.0.0.1")
