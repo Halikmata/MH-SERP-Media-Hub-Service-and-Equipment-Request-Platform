@@ -7,7 +7,7 @@ def apply_foreign(rows_list, col_name):
         case "requests":
             return request_foreign(rows_list)
         case _:
-            return None # collection is already verified in this scenario, but if somehow lands here...
+            return rows_list # returns collections with no foreign keys
         
 
 def equipment_foreign(rows_list):
