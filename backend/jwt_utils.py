@@ -3,6 +3,9 @@ from flask import jsonify, request
 from functools import wraps # related to jwt
 from __init__ import app
 
+# checks if requests have a specific field for the token and if token is correct
+# so sessions must have tokens in every requests it gives to APIs
+# Privilege level access has yet to be implemented nor applied token feature to routes yet.
 def check_token(f):
     @wraps(f)
     def get_header_token(*args, **kwargs):

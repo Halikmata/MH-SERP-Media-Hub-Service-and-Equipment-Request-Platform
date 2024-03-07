@@ -1,35 +1,46 @@
 from flask import jsonify, request
 from bson.objectid import ObjectId
 # from pymongo.errors import ConnectionFailure
-from jwt import check_token
+from jwt_utils import check_token
+import jwt
 from __init__ import app, db
 from utils import verify_collection
 
 from foreign import apply_foreign
 
-acc = {'teststatic420@gmail.com':{'password':'648221'}} # temporary, will be connected to accounts table.
-"""@app.route("/login",methods=["POST"])
-def login():
-    
-    data = request.get_json()
+# doesn't have restrictions yet but login is partially prepared.
+
+# untested route but replicated from previous project.
+@app.route("/login",methods=["POST"]) 
+def login(): # will add gmail api, email sent verification, and jwt encode for password support soon.
+    data = request.get_json() # contains login credentials (email and password)
     
     if 'email' not in data or 'password' not in data:
-        return jsonify("Missing Email or Password"), 400
-
+        return jsonify({"message":"Missing Email or Password"}), 401
+    
     email = data['email']
     password = data['password']
     
-    if acc.get(email, None) is not None and acc[email]['password'] == password:
+    accounts = db['accounts'].find({"gmail":email, "password":password})
+    
+    if accounts.count == 0:
+        return jsonify({"message":"Wrong Email or Password"}), 401
+    
+    elif accounts.count == 1:
+        token = jwt.encode({'email': email}, app.config['SECRET_KEY'], algorithm='HS256') # encodes to check integrity
+        response = token.decode('UTF-8') # and then decodes it..
         
+        return jsonify({"message":f"{response}"}), 200
+    else:
         token = jwt.encode({'email': email}, app.config['SECRET_KEY'], algorithm='HS256')
-        
         response = token.decode('UTF-8')
         
-        return jsonify({"token":f"{response}"}), 200 # returns the token if account is in accounts collection.
-    else:
-        return jsonify({"message":"Wrong Credentials."}),401"""
+        print("more than 1 rows received, data redundancy detected.") # debugger for accounts collection row duplicates.
+        return jsonify({"message":f"{response}"}), 200
 
-@app.route('/<collection>', methods=['GET']) # do something about foreign keys!
+# the token received in login() should be temporarily stored in the session.
+
+@app.route('/<collection>', methods=['GET'])
 def index(collection):
     if not verify_collection(collection):
         return jsonify({"message": "Unknown URL"}), 404
@@ -65,7 +76,6 @@ def index(collection):
     for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
         x['_id'] = str(x['_id'])
         
-    # update foreign keys, test
     rows_list = apply_foreign(rows_list,col_name)
 
     return jsonify(rows_list), 200

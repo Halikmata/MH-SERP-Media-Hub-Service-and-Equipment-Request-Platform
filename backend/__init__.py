@@ -8,7 +8,7 @@ fake = Faker() # rechanges secret key every server restart
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb+srv://elsidpanolino:ELSID62mdb@cluster0.xzw6t37.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-app.config['SECRET_KEY'] = fake.bothify(text='??????#####') # not used yet.
+app.config['SECRET_KEY'] = fake.bothify(text='??????#####')
 
 mongodb_client = MongoClient(app.config["MONGO_URI"], server_api=ServerApi('1'))
 db = mongodb_client['mh-serp']
