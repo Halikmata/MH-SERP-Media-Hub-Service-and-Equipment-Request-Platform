@@ -4,10 +4,15 @@ import logo from '../images/logo.png';
 
 function Header() {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
+
+      if (window.innerWidth < 768) {
+        setMenuVisible(false);
+      }
     };
 
     handleResize();
@@ -19,30 +24,53 @@ function Header() {
     };
   }, []);
 
+  const toggleMenu = () => {
+    setMenuVisible(prevState => !prevState);
+  };
+
   return (
     <header style={headerStyle}>
-      <div style={{ display: 'flex', margin: '0 30px' }}>
-        <img src={logo} style={{ width: '50px' }} alt="Logo" />
-      </div>
+      {!menuVisible && (
+        <div style={{ display: 'flex', margin: '0 30px' }}>
+          <img src={logo} style={{ width: '50px' }} alt="Logo" />
+        </div>
+      )}
       {isSmallScreen ? (
-        <div>
-          <button style={linkStyle}>Menu</button>
+        <div style={{display:'flex',flexDirection:'column'}}>
+          <button onClick={toggleMenu}>Menu</button>
+          {menuVisible && (
+            <nav>
+              <ul style={{ display: 'flex', flexDirection: 'column', ...navStyle }} onClick={toggleMenu}>
+                <li><Link style={liStyle} to="/">Home</Link></li>
+                <li><Link style={liStyle} to="/requests">Requests</Link></li>
+                <li><Link style={liStyle} to="/equipment">Equipment</Link></li>
+                <li><Link style={liStyle} to="/services">Services</Link></li>
+                <li><Link style={liStyle} to="/about">About Us</Link></li>
+              </ul>
+            </nav>
+          )}
+          {menuVisible && (
+            <div onClick={toggleMenu}>
+              <a style={linkStyle}>Log in</a>
+              <a style={linkStyle}>Sign Up</a>
+            </div>
+          )}
         </div>
       ) : (
         <>
-        <nav>
-          <ul style={navStyle}>
-            <li><Link style={liStyle} to="/">Home</Link></li>
-            <li><Link style={liStyle} to="/requests">Requests</Link></li>
-            <li><Link style={liStyle} to="/equipment">Equipment</Link></li>
-            <li><Link style={liStyle} to="/services">Services</Link></li>
-            <li><Link style={liStyle} to="/about">About Us</Link></li>
-          </ul>
-        </nav>
-        <div>
-          <a style={linkStyle}>Log in</a>
-          <a style={linkStyle}>Sign Up</a>
-        </div>
+          <nav>
+            <ul style={navStyle}>
+              <li><Link style={liStyle} to="/">Home</Link></li>
+              <li><Link style={liStyle} to="/requests">Requests</Link></li>
+              <li><Link style={liStyle} to="/equipment">Equipment</Link></li>
+              <li><Link style={liStyle} to="/services">Services</Link></li>
+              <li><Link style={liStyle} to="/about">About Us</Link></li>
+            </ul>
+          </nav>
+          <div>
+            <a style={linkStyle}>Log in</a>
+            <a style={linkStyle}>Sign Up</a>
+          </div>
         </>
       )}
     </header>
@@ -54,6 +82,7 @@ const headerStyle = {
   justifyContent: 'space-between',
   alignItems: 'center',
   width: '100vw',
+  height:'fit-content',
   minHeight: '60px',
   textAlign: 'center',
   padding: '0',
