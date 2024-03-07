@@ -34,7 +34,9 @@ def index(collection):
     if not verify_collection(collection):
         return jsonify({"message": "Unknown URL"}), 404
     else:
+        col_name = collection
         collection = db[collection]
+        
     
     # URL inputs.
     page = int(request.args.get('page', default=1))
@@ -64,7 +66,7 @@ def index(collection):
         x['_id'] = str(x['_id'])
         
     # update foreign keys, test
-    rows_list = apply_foreign(rows_list,collection)
+    rows_list = apply_foreign(rows_list,col_name)
 
     return jsonify(rows_list), 200
 

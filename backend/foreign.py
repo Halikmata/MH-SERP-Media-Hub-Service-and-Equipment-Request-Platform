@@ -1,11 +1,11 @@
 from __init__ import db
 
-def apply_foreign(rows_list, collection):
-    match collection:        
+def apply_foreign(rows_list, col_name):
+    match col_name:
         case "equipment":
-            return equipment_foreign()
-        case "":
-            pass
+            return equipment_foreign(rows_list)
+        case "requests":
+            return request_foreign(rows_list)
         case _:
             return None # collection is already verified in this scenario, but if somehow lands here...
         
@@ -24,3 +24,5 @@ def equipment_foreign(rows_list):
         x['equipment_type'] = name       
     return rows_list
 
+def request_foreign(rows_list):
+    pass
