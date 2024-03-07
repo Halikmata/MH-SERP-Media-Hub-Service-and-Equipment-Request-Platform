@@ -30,7 +30,7 @@ const Equipment = () => {
             <th>Type</th>
             <th>Location</th>
             <th>Unit Cost</th>
-          </tr>
+          </tr> 
         </thead>
         <tbody>
           {equipment.map(item => (
