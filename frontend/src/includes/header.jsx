@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import logo from '../images/logo.png';
 
 function Header() {
@@ -36,21 +36,21 @@ function Header() {
         </div>
       )}
       {isSmallScreen ? (
-        <div style={{display:'flex',flexDirection:'column'}}>
+        <div style={{ display: 'flex', flexDirection: 'column', width: menuVisible ? '100%' : 'auto' }}>          
           <button onClick={toggleMenu}>Menu</button>
           {menuVisible && (
             <nav>
-              <ul style={{ display: 'flex', flexDirection: 'column', ...navStyle }} onClick={toggleMenu}>
-                <li><Link style={liStyle} to="/">Home</Link></li>
-                <li><Link style={liStyle} to="/requests">Requests</Link></li>
-                <li><Link style={liStyle} to="/equipment">Equipment</Link></li>
-                <li><Link style={liStyle} to="/services">Services</Link></li>
-                <li><Link style={liStyle} to="/about">About Us</Link></li>
+              <ul style={{ ...menuStyle, ...navStyle }} onClick={toggleMenu}>
+                <li style={menuItemStyle}><Link style={liStyle} to="/">Home</Link></li>
+                <li style={menuItemStyle}><Link style={liStyle} to="/requests">Requests</Link></li>
+                <li style={menuItemStyle}><Link style={liStyle} to="/equipment">Equipment</Link></li>
+                <li style={menuItemStyle}><Link style={liStyle} to="/services">Services</Link></li>
+                <li style={menuItemStyle}><Link style={liStyle} to="/about">About Us</Link></li>
               </ul>
             </nav>
           )}
           {menuVisible && (
-            <div onClick={toggleMenu}>
+            <div style={menuItemStyle} onClick={toggleMenu}>
               <a style={linkStyle}>Log in</a>
               <a style={linkStyle}>Sign Up</a>
             </div>
@@ -60,11 +60,11 @@ function Header() {
         <>
           <nav>
             <ul style={navStyle}>
-              <li><Link style={liStyle} to="/">Home</Link></li>
-              <li><Link style={liStyle} to="/requests">Requests</Link></li>
-              <li><Link style={liStyle} to="/equipment">Equipment</Link></li>
-              <li><Link style={liStyle} to="/services">Services</Link></li>
-              <li><Link style={liStyle} to="/about">About Us</Link></li>
+              <li><NavLink exact to="/" style={liStyle} activestyle={activeStyle}>Home</NavLink></li>
+              <li><NavLink to="/requests" style={liStyle} activestyle={activeStyle}>Requests</NavLink></li>
+              <li><NavLink to="/equipment" style={liStyle} activestyle={activeStyle}>Equipment</NavLink></li>
+              <li><NavLink to="/services" style={liStyle} activestyle={activeStyle}>Services</NavLink></li>
+              <li><NavLink to="/about" style={liStyle} activestyle={activeStyle}>About Us</NavLink></li>
             </ul>
           </nav>
           <div>
@@ -107,5 +107,24 @@ const linkStyle = {
   margin: '0 10px',
   color: '#000000',
 };
+
+const menuStyle = { 
+  display: 'flex',
+  flexDirection: 'column'
+}
+
+const menuItemStyle = { 
+  width: '100%',
+  height:'30px',
+  display:'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  border:'1px solid #22222222'
+}
+
+const activeStyle = {
+  backgroundColor: 'orange',
+  borderRadius:'10px'
+}
 
 export default Header;
