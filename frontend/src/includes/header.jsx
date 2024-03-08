@@ -51,8 +51,8 @@ function Header() {
           )}
           {menuVisible && (
             <div style={menuItemStyle} onClick={toggleMenu}>
-              <a style={linkStyle}>Log in</a>
-              <a style={linkStyle}>Sign Up</a>
+              <Link style={linkStyle} to="/login">Log in</Link>
+              <Link style={linkStyle} to="/signup">Sign Up</Link>
             </div>
           )}
         </div>
