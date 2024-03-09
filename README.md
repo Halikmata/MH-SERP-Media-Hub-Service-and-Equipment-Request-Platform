@@ -24,6 +24,8 @@ TO RUN install node JS:
 download nodeJS
 
 
+Go to frontend:
+# cd frontend
 
 install vite globally:
 # npm install -g vite
