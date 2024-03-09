@@ -5,6 +5,7 @@ import Header from './includes/header.jsx';
 import Home from './pages/home.jsx';
 import Equipment from './pages/equipment';
 import Requests from './pages/request.jsx';
+import Services from './pages/services.jsx';
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/equipment" element={<Equipment />} />
           <Route path="/requests" element={<Requests />} />
+          <Route path="/services" element={<Services />} />
         </Routes>
       </div>
     </Router>

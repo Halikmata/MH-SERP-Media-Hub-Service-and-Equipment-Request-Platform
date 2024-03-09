@@ -3,6 +3,8 @@ A compliance project to avoid the impending doom brought upon by my academic con
 
 Project Manager: Jason Maverick Serencio
 
+Graphics Designer: Emmanuel Juanich
+
 Developers:
   Full Stack: Elsid Rick Panolino
   
