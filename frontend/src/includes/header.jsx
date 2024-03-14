@@ -41,11 +41,11 @@ function Header() {
           {menuVisible && (
             <nav>
               <ul style={{ ...menuStyle, ...navStyle }} onClick={toggleMenu}>
-                <li style={menuItemStyle}><Link style={liStyle} to="/">Home</Link></li>
-                <li style={menuItemStyle}><Link style={liStyle} to="/requests">Requests</Link></li>
-                <li style={menuItemStyle}><Link style={liStyle} to="/equipment">Equipment</Link></li>
-                <li style={menuItemStyle}><Link style={liStyle} to="/services">Services</Link></li>
-                <li style={menuItemStyle}><Link style={liStyle} to="/about">About Us</Link></li>
+                <li style={menuItemStyle}><NavLink style={liStyle} to="/">Home</NavLink></li>
+                <li style={menuItemStyle}><NavLink style={liStyle} to="/requests">Requests</NavLink></li>
+                <li style={menuItemStyle}><NavLink style={liStyle} to="/equipment">Equipment</NavLink></li>
+                <li style={menuItemStyle}><NavLink style={liStyle} to="/services">Services</NavLink></li>
+                <li style={menuItemStyle}><NavLink style={liStyle} to="/about">About Us</NavLink></li>
               </ul>
             </nav>
           )}
@@ -60,11 +60,11 @@ function Header() {
         <>
           <nav>
             <ul style={navStyle}>
-              <li><NavLink exact to="/" style={liStyle} activestyle={activeStyle}>Home</NavLink></li>
-              <li><NavLink to="/requests" style={liStyle} activestyle={activeStyle}>Requests</NavLink></li>
-              <li><NavLink to="/equipment" style={liStyle} activestyle={activeStyle}>Equipment</NavLink></li>
-              <li><NavLink to="/services" style={liStyle} activestyle={activeStyle}>Services</NavLink></li>
-              <li><NavLink to="/about" style={liStyle} activestyle={activeStyle}>About Us</NavLink></li>
+              <li><NavLink exact to="/" style={liStyle} activeStyle={activeStyle}>Home</NavLink></li>
+              <li><NavLink to="/requests" style={liStyle} activeStyle={activeStyle}>Requests</NavLink></li>
+              <li><NavLink to="/equipment" style={liStyle} activeStyle={activeStyle}>Equipment</NavLink></li>
+              <li><NavLink to="/services" style={liStyle} activeStyle={activeStyle}>Services</NavLink></li>
+              <li><NavLink to="/about" style={liStyle} activeStyle={activeStyle}>About Us</NavLink></li>
             </ul>
           </nav>
           <div>
@@ -123,8 +123,7 @@ const menuItemStyle = {
 }
 
 const activeStyle = {
-  backgroundColor: 'orange',
-  borderRadius:'10px'
+  fontWeight:'bold'
 }
 
 export default Header;
