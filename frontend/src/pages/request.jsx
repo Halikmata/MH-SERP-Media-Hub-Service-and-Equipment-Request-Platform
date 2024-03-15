@@ -35,33 +35,13 @@ const Requests = () => {
 
   return (
     <div>
-      <h2>Requests List</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Event</th>
-            <th>Requester</th>
-            <th>Event Affiliation</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Status</th>
-            <th>Equipment</th>
-          </tr>
-        </thead>
-        <tbody>
-          {requests.map(item => (
-            <tr key={item.id} rowspan={item.equipment.count}>
-              <td>{item.event_name}</td>
-              <td>{item.requester_affiliation}</td>
-              <td>{item.event_affiliation}</td>
-              <td>{item.request_start}</td>
-              <td>{item.request_end}</td>
-              <td>{item.request_status}</td>
-              <td>{item.equipment}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <h2>Request Details</h2>
+      <form>
+        <label for="organization">Organization</label>
+        <input type='text' name='organization' />
+        <label for="event">Event</label>
+        <input type='text' name='event' />
+      </form>
       <br /><br />
       <h2>Equipment List</h2>
       <table>
