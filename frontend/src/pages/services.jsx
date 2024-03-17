@@ -8,7 +8,7 @@ const Services = () => {
   var backend_api = 'http://127.0.0.1:5000/services'
 
   useEffect(() => {
-    axios.get(backend_api)
+    axios.get(fake_api)
       .then(response => {
         setServices(response.data);
       })

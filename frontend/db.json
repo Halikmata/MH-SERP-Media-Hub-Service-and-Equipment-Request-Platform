@@ -9,7 +9,8 @@
             "idequipment": "PSU_MEDIA_HUB_1_01",
             "image": "",
             "model": "AG-UX90",
-            "unit_cost": "144,900.00"
+            "unit_cost": "144,900.00",
+            "avaiability":1
           },
           {
             "_id": "65e06530b7506a0d8fcc10de",
@@ -288,5 +289,43 @@
             "requester_status": "HAS IR",
             "service": ""
           }
-    ]
+    ],
+    "services":[ 
+          {
+            "_id": "65e06530b7506a0d8fcc10dd111111",
+            "idsevice": "4",
+            "name": "Live_Streaming"
+            
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10dd222222",
+            "idsevice": "2",
+            "name": "Video_Coverage"
+            
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10dd333333",
+            "idsevice": "3",
+            "name": "Same_Day_Edit"
+            
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10dd4444444",
+            "idsevice": "1",
+            "name": "Photo_Coverage"
+            
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10dd5555555",
+            "idsevice": "5",
+            "name": "Voice/Music_Recording_in_Music_Studio"
+            
+          },
+          {
+            "_id": "65e06530b7506a0d8fcc10dd666666",
+            "idsevice": "6",
+            "name": "Photoshoot_in_Studio"
+            
+          }
+      ]
 }
