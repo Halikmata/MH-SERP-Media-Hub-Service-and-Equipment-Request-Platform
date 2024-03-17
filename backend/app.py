@@ -139,3 +139,29 @@ def delete_row(collection, id):
         return jsonify({"message": "Deleted successfully", "id": id}), 201
     else:
         return jsonify({"message": "No row found with the given ID"}), 404
+        return jsonify({"message": "No row found with the given ID"}), 404
+
+
+@app.route('/equipment/available', methods=['GET'])
+def get_available():
+    try:
+        equipment_collection = db['equipment']
+        
+        available_items_cursor = equipment_collection.find({'availability': '1'})
+        
+        available_items = []
+        for item in available_items_cursor:
+            item['_id'] = str(item['_id'])
+            available_items.append(item)
+
+        if not available_items:
+            return jsonify({"message": "No available items found"}), 404
+
+        return jsonify(available_items)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+if __name__ == "__main__":
+    #print_collections()
+    app.run(debug=True,host="127.0.0.1")
