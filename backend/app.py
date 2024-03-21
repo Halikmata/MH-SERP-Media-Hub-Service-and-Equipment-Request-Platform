@@ -139,7 +139,6 @@ def delete_row(collection, id):
         return jsonify({"message": "Deleted successfully", "id": id}), 201
     else:
         return jsonify({"message": "No row found with the given ID"}), 404
-        return jsonify({"message": "No row found with the given ID"}), 404
 
 
 @app.route('/equipment/available', methods=['GET'])
