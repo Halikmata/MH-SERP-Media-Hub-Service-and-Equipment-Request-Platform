@@ -162,6 +162,6 @@ def get_available():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-if __name__ == "__main__":
+""" if __name__ == "__main__":
     #print_collections()
-    app.run(debug=True,host="127.0.0.1")
+    app.run(debug=True,host="127.0.0.1") """
