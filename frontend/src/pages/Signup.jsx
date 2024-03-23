@@ -24,6 +24,7 @@ function Signup() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({
+      
       ...prevData,
       [name]: value
     }));
@@ -50,7 +51,7 @@ function Signup() {
         <select name="userType" value={formData.userType} onChange={handleInputChange}>
           <option value="Student">Student</option>
           <option value="Faculty">Faculty</option>
-          <option value="Staff">Staff</option>
+          <option value="Staff">Staff</option>  
         </select>
         {formData.userType === 'Student' && (
           <>
