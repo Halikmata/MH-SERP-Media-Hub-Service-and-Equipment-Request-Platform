@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './request.css';
 
 const Equipment = () => {
   const [equipment, setEquipment] = useState([]);
 
-  var fake_api = 'http://127.0.0.1:3001/equipment'
-  var backend_api = 'http://127.0.0.1:5000/equipment'
+  const fakeUrl = 'http://127.0.0.1:3001';
+  const backendUrl = 'http://127.0.0.1:5000';
+  const url = backendUrl;
 
   useEffect(() => {
-    axios.get(backend_api)
+    axios.get(url + '/equipment')
       .then(response => {
         setEquipment(response.data);
       })
@@ -17,35 +19,30 @@ const Equipment = () => {
       });
   }, []);
 
+
   return (
     <div>
-      <h2>Equipment List</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Brand</th>
-            <th>Model</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Location</th>
-            <th>Unit Cost</th>
-          </tr>
-        </thead>
-        <tbody>
-          {equipment.map(item => (
-            <tr key={item.id}>
-              <td>{item.idequipment}</td>
-              <td>{item.brand}</td>
-              <td>{item.model}</td>
-              <td>{item.description}</td>
-              <td>{item.equipment_type}</td>
-              <td>{item.equipment_location}</td>
-              <td>{item.unit_cost}</td>
+        <h2>Equipment List</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Brand</th>
+              <th>Model</th>
+              <th>Type</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {equipment.map(item => (
+              <tr key={item._id}>
+                <td>{item.idequipment}</td>
+                <td>{item.brand}</td>
+                <td>{item.model}</td>
+                <td>{item.equipment_type}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
     </div>
   );
 };
