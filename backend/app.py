@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from bson.objectid import ObjectId
 # from pymongo.errors import ConnectionFailure
-from jwt_utils import check_token
+
 import jwt
 from __init__ import app, db
 from utils import verify_collection
@@ -30,14 +30,25 @@ def login():
     
     if len(accounts) == 0:
         return jsonify({"message":"Wrong Email or Password"}), 401
-    elif len(accounts) == 1:
+    elif len(accounts) > 0:
+        
+        if len(accounts) > 1:
+            print("more than 1 rows received, data redundancy detected.") # debugger for accounts collection row duplicates.
+        
+        
         
         access_token = create_access_token(identity=accounts[0]['username'])
-        return jsonify(access_token=access_token), 200
+        
+        accounts[0]['Authorization'] = access_token
+        
+        for x in accounts: # turns ObjectID to str, to make it possible to jsonify.
+            x['_id'] = str(x['_id'])
+            
+        return jsonify(accounts), 200
         
     else:
 
-        print("more than 1 rows received, data redundancy detected.") # debugger for accounts collection row duplicates.
+        
         access_token = create_access_token(identity=accounts[0]['username'])
         return jsonify(access_token=access_token), 200
 
