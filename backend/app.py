@@ -139,7 +139,6 @@ def delete_row(collection, id):
         return jsonify({"message": "Deleted successfully", "id": id}), 201
     else:
         return jsonify({"message": "No row found with the given ID"}), 404
-        return jsonify({"message": "No row found with the given ID"}), 404
 
 
 @app.route('/equipment/available', methods=['GET'])
@@ -162,6 +161,6 @@ def get_available():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-if __name__ == "__main__":
+""" if __name__ == "__main__":
     #print_collections()
-    app.run(debug=True,host="127.0.0.1")
+    app.run(debug=True,host="127.0.0.1") """
