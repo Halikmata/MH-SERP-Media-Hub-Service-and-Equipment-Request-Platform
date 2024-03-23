@@ -36,7 +36,7 @@ def equipment_foreign(rows_list):
 
 def requests_foreign(rows_list):
     request_status = db['request_status']
-    
+    print(rows_list)
     # not working due to instances having different keys. Check Mongodb request collection for details
     """ for x in rows_list:
         row = request_status.find({f"statusID":x['request_status']})
