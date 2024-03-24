@@ -1,2 +1,4 @@
 README.md
 backend/env
+backend/__pycache__
+.gitignore

@@ -60,11 +60,11 @@ function Header() {
         <>
           <nav>
             <ul style={navStyle}>
-              <li><NavLink exact to="/" style={liStyle} activeStyle={activeStyle}>Home</NavLink></li>
-              <li><NavLink to="/requests" style={liStyle} activeStyle={activeStyle}>Requests</NavLink></li>
-              <li><NavLink to="/equipment" style={liStyle} activeStyle={activeStyle}>Equipment</NavLink></li>
-              <li><NavLink to="/services" style={liStyle} activeStyle={activeStyle}>Services</NavLink></li>
-              <li><NavLink to="/about" style={liStyle} activeStyle={activeStyle}>About Us</NavLink></li>
+              <li><NavLink to="/" style={liStyle}>Home</NavLink></li>
+              <li><NavLink to="/requests" style={liStyle}>Requests</NavLink></li>
+              <li><NavLink to="/equipment" style={liStyle}>Equipment</NavLink></li>
+              <li><NavLink to="/services" style={liStyle}>Services</NavLink></li>
+              <li><NavLink to="/about" style={liStyle}>About Us</NavLink></li>
             </ul>
           </nav>
           {!isSmallScreen && (
@@ -121,12 +121,6 @@ const menuItemStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  border: '1px solid #22222222'
-};
-
-const activeStyle = {
-  backgroundColor: 'orange',
-  borderRadius: '10px'
-};
-
+  border:'1px solid #22222222'
+}
 export default Header;

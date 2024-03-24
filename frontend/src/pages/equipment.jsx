@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './request.css';
 
 const Equipment = () => {
   const [equipment, setEquipment] = useState([]);
 
-  var fake_api = 'http://127.0.0.1:3001/equipment'
-  var backend_api = 'http://127.0.0.1:5000/equipment'
+  const fakeUrl = 'http://127.0.0.1:3001';
+  const backendUrl = 'http://127.0.0.1:5000';
+  const url = fakeUrl;
 
   useEffect(() => {
-    axios.get(fake_api)
+    axios.get(url + '/equipment')
       .then(response => {
         setEquipment(response.data);
       })
@@ -16,6 +18,7 @@ const Equipment = () => {
         console.error(error);
       });
   }, []);
+
 
   return (
     <div>

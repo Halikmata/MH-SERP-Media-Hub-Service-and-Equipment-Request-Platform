@@ -9,7 +9,8 @@
             "idequipment": "PSU_MEDIA_HUB_1_01",
             "image": "",
             "model": "AG-UX90",
-            "unit_cost": "144,900.00"
+            "unit_cost": "144,900.00",
+            "avaiability":1
           },
           {
             "_id": "65e06530b7506a0d8fcc10de",
