@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css'; //react-bootstrap
 
 import Header from './includes/header.jsx';
 import Home from './pages/home.jsx';
