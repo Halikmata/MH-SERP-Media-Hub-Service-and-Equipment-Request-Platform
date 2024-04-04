@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './request.css';
 
-const Requests = () => {
+const Requests = ({url}) => {
   const [requests, setRequest] = useState([]);
   const [equipment, setEquipment] = useState([]);
   const [selectedEquipment, setSelectedEquipment] = useState([]);
@@ -10,10 +10,6 @@ const Requests = () => {
     organization: '',
     event: '',
   });
-
-  const fakeUrl = 'http://127.0.0.1:3001';
-  const backendUrl = 'http://127.0.0.1:5000';
-  const url = backendUrl;
 
   useEffect(() => {
     axios.get(url + '/requests')

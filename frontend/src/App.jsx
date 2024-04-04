@@ -12,15 +12,19 @@ function App() {
   const location = useLocation();
   const isAdminPage = location.pathname === '/admin';
 
+  const fakeUrl = 'http://127.0.0.1:3001';
+  const backendUrl = 'http://127.0.0.1:5000';
+  const url = backendUrl;
+
   return (
     <div>
       {!isAdminPage && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/equipment" element={<Equipment />} />
-        <Route path="/requests" element={<Requests />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/equipment" element={<Equipment url={url} />} />
+        <Route path="/requests" element={<Requests url={url} />} />
+        <Route path="/services" element={<Services url={url} />} />
+        <Route path="/admin" element={<Admin url={url} />} />
       </Routes>
     </div>
   );

@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Services = () => {
+const Services = ({url}) => {
   const [services, setServices] = useState([]);
 
-  var fake_api = 'http://127.0.0.1:3001/services'
-  var backend_api = 'http://127.0.0.1:5000/services'
-
   useEffect(() => {
-    axios.get(fake_api)
+    axios.get(url + 'services')
       .then(response => {
         setServices(response.data);
       })

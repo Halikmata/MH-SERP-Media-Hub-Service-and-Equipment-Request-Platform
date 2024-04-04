@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
-function AdminTable({ collection, not_include = [] }) {
+function AdminTable({ url, collection, not_include = [] }) {
   not_include.push("_id")
   const [data, setData] = useState([]);
+  const [id, setId] = useState(null); // State to hold the ID of the item to be updated
 
   useEffect(() => {
     // Fetch data based on collection
     fetchData();
   }, [collection]);
-
-  const fakeUrl = 'http://127.0.0.1:3001';
-  const backendUrl = 'http://127.0.0.1:5000';
-  const url = backendUrl;
 
   const fetchData = () => {
     // Fetch data from API
@@ -26,7 +23,7 @@ function AdminTable({ collection, not_include = [] }) {
   };
 
   const handleUpdate = (id) => {
-    // Handle update functionality
+
   };
 
   const handleDelete = (id) => {
@@ -63,10 +60,12 @@ function AdminTable({ collection, not_include = [] }) {
           {data.map(item => (
             <tr key={item.id}>
               {getFields().map(field => (
-                <td key={field}>{item[field]}</td>
+                <td key={field}>
+                  {item[field]}
+                </td>
               ))}
               <td>
-                <button onClick={() => handleUpdate(item.id)}>Update</button>
+                <button onClick={() => handleUpdate(item.id)}>Edit</button>
                 <button onClick={() => handleDelete(item.id)}>Delete</button>
               </td>
             </tr>

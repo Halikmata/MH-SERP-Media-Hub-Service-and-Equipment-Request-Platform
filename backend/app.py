@@ -55,7 +55,7 @@ def login():
 # the token received in login() should be temporarily stored in the session.
 
 @app.route('/<collection>', methods=['GET'])
-@jwt_required()
+# @jwt_required()
 def index(collection):
     if not verify_collection(collection):
         return jsonify({"message": "Unknown URL"}), 404
@@ -157,7 +157,7 @@ def delete_row(collection, id):
 
 
 @app.route('/equipment/available', methods=['GET'])
-@jwt_required()
+# @jwt_required()
 def get_available():
     try:
         equipment_collection = db['equipment']
