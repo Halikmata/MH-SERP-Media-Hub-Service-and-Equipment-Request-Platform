@@ -15,6 +15,10 @@ function App() {
   const location = useLocation();
   const isAdminPage = location.pathname === '/admin';
 
+  const fakeUrl = 'http://127.0.0.1:3001';
+  const backendUrl = 'http://127.0.0.1:5000';
+  const url = backendUrl;
+
   return (
     <div>
       {!isAdminPage && <Header />}

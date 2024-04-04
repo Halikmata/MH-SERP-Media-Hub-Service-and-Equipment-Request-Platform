@@ -3,14 +3,14 @@ import axios from 'axios';
 
 import AdminTable from './component/AdminTable';
 
-const Admin = () => {
+const Admin = ({url}) => {
 
   return (
     <div>
       <h1>Admin</h1>
-      <AdminTable collection={"equipment"} not_include={["description"]}></AdminTable>
-      <AdminTable collection={"services"} not_include={["idservice"]}></AdminTable>
-      <AdminTable collection={"requests"}></AdminTable>
+      <AdminTable url={url} collection={"equipment"} not_include={["description"]}></AdminTable>
+      <AdminTable url={url} collection={"services"} not_include={["idservice"]}></AdminTable>
+      <AdminTable url={url} collection={"requests"}></AdminTable>
     </div>
   );
 };

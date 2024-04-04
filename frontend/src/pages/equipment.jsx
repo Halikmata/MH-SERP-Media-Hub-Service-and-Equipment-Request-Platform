@@ -2,12 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './request.css';
 
-const Equipment = () => {
+const Equipment = ({url}) => {
   const [equipment, setEquipment] = useState([]);
-
-  const fakeUrl = 'http://127.0.0.1:3001';
-  const backendUrl = 'http://127.0.0.1:5000';
-  const url = fakeUrl;
 
   useEffect(() => {
     axios.get(url + '/equipment')
