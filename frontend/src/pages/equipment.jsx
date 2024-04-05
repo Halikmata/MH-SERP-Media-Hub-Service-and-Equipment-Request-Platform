@@ -18,27 +18,33 @@ const Equipment = ({url}) => {
 
   return (
     <div>
-        <h2>Equipment List</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Brand</th>
-              <th>Model</th>
-              <th>Type</th>
+      <h2>Equipment List</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Unit Cost</th>
+          </tr> 
+        </thead>
+        <tbody>
+          {equipment.map(item => (
+            <tr key={item.id}>
+              <td>{item.idequipment}</td>
+              <td>{item.brand}</td>
+              <td>{item.model}</td>
+              <td>{item.description}</td>
+              <td>{item.equipment_type}</td>
+              <td>{item.equipment_location}</td>
+              <td>{item.unit_cost}</td>
             </tr>
-          </thead>
-          <tbody>
-            {equipment.map(item => (
-              <tr key={item._id}>
-                <td>{item.idequipment}</td>
-                <td>{item.brand}</td>
-                <td>{item.model}</td>
-                <td>{item.equipment_type}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

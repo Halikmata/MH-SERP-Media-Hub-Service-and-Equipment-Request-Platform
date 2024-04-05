@@ -36,7 +36,7 @@ function Header() {
         </div>
       )}
       {isSmallScreen ? (
-        <div style={{ display: 'flex', flexDirection: 'column', width: menuVisible ? '100%' : 'auto' }}>          
+        <div style={{ display: 'flex', flexDirection: 'column', width: menuVisible ? '100%' : 'auto' }}>
           <button onClick={toggleMenu}>Menu</button>
           {menuVisible && (
             <nav>
@@ -51,8 +51,8 @@ function Header() {
           )}
           {menuVisible && (
             <div style={menuItemStyle} onClick={toggleMenu}>
-              <Link style={linkStyle} to="/login">Log in</Link>
-              <Link style={linkStyle} to="/signup">Sign Up</Link>
+              <Link to="/signup" style={linkStyle}>Sign Up</Link>
+              <Link to="/login" style={linkStyle}>Log in</Link>
             </div>
           )}
         </div>
@@ -67,10 +67,12 @@ function Header() {
               <li><NavLink to="/about" style={liStyle}>About Us</NavLink></li>
             </ul>
           </nav>
-          <div>
-            <a style={linkStyle}>Log in</a>
-            <a style={linkStyle}>Sign Up</a>
-          </div>
+          {!isSmallScreen && (
+            <div>
+              <Link to="/signup" style={linkStyle}>Sign Up</Link>
+              <Link to="/login" style={linkStyle}>Log in</Link>
+            </div>
+          )}
         </>
       )}
     </header>
@@ -82,7 +84,7 @@ const headerStyle = {
   justifyContent: 'space-between',
   alignItems: 'center',
   width: '100vw',
-  height:'fit-content',
+  height: 'fit-content',
   minHeight: '60px',
   textAlign: 'center',
   padding: '0',
@@ -108,15 +110,15 @@ const linkStyle = {
   color: '#000000',
 };
 
-const menuStyle = { 
+const menuStyle = {
   display: 'flex',
   flexDirection: 'column'
-}
+};
 
-const menuItemStyle = { 
+const menuItemStyle = {
   width: '100%',
-  height:'30px',
-  display:'flex',
+  height: '30px',
+  display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   border:'1px solid #22222222'
