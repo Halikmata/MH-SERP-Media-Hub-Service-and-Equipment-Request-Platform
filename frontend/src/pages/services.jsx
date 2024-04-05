@@ -5,7 +5,7 @@ const Services = ({url}) => {
   const [services, setServices] = useState([]);
 
   useEffect(() => {
-    axios.get(url + 'services')
+    axios.get(url + '/services')
       .then(response => {
         setServices(response.data);
       })
