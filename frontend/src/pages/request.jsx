@@ -9,6 +9,8 @@ const Requests = ({url}) => {
   const [formData, setFormData] = useState({
     organization: '',
     event: '',
+    start_date: '',
+    end_date: '',
   });
 
   useEffect(() => {
@@ -75,7 +77,17 @@ const Requests = ({url}) => {
         <input type='text' name='organization' value={formData.organization} onChange={handleChange} /><br />
         <label htmlFor="event">Event</label>
         <input type='text' name='event' value={formData.event} onChange={handleChange} />
-        <br /><br />
+        <br />
+        <label htmlFor="location">Location</label>
+        <input type='text' name='location' value={formData.event} onChange={handleChange} />
+        <br />
+        <label htmlFor="start_date">Start Date</label>
+        <input type='date' name='start_date' value={formData.start_date} onChange={handleChange} />
+        <br />
+        <label htmlFor="end_date">End Date</label>
+        <input type='date' name='end_date' value={formData.event} onChange={handleChange} />
+        <br />
+        <br />
         <h2>Equipment List</h2>
         <table>
           <thead>
@@ -84,7 +96,7 @@ const Requests = ({url}) => {
               <th>Brand</th>
               <th>Model</th>
               <th>Type</th>
-              <th>Quantity</th>
+              <th>Request</th>
             </tr>
           </thead>
           <tbody>
