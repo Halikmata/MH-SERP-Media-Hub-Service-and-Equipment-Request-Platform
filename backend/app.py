@@ -15,6 +15,31 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.get_json() # register credentials
+    
+    # data['_id'] = str(data['_id']) # string id to object
+    
+    # credential conditions are tied in front end (e.g last name must have not have special characters) because back end will not check it. 
+    
+    # check if email exists already
+    
+    email = data['email']
+    
+    account = db['accounts'].find({"gmail":email})
+    account = list(account)
+    
+    if len(account) == 0: # means that there is no account existing for that email yet.
+        data = data.pop('_id', 'unknown_id') # doesn't include id, unknown if id not exist
+        
+        create_account = db['accounts'].insert_one(data)
+        return jsonify({'message':'Account created!'}), 201
+    else:
+        return jsonify({'message':'Account already exists!!'}), 400 # 400 as status code?
+    
+    # hash the password. and dehash it, will implement soon.
+
 @app.route("/login",methods=["POST"]) 
 def login():
     data = request.get_json() # contains login credentials (email and password keys)
@@ -68,6 +93,23 @@ def index(collection):
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
     # sort = request.args.get('sort', default=None)
+    id = request.args.get('id',default=None) # ID specification
+    
+    if id != None and len(id) != 0: # the objectid
+        id = ObjectId(id)
+        row = collection.find({'_id':id})
+        row = list(row)
+        if len(row) == 1:
+            rows_list = list(row)
+    
+            for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
+                x['_id'] = str(x['_id'])
+            
+            rows_list = apply_foreign(rows_list,col_name)
+
+            return jsonify(rows_list), 200
+        else:
+            return jsonify({'message':'instance not found'}),400
     
     if(int(page) < 1): # avoids negatives.
         page = 1
@@ -104,6 +146,7 @@ def add_row(collection):
     
     if request.method == "POST":
         json_input = request.get_json()
+        json_input = json_input.pop('_id')
         result = collection.insert_one(json_input)
         return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
     else:
