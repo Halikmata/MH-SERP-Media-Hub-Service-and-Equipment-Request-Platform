@@ -11,6 +11,7 @@
     "start-json-server": "json-server --watch db.json --port 3001"
   },
   "dependencies": {
+    "@tanstack/react-table": "^8.15.3",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.3",
     "json-server": "^1.0.0-alpha.23",
