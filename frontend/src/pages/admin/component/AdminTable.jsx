@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-const AdminTable = ({ url, collection, children }) => {
+const AdminTable = ({ url, collection, columns, children }) => {
   const [data, setData] = useState([]);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
+  const location = useLocation();
 
   useEffect(() => {
     fetchData();
@@ -16,18 +17,6 @@ const AdminTable = ({ url, collection, children }) => {
       .then(response => response.json())
       .then(data => setData(data))
       .catch(error => console.error('Error fetching data:', error));
-  };
-
-  const handleCreate = () => {
-    // Handle create functionality
-  };
-
-  const handleUpdate = id => {
-    // handle Edit
-  };
-
-  const handleDelete = id => {
-    // Handle delete functionality
   };
 
   const handleSort = field => {
@@ -57,15 +46,15 @@ const AdminTable = ({ url, collection, children }) => {
       <table>
         <thead>
           <tr>
-            {React.Children.map(children, child => (
+            {columns.map(({ field, label }) => (
               <th
-                key={child.props.field}
-                onClick={() => handleSort(child.props.field)}
+                key={field}
+                onClick={() => handleSort(field)}
                 style={{ cursor: "pointer" }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span>{child}</span>
-                  {sortBy === child.props.field && (
+                  <span>{label}</span>
+                  {sortBy === field && (
                     <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
                   )}
                 </div>
@@ -77,14 +66,14 @@ const AdminTable = ({ url, collection, children }) => {
         <tbody>
           {sortedData.map(item => (
             <tr key={item._id}>
-              {React.Children.map(children, child => (
-                <td key={child.props.field}>
-                  {item[child.props.field]}
+              {columns.map(({ field }) => (
+                <td key={field}>
+                  {item[field]}
                 </td>
               ))}
               <td>
                 <Link to={`${location.pathname}/edit/${item._id}`}>Edit</Link>
-                <Link to={`${location.pathname}/delete/${item._id}`}>delete</Link>
+                <Link to={`${location.pathname}/delete/${item._id}`}>Delete</Link>
               </td>
             </tr>
           ))}

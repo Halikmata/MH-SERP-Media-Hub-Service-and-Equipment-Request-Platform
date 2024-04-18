@@ -1,55 +1,75 @@
+// admin.jsx
 import React from 'react';
+import { Routes, Route} from 'react-router-dom';
 import AdminTable from './component/AdminTable';
 import AdminHeader from './component/AdminHeader';
-import Column from './component/Column';
-import EditItemPage from './edit';
+import AddItem from './add'; // Import AddItem component
 
 const Admin = ({ url }) => {
   const pathname = window.location.pathname;
 
   const isAdminPage = pathname.startsWith('/admin');
 
-  // Determine which collection is being accessed based on the URL path
-  let collection;
-  if (pathname.startsWith('/admin/equipment')) {
-    collection = "equipment";
-  } else if (pathname.startsWith('/admin/services')) {
-    collection = "services";
-  } else if (pathname.startsWith('/admin/requests')) {
-    collection = "requests";
-  }
+  const collectionMap = {
+    '/admin/equipment': {
+      collection: "equipment",
+      columns: [
+        { field: 'brand', label: 'Brand' },
+        { field: 'model', label: 'Model' },
+        { field: 'equipment_type', label: 'Type' },
+        { field: 'availability', label: 'Availability' },
+        { field: 'unit_cost', label: 'Cost' }
+      ]
+    },
+    '/admin/services': {
+      collection: "services",
+      columns: [
+        { field: 'idservice', label: 'ID' },
+        { field: 'name', label: 'Name' }
+      ]
+    },
+    '/admin/requests': {
+      collection: "requests",
+      columns: [
+        { field: 'idrequests', label: 'ID' },
+        { field: 'event_name', label: 'Name' },
+        { field: 'requester_full_name', label: 'Requester' },
+        { field: 'event_affiliation', label: 'Organization' },
+        { field: 'request_start', label: 'Start' },
+        { field: 'request_end', label: 'End' },
+        { field: 'event_location', label: 'Location' },
+        { field: 'requester_status', label: 'Status' }
+      ]
+    },
+    '/admin/users': {
+      collection: "accounts",
+      columns: [
+        { field: 'last_name', label: 'Lastname' },
+        { field: 'first_name', label: 'Firstname' },
+        { field: 'gmail', label: 'email' }
+      ]
+    },
+    '/admin/organization': {
+      collection: "organization",
+      columns: [
+        { field: 'acronym', label: 'Acronym' },
+        { field: 'name', label: 'Name' },
+      ]
+    },
+  };
+
+  const { collection, columns } = collectionMap[pathname] || {};
 
   return (
     <div>
       {isAdminPage && <AdminHeader />}
       {pathname === '/admin' && <h1>Dashboard</h1>}
-      {collection === "equipment" && (
-        <AdminTable url={url} collection={"equipment"}>
-          <Column field="brand">Brand</Column>
-          <Column field="model">Model</Column>
-          <Column field="equipment_type">Type</Column>
-          <Column field="availability">Availability</Column>
-          <Column field="unit_cost">Cost</Column>
-        </AdminTable>
+      {collection && (
+        <AdminTable url={url} collection={collection} columns={columns} />
       )}
-      {collection === "services" && (
-        <AdminTable url={url} collection={"services"}>
-          <Column field="idservice">ID</Column>
-          <Column field="name">Name</Column>
-        </AdminTable>
-      )}
-      {collection === "requests" && (
-        <AdminTable url={url} collection={"requests"}>
-          <Column field="idrequests">ID</Column>
-          <Column field="event_name">Name</Column>
-          <Column field="requester_full_name">Requester</Column>
-          <Column field="event_affiliation">Organization</Column>
-          <Column field="request_start">Start</Column>
-          <Column field="request_end">End</Column>
-          <Column field="event_location">Location</Column>
-          <Column field="requester_status">Status</Column>
-        </AdminTable>
-      )}
+      <Routes>
+        <Route path="/:collection/add" element={<AddItem url={url+"/admin/"} />} />
+      </Routes>
     </div>
   );
 };
