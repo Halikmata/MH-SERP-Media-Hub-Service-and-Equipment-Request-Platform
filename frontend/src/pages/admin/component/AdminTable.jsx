@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const AdminTable = ({ url, collection, children }) => {
   const [data, setData] = useState([]);
@@ -21,7 +23,7 @@ const AdminTable = ({ url, collection, children }) => {
   };
 
   const handleUpdate = id => {
-    // Handle update functionality
+    // handle Edit
   };
 
   const handleDelete = id => {
@@ -51,7 +53,7 @@ const AdminTable = ({ url, collection, children }) => {
   return (
     <div>
       <h2>{collection}</h2>
-      <button onClick={handleCreate}>Create</button>
+      <Link to={`${location.pathname}/add`}>Add</Link>
       <table>
         <thead>
           <tr>
@@ -74,15 +76,15 @@ const AdminTable = ({ url, collection, children }) => {
         </thead>
         <tbody>
           {sortedData.map(item => (
-            <tr key={item.id}>
+            <tr key={item._id}>
               {React.Children.map(children, child => (
                 <td key={child.props.field}>
                   {item[child.props.field]}
                 </td>
               ))}
               <td>
-                <button onClick={() => handleUpdate(item.id)}>Edit</button>
-                <button onClick={() => handleDelete(item.id)}>Delete</button>
+                <Link to={`${location.pathname}/edit/${item._id}`}>Edit</Link>
+                <Link to={`${location.pathname}/delete/${item._id}`}>delete</Link>
               </td>
             </tr>
           ))}
