@@ -1,5 +1,6 @@
 from flask import jsonify, request
 from bson.objectid import ObjectId
+from bson.decimal128 import Decimal128
 # from pymongo.errors import ConnectionFailure
 
 import jwt

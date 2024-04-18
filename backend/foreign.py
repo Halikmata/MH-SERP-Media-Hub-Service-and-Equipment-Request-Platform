@@ -32,6 +32,10 @@ def equipment_foreign(rows_list):
         except:
             name = None
         x['availability'] = name
+    
+    for x in rows_list: # decimal128 -> str
+        x['unit_cost'] = str(x['unit_cost'])
+        
     return rows_list
 
 def requests_foreign(rows_list):
