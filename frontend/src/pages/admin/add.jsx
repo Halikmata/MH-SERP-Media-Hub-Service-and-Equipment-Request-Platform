@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom'; // Import useParams hook
-import types from './types.json';
+import { useNavigate, useParams } from 'react-router-dom';
+import { types } from './types.js';
 
-const AddItem = ({ url }) => {
+const EditItem = ({ url }) => {
     const { collection } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({});
 
     const renderInput = (field, fieldConfig) => {
-        const fieldType = Object.keys(fieldConfig)[0];
-        const fieldValue = fieldConfig[fieldType];
+        const fieldType = fieldConfig["data_type"];
+        const fieldValue = fieldConfig["option"];
 
         switch (fieldType) {
             case 'text':
@@ -41,6 +41,17 @@ const AddItem = ({ url }) => {
                         ))}
                     </>
                 );
+            case 'foreign_xor':
+                return (
+                    <select name={field} onChange={handleChange}>
+                        <option value="">Select...</option>
+                        {fieldValue.map((option) => (
+                            <option key={option._id.$oid} value={option.fk_id}>
+                                {`${option.name}`}
+                            </option>
+                        ))}
+                    </select>
+                );
             default:
                 return null;
         }
@@ -57,15 +68,14 @@ const AddItem = ({ url }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // const Data = JSON.stringify(formData)
         axios.post(`${url}${collection}/add`, formData)
-        .then((response) => {
-            console.log('Item added successfully:', response.data);
-            navigate(`/admin/${collection}`);
-        })
-        .catch((error) => {
-            console.error('Error adding item:', error);
-        });
+            .then((response) => {
+                console.log('Item added successfully:', response.data);
+                navigate(`/admin/${collection}`);
+            })
+            .catch((error) => {
+                console.error('Error adding item:', error);
+            });
     };
 
     const renderForm = () => {
@@ -74,21 +84,21 @@ const AddItem = ({ url }) => {
             <form onSubmit={handleSubmit}>
                 {Object.entries(collectionTypes).map(([field, config]) => (
                     <div key={field}>
-                        <label>{field}</label>
+                        <label>{config["label"]}: </label>
                         {renderInput(field, config)}
                     </div>
                 ))}
-                <button type="submit">Add</button>
+                <button type="submit">Submit</button>
             </form>
         );
     };
 
     return (
         <div>
-            <h2>Add New {collection}</h2>
+            <h2>Edit {collection}</h2>
             {renderForm()}
         </div>
     );
 };
 
-export default AddItem;
+export default EditItem;

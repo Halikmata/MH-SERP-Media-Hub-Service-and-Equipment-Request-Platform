@@ -41,7 +41,7 @@ const Admin = ({ url }) => {
         { field: 'requester_status', label: 'Status' }
       ]
     },
-    '/admin/users': {
+    '/admin/accounts': {
       collection: "accounts",
       columns: [
         { field: 'last_name', label: 'Lastname' },
@@ -56,12 +56,19 @@ const Admin = ({ url }) => {
         { field: 'name', label: 'Name' },
       ]
     },
+    '/admin/college_office': {
+      collection: "college_office",
+      columns: [
+        { field: 'fk_idcollegeoffice', label: 'ID' },
+        { field: 'name', label: 'Name' },
+      ]
+    },
   };
 
   const { collection, columns } = collectionMap[pathname] || {};
 
   return (
-    <div>
+    <div >
       {isAdminPage && <AdminHeader />}
       {pathname === '/admin' && <h1>Dashboard</h1>}
       {collection && (

@@ -1,35 +1,105 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom'; // Import useParams hook
+import types from './types.js';
 
-const EditItemPage = ({ url, collection }) => {
-  const { id } = useParams();
-  const [item, setItem] = useState(null);
+const EditItem = ({ url }) => {
+  const { collection } = useParams();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({});
 
-  useEffect(() => {
-    // Fetch item data based on the ID from the URL
-    fetch(`${url}/${collection}/${id}`)
-      .then(response => response.json())
-      .then(data => setItem(data))
-      .catch(error => console.error('Error fetching item:', error));
-  }, [id, url]);
+  const renderInput = (field, fieldConfig) => {
+    const fieldType = fieldConfig["data_type"];
+    const fieldValue = fieldConfig[fieldType];
 
-  // Handle form submission for updating the item
-  const handleSubmit = (e) => {
-    // Implement your update logic here
+    switch (fieldType) {
+      case 'text':
+        return <input type="text" name={field} onChange={handleChange} />;
+      case 'date':
+        return <input type="date" name={field} onChange={handleChange} />;
+      case 'number':
+        return <input type="number" name={field} onChange={handleChange} />;
+      case 'xor':
+        return (
+          <select name={field} onChange={handleChange}>
+            <option value="">Select...</option>
+            {fieldValue.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        );
+      case 'or':
+        return (
+          <>
+            {fieldValue.map((option) => (
+              <div key={option}>
+                <input type="checkbox" name={field} value={option} onChange={handleCheckboxChange} />
+                <label>{option}</label>
+              </div>
+            ))}
+          </>
+        );
+        case 'foreign_xor':
+          return (
+              <select name={field} onChange={handleChange}>
+                  <option value="">Select...</option>
+                  {fieldValue.map((option) => (
+                      <option key={option._id.$oid} value={option.fk_id}>
+                          {`fk_${option.fk_id}: ${option.name}`}
+                      </option>
+                  ))}
+              </select>
+          );
+      default:
+        return null;
+    }
   };
 
-  if (!item) {
-    return <div>Loading...</div>;
-  }
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Placeholder function for handling checkbox changes
+  const handleCheckboxChange = (e) => {
+    // Placeholder function
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // const Data = JSON.stringify(formData)
+    axios.post(`${url}${collection}/add`, formData)
+      .then((response) => {
+        console.log('Item added successfully:', response.data);
+        navigate(`/admin/${collection}`);
+      })
+      .catch((error) => {
+        console.error('Error adding item:', error);
+      });
+  };
+
+  const renderForm = () => {
+    const collectionTypes = types[collection] || {};
+    return (
+      <form onSubmit={handleSubmit}>
+        {Object.entries(collectionTypes).map(([field, config]) => (
+          <div key={field}>
+            <label>{config["label"]}</label>
+            {renderInput(field, config)}
+          </div>
+        ))}
+        <button type="submit">Submit</button>
+      </form>
+    );
+  };
 
   return (
     <div>
-      <h2>Edit Item</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Render form fields for editing item */}
-      </form>
+      <h2>Add New {collection}</h2>
+      {renderForm()}
     </div>
   );
 };
 
-export default EditItemPage;
+export default EditItem;
