@@ -13,8 +13,8 @@ import Login from './pages/Login.jsx';
 
 function App() {
   const location = useLocation();
-  const isAdminPage = location.pathname === '/admin';
-
+  const isAdminPage = location.pathname.startsWith('/admin');
+  
   const fakeUrl = 'http://127.0.0.1:3001';
   const backendUrl = 'http://127.0.0.1:5000';
   const url = backendUrl;
@@ -29,7 +29,7 @@ function App() {
         <Route path="/services" element={<Services url={url}/>} />
         <Route path="/signup" element={<Signup url={url} />} />
         <Route path="/login" element={<Login url={url} />} />
-        <Route path="/admin" element={<Admin url={url} />} />
+        <Route path="/admin/*" element={<Admin url={url} />} />
       </Routes>
     </div>
   );

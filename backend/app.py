@@ -154,6 +154,25 @@ def add_row(collection):
         
         pass
         # will add GET request for acquiring choose-able options
+        
+@app.route('/admin/<collection>/add', methods=["GET","POST"])
+#@jwt_required()
+def admin_add_row(collection):   
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        collection = db[collection]
+    
+    if request.method == "POST":
+        json_input = request.get_json()
+        # json_input = json_input.pop('_id')
+        result = collection.insert_one(json_input)
+        return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
+    else:
+        
+        pass
+        # will add GET request for acquiring choose-able options
+
     
 
 @app.route('/<collection>/update/<id>', methods=['GET','POST']) # not yet tested -------------------------------------------------------------------- 
