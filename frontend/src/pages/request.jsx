@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Button, Table } from 'react-bootstrap';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Requests = ({ url }) => {
   const [requests, setRequest] = useState([]);
@@ -10,8 +12,8 @@ const Requests = ({ url }) => {
     organization: '',
     event: '',
     location: '',
-    start_date: '',
-    end_date: '',
+    start_date: null,
+    end_date: null,
   });
 
   useEffect(() => {
@@ -65,7 +67,7 @@ const Requests = ({ url }) => {
     axios.post(`${url}/requests/add`, requestData)
       .then(response => {
         console.log('Request created successfully:', response.data);
-        setFormData({ organization: '', event: '', location: '', start_date: '', end_date: '' });
+        setFormData({ organization: '', event: '', location: '', start_date: null, end_date: null });
         setSelectedEquipment([]);
       })
       .catch(error => {
@@ -77,26 +79,39 @@ const Requests = ({ url }) => {
     <div className="container mt-5">
       <h2 className="mb-4" style={{ color: '#FF5733' }}>Request Details</h2>
       <Form onSubmit={handleSubmit}>
+
+        {/* Organization */}
         <Form.Group className="mb-3" controlId="organization">
           <Form.Label>Organization</Form.Label>
           <Form.Control type="text" name="organization" value={formData.organization} onChange={handleChange} required />
         </Form.Group>
+
+        {/* Event */}
         <Form.Group className="mb-3" controlId="event">
           <Form.Label>Event</Form.Label>
           <Form.Control type="text" name="event" value={formData.event} onChange={handleChange} required />
         </Form.Group>
+
+        {/* Location */}
         <Form.Group className="mb-3" controlId="location">
           <Form.Label>Location</Form.Label>
           <Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
         </Form.Group>
+
+        {/* Start Date */}
         <Form.Group className="mb-3" controlId="start_date">
           <Form.Label>Start Date</Form.Label>
-          <Form.Control type="date" name="start_date" value={formData.start_date} onChange={handleChange} required />
+          <br />
+          <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
         </Form.Group>
+
+        {/* End Date */}
         <Form.Group className="mb-3" controlId="end_date">
           <Form.Label>End Date</Form.Label>
-          <Form.Control type="date" name="end_date" value={formData.end_date} onChange={handleChange} required />
+          <br />
+          <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
         </Form.Group>
+
         <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Equipment List</h2>
         <Table striped bordered hover>
           <thead>
@@ -129,7 +144,10 @@ const Requests = ({ url }) => {
             ))}
           </tbody>
         </Table>
-        <Button variant="primary" type="submit" className="custom-submit-btn">Submit</Button>
+
+        {/* Submit Button */}
+        <Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
+
       </Form>
     </div>
   );

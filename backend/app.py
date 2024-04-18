@@ -147,7 +147,7 @@ def add_row(collection):
     
     if request.method == "POST":
         json_input = request.get_json()
-        json_input = json_input.pop('_id')
+        # json_input = json_input.pop('_id')
         result = collection.insert_one(json_input)
         return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
     else:
