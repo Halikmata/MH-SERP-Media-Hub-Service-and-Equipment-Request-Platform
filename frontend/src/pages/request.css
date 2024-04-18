@@ -1,8 +1,9 @@
-table tr td{
-    border: 1px solid black;
-    padding: 5px;
+.custom-submit-btn {
+  background-color: #FF5733;
+  border-color: #FF5733;
 }
 
-table{
-    border-collapse: collapse;
+.custom-submit-btn:hover {
+  background-color: #E54E29;
+  border-color: #E54E29;
 }
