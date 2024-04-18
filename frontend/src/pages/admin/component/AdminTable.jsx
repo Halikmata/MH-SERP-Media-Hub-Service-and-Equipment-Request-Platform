@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
-function AdminTable({ url, collection, not_include = [] }) {
-  not_include.push("_id")
+const AdminTable = ({ url, collection, children }) => {
   const [data, setData] = useState([]);
-  const [id, setId] = useState(null); // State to hold the ID of the item to be updated
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
-    // Fetch data based on collection
     fetchData();
   }, [collection]);
 
   const fetchData = () => {
-    // Fetch data from API
     fetch(`${url}/${collection}`)
       .then(response => response.json())
       .then(data => setData(data))
@@ -22,26 +20,33 @@ function AdminTable({ url, collection, not_include = [] }) {
     // Handle create functionality
   };
 
-  const handleUpdate = (id) => {
-
+  const handleUpdate = id => {
+    // Handle update functionality
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = id => {
     // Handle delete functionality
   };
 
-  const getFields = () => {
-    // Get all unique fields from data
-    const fields = new Set();
-    data.forEach(item => {
-      Object.keys(item).forEach(key => {
-        if (!not_include.includes(key)) { // Check if the field is not in the not_include list
-          fields.add(key);
-        }
-      });
-    });
-    return Array.from(fields);
+  const handleSort = field => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
   };
+
+  const sortedData = [...data].sort((a, b) => {
+    if (sortBy && a[sortBy] && b[sortBy]) {
+      if (sortOrder === "asc") {
+        return a[sortBy].localeCompare(b[sortBy]);
+      } else {
+        return b[sortBy].localeCompare(a[sortBy]);
+      }
+    }
+    return 0;
+  });
 
   return (
     <div>
@@ -50,18 +55,29 @@ function AdminTable({ url, collection, not_include = [] }) {
       <table>
         <thead>
           <tr>
-            {getFields().map(field => (
-              <th key={field}>{field}</th>
+            {React.Children.map(children, child => (
+              <th
+                key={child.props.field}
+                onClick={() => handleSort(child.props.field)}
+                style={{ cursor: "pointer" }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>{child}</span>
+                  {sortBy === child.props.field && (
+                    <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
+                  )}
+                </div>
+              </th>
             ))}
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {data.map(item => (
+          {sortedData.map(item => (
             <tr key={item.id}>
-              {getFields().map(field => (
-                <td key={field}>
-                  {item[field]}
+              {React.Children.map(children, child => (
+                <td key={child.props.field}>
+                  {item[child.props.field]}
                 </td>
               ))}
               <td>
@@ -74,6 +90,6 @@ function AdminTable({ url, collection, not_include = [] }) {
       </table>
     </div>
   );
-}
+};
 
 export default AdminTable;
