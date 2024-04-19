@@ -160,47 +160,51 @@ const Requests = ({ url }) => {
           </Dropdown.Menu>
         </Dropdown>
         <br />
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Brand</th>
-              <th>Model</th>
-              <th>Type</th>
-              <th>Add</th>
-            </tr>
-          </thead>
-          <tbody>
-            {equipment.map(item => {
-              if (selectedTypes.includes(item.equipment_type)) {
-                const typeName = equipmentTypes.find(type => type.fk_idequipment_type === item.equipment_type)?.name;
-                return (
-                  <tr key={item._id}>
-                    <td>{item.idequipment}</td>
-                    <td>{item.brand}</td>
-                    <td>{item.model}</td>
-                    <td>{typeName}</td>
-                    <td>
-                      <Form.Check
-                        type="checkbox"
-                        id={item.idequipment}
-                        value={item.idequipment}
-                        label=""
-                        onChange={handleCheckboxChange}
-                        checked={selectedEquipment.includes(item.idequipment)}
-                      />
-                    </td>
-                  </tr>
-                );
-              } else {
-                return null;
-              }
-            })}
-          </tbody>
-        </Table>
+        <div className="table-responsive">
+          <Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Type</th>
+                <th>Add</th>
+              </tr>
+            </thead>
+            <tbody>
+              {equipment.map(item => {
+                if (selectedTypes.includes(item.equipment_type)) {
+                  const typeName = equipmentTypes.find(type => type.fk_idequipment_type === item.equipment_type)?.name;
+                  return (
+                    <tr key={item._id}>
+                      <td>{item.idequipment}</td>
+                      <td>{item.brand}</td>
+                      <td>{item.model}</td>
+                      <td>{typeName}</td>
+                      <td>
+                        <Form.Check
+                          type="checkbox"
+                          id={item.idequipment}
+                          value={item.idequipment}
+                          label=""
+                          onChange={handleCheckboxChange}
+                          checked={selectedEquipment.includes(item.idequipment)}
+                        />
+                      </td>
+                    </tr>
+                  );
+                } else {
+                  return null;
+                }
+              })}
+            </tbody>
+          </Table>
+        </div>
         <br />
         {/* Submit Button */}
-        <Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
+        <div className="text-center">
+          <Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
+        </div>
         <br /><br />
       </Form>
     </div>
