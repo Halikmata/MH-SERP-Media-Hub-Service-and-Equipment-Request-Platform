@@ -1,6 +1,7 @@
-from flask import jsonify, request
+from flask import jsonify, request, make_response
 from bson.objectid import ObjectId
 from bson.decimal128 import Decimal128
+from datetime import datetime, timedelta
 # from pymongo.errors import ConnectionFailure
 
 import jwt
@@ -15,6 +16,16 @@ from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
 )
+
+
+
+@app.route('/signout',methods=['POST'])
+def sign_out(): # sign out redirect to main page.
+    
+    response = make_response(jsonify({"message":"Logged out"}))
+    response.set_cookie('access_token', '', expires=datetime.now() - timedelta(days=1)) # cookie remover.
+    
+    return response
 
 @app.route("/register", methods=["POST"])
 def register():
