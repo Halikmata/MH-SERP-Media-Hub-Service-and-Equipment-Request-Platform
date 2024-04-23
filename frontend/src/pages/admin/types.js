@@ -112,5 +112,12 @@ export const types = {
             "data_type": "text",
             "label": "Accronym"
         }
+    },
+    
+    "college_office": {
+        "name": {
+            "data_type": "text",
+            "label": "Name"
+        }
     }
 }

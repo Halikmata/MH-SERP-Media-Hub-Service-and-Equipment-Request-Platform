@@ -1,6 +1,5 @@
-// admin.jsx
 import React from 'react';
-import { Routes, Route} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AdminTable from './component/AdminTable';
 import AdminHeader from './component/AdminHeader';
 import AddItem from './add'; // Import AddItem component
@@ -18,7 +17,7 @@ const Admin = ({ url }) => {
         { field: 'model', label: 'Model' },
         { field: 'equipment_type', label: 'Type' },
         { field: 'availability', label: 'Availability' },
-        { field: 'unit_cost', label: 'Cost' }
+        { field: 'unit_cost', label: 'Cost', cell: formatAmount }
       ]
     },
     '/admin/services': {
@@ -38,7 +37,12 @@ const Admin = ({ url }) => {
         { field: 'request_start', label: 'Start' },
         { field: 'request_end', label: 'End' },
         { field: 'event_location', label: 'Location' },
-        { field: 'requester_status', label: 'Status' }
+        {
+          field: 'requester_status',
+          label: 'Status',
+          cell: renderSelectCell,
+          options: ['approved', 'pending', 'declined']
+        }
       ]
     },
     '/admin/accounts': {
@@ -75,10 +79,28 @@ const Admin = ({ url }) => {
         <AdminTable url={url} collection={collection} columns={columns} />
       )}
       <Routes>
-        <Route path="/:collection/add" element={<AddItem url={url+"/admin/"} />} />
+        <Route path="/:collection/add" element={<AddItem url={url + "/admin/"} />} />
       </Routes>
     </div>
   );
 };
 
 export default Admin;
+
+
+const formatAmount = (value) => {
+  const formattedAmount = `${value} php`;
+  return formattedAmount;
+};
+
+
+
+const renderSelectCell = (value, options) => {
+  return (
+    <select value={value}>
+      {options.map((option, index) => (
+        <option key={index} value={option}>{option}</option>
+      ))}
+    </select>
+  );
+};

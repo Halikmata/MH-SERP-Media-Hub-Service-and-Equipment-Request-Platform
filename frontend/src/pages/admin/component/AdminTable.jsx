@@ -66,9 +66,9 @@ const AdminTable = ({ url, collection, columns, children }) => {
         <tbody>
           {sortedData.map(item => (
             <tr key={item._id}>
-              {columns.map(({ field }) => (
+              {columns.map(({ field, cell, options }) => (
                 <td key={field}>
-                  {item[field]}
+                  {cell ? cell(item[field], options) : item[field]}
                 </td>
               ))}
               <td>

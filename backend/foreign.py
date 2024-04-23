@@ -56,7 +56,7 @@ def requests_foreign(rows_list):
         
         name_list = list()
         for y in x['equipment']:       
-            element = equipment.find({'idequipment':y})
+            element = equipment.find({'fk_idequipment':y})
             try:
                 name = list(element)[0]['description']
             except:

@@ -133,7 +133,7 @@ def index(collection):
     for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
         x['_id'] = str(x['_id'])
         
-    rows_list = apply_foreign(rows_list,col_name)
+    # rows_list = apply_foreign(rows_list,col_name)
 
     return jsonify(rows_list), 200
 
@@ -299,7 +299,7 @@ def admin_report():
     """ for x in rows_list:
         x['_id'] = str(x['_id']) """
     
-    #rows_list = apply_foreign(rows_list,"requests")
+    # rows_list = apply_foreign(rows_list,"requests")
     
     return jsonify(rows_list), 200
     
