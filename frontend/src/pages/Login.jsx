@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+
+
 
 function Login() {
   const [formData, setFormData] = useState({
     username: '',
-    password: ''
+    password: '',
+    session_const: false
   });
 
   const [buttonColor, setButtonColor] = useState('orange'); // Initial button color
@@ -14,6 +18,14 @@ function Login() {
     setFormData(prevData => ({
       ...prevData,
       [name]: value
+    }));
+  };
+
+  const handleInputChangeSession = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -29,7 +41,18 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login (to be implemented in backend)
+    axios.post('http://localhost:5000/login', formData, {
+      headers: {
+        "Content-type":"application/json"
+      },
+      withCredentials: true
+    })
+    .then(response => {
+        console.log(response.data);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
     console.log(formData);
   };
 
@@ -46,6 +69,12 @@ function Login() {
                 </div>
                 <div className="mb-3">
                   <input type="password" name="password" className="form-control" placeholder="Password" value={formData.password} onChange={handleInputChange} required />
+                </div>
+                <div className="mb-3">
+                
+                  <input type="checkbox" name="session_const" checked={formData.session_const} onChange={handleInputChangeSession} />
+                  Remember me
+                
                 </div>
                 <div className="mb-3 d-grid">
                   <button 
