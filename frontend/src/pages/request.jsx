@@ -3,8 +3,10 @@ import axios from 'axios';
 import { Form, Button, Table, Dropdown } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useCookies } from 'react-cookie';
 
 const Requests = ({ url }) => {
+  const [cookies] = useCookies(['presence']);
   const [requests, setRequest] = useState([]);
   const [equipment, setEquipment] = useState([]);
   const [equipmentTypes, setEquipmentTypes] = useState([]);
@@ -18,14 +20,33 @@ const Requests = ({ url }) => {
     end_date: null,
   });
 
+  
   useEffect(() => {
-    axios.get(`${url}/requests`)
+    
+    axios.get(`${url}/requests`,{
+      headers: {
+        'Authorization': 'Bearer ' + cookies.presence
+      }
+    })
       .then(response => {
         setRequest(response.data);
       })
       .catch(error => {
-        console.error(error);
-      });
+        if (error.response) {
+           // The request was made and the server responded with a status code
+           // that falls out of the range of 2xx
+           console.error(error.response.data);
+           console.error(error.response.status);
+           console.error(error.response.headers);
+        } else if (error.request) {
+           // The request was made but no response was received
+           console.error(error.request);
+        } else {
+           // Something happened in setting up the request that triggered an Error
+           console.error('Error', error.message);
+        }
+        console.error(error.config);
+       });
   }, []);
 
   useEffect(() => {
