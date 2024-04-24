@@ -16,12 +16,34 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
-
+from functools import wraps
 
 # ---------- User approutes
 
+def check_token(f): # custom-made @jwt_required specifically for verifying presence and validating session.
+    @wraps(f)
+    def get_header_token(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        token = token.replace("Bearer ", "")
+        
+        if not token:
+            return make_response(jsonify({"msg": "No Session Found"}), 200)
+        
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            
+        except jwt.ExpiredSignatureError:
+            return make_response(jsonify({"msg": "Session expired"}), 200)
+        
+        except jwt.InvalidTokenError:
+            return make_response(jsonify({"msg": "Invalid session"}), 200)
+
+        return f(*args, **kwargs)
+
+    return get_header_token
+    
 @app.route('/verify_presence')
-@jwt_required
+@check_token
 def verify_presence():
     token = request.headers.get('Authorization')
     
@@ -29,12 +51,12 @@ def verify_presence():
     
     accounts = db['accounts'].find({"gmail": token['sub']})
     
-    if len(accounts) <= 0:
-        return make_response(jsonify({"msg": False}), 200)
-    else:
-        if len(accounts) > 0:
+    if len(accounts) >= 1:
+        if len(accounts) > 1:
             print("Redundancy Data detected.")
         return make_response(jsonify({"msg": True}), 200)
+    
+
     
     
     
@@ -87,7 +109,7 @@ def login():
     accounts = list(accounts)
     
     if len(accounts) <= 0:
-        return jsonify({"msg":"Wrong Username or Password"}), 401
+        return jsonify({"msg": False}), 401
     elif len(accounts) > 0: # if account exists
         
         for x in accounts:
@@ -98,7 +120,7 @@ def login():
         
         access_token = create_access_token(identity=accounts[0]['gmail'])
         
-        response = make_response(jsonify({"msg":"Log-in Success"}), 200)
+        response = make_response(jsonify({"msg":True}), 200)
         
         if bool(session_const) == True:
             expire_session = datetime.now() + timedelta(days=7)
