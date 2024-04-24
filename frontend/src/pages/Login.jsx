@@ -1,18 +1,53 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useCookies } from 'react-cookie';
 
 function Login() {
-
+    let navigate = useNavigate();
+    
+    
     const user_form_input = {
         username: '',
         password: '',
         session_const: false
     };
-
-    const [formData, setFormData] = useState(user_form_input)
-
+    const [formData, setFormData] = useState(user_form_input);
     const [buttonColor, setButtonColor] = useState('orange');
+    const [cookies, removeCookie] = useCookies(['presence']);
+
+    async function verify_presence(){ // cookie checker, if true, then direct back to homepage. facebook style.
+
+        if (cookies.presence === undefined){
+            return;
+        }
+
+        const url = 'http://localhost:5000/verify_presence'; // App route that checks if valid session is already existing.
+
+        const headers = {
+            "Content-type": "application/json",
+            "Authorization": "Bearer" + cookies.presence
+        };
+
+        const options = {
+            headers: headers,
+            withCredentials: true
+        };
+
+        try {
+            const response = await axios.get(url, options);
+            console.log(response.data);
+
+            if (response.data['msg'] === true){
+                navigate('/')
+            } else{
+                removeCookie('presence')
+            }
+        } catch (error) {
+            console.error("Error: ", error); // will remove log
+        }
+    }
+    useEffect(() => {verify_presence()},[]);
 
     function handleInputChangeSession(e){
         const { name, value, type, checked } = e.target;
@@ -65,10 +100,13 @@ function Login() {
         try {
             const response = await axios.post(url, formData, options);
             console.log(response.data);
+
+            if (response.data['msg'] === true){
+                navigate('/'); // goal: return to previous page, navigate(-1); uses browser window history feature, not recommended.
+            }
         } catch (error) {
             console.error("Error: ", error); // will remove log
         }
-        
     }
 
 
