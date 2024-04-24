@@ -20,10 +20,30 @@ from flask_jwt_extended import (
 
 # ---------- User approutes
 
+@app.route('/verify_presence')
+@jwt_required
+def verify_presence():
+    token = request.headers.get('Authorization')
+    
+    token = jwt.decode(token) # gmail is used as payload.
+    
+    accounts = db['accounts'].find({"gmail": token['sub']})
+    
+    if len(accounts) <= 0:
+        return make_response(jsonify({"msg": False}), 200)
+    else:
+        if len(accounts) > 0:
+            print("Redundancy Data detected.")
+        return make_response(jsonify({"msg": True}), 200)
+    
+    
+    
+    
+
 @app.route('/logout',methods=['GET'])
 def sign_out(): # sign out redirect to main page.
     
-    response = make_response(jsonify({"message":"Logged out"}))
+    response = make_response(jsonify({"msg":"Logged out"}))
     response.set_cookie('Authorization', '', expires=datetime.now() - timedelta(days=1)) # cookie remover.
     
     return response, 200
@@ -49,9 +69,9 @@ def register():
         data['password']
         
         create_account = db['accounts'].insert_one(data)
-        return jsonify({'message':'Account created!'}), 201
+        return jsonify({'msg':'Account created!'}), 201
     else:
-        return jsonify({'message':'Account already exists!!'}), 401 # 400 as status code?
+        return jsonify({'msg':'Account already exists!!'}), 401 # 400 as status code?
     
     # hash the password. and dehash it, will implement soon.
 
@@ -67,7 +87,7 @@ def login():
     accounts = list(accounts)
     
     if len(accounts) <= 0:
-        return jsonify({"message":"Wrong Username or Password"}), 401
+        return jsonify({"msg":"Wrong Username or Password"}), 401
     elif len(accounts) > 0: # if account exists
         
         for x in accounts:
@@ -78,8 +98,8 @@ def login():
         
         access_token = create_access_token(identity=accounts[0]['gmail'])
         
-        #response = make_response(jsonify(access_token=access_token,account_detail=accounts))
-        response = make_response(jsonify(access_token=access_token))
+        response = make_response(jsonify({"msg":"Log-in Success"}), 200)
+        
         if bool(session_const) == True:
             expire_session = datetime.now() + timedelta(days=7)
             
@@ -88,7 +108,7 @@ def login():
         else:
             response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost')
         
-        return response, 200 # this shouldn't send any important credentials at all.
+        return response # this shouldn't send any important credentials at all.
         
 
 @app.route('/testcookie', methods=['GET'])
@@ -102,7 +122,7 @@ def test():
 
 @app.route('/', methods=['GET'])
 def landing_page():
-    return jsonify({'message':'hello'}), 200 # output: related to "View Updates feature"
+    return jsonify({'msg':'hello'}), 200 # output: related to "View Updates feature"
 
 @app.route('/requests', methods=['GET'])
 @jwt_required() # react vite overcomes this security because it access "requests" in react localhost, not python flask jwt. --
@@ -116,7 +136,7 @@ def user_requests():
     """ data = request.get_json() # input: user's account email
     
     if data == None:
-        return jsonify({"message":"no json data found"}), 400 """
+        return jsonify({"msg":"no json data found"}), 400 """
     
     #id = data['_id']
     collection = db['requests']
@@ -157,7 +177,7 @@ def user_add_requests(): # twice a day only.
     data = request.get_json() # input: request collection attribute (including a new attribute that acts as foreign key <-- primary key from account's objectid)
     
     if data == None:
-        return jsonify({"message":"no form data found"}), 400
+        return jsonify({"msg":"no form data found"}), 400
     
     collection = db['requests']
     
@@ -167,16 +187,16 @@ def user_add_requests(): # twice a day only.
         
         result = collection.insert_one(json_input)
         
-        return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
+        return jsonify({"msg": "Row added successfully", "id": str(result.inserted_id)}), 201
     else:
         
         pass
-        #return jsonify({'message':'hello'}), 200
+        #return jsonify({'msg':'hello'}), 200
         # will add GET request for acquiring choose-able options
     
     # on-progress
         
-    return jsonify({'message':'hello'}), 200
+    return jsonify({'msg':'hello'}), 200
 
 @app.route('/requests/delete', methods=['POST'])
 # @jwt_required() # needs login because its an approute specifically for a user.
@@ -186,7 +206,7 @@ def user_delete_requests():
     collection = db['requests']
     
     if data == None:
-        return jsonify({"message":"no form data found"}), 400
+        return jsonify({"msg":"no form data found"}), 400
     
  
     collection = db['requests']
@@ -194,7 +214,7 @@ def user_delete_requests():
     query = {'_id': ObjectId(id), "{new attribute name}": "{new attribute name}"} # _id = specific request it
     result = collection.delete_one(query)
     
-    return jsonify({'message':'hello'}), 200
+    return jsonify({'msg':'hello'}), 200
 
 
 @app.route('/equipments', methods=['GET'])
@@ -229,7 +249,7 @@ def equipments():
 @app.route('/services', methods=['GET'])
 def services():
     
-    return jsonify({'message':'hello'}), 200
+    return jsonify({'msg':'hello'}), 200
 
 
 
@@ -238,7 +258,7 @@ def services():
 def apply_volunteer():
     
     
-    return jsonify({'message':'hello'}), 200
+    return jsonify({'msg':'hello'}), 200
 
 # ---------- User approutes
 
@@ -259,13 +279,13 @@ def admin_request_conclude():
     id = int(request.args.get('id', default=None))
 
     if id == None:
-        return jsonify({'message':'Bad request, no ID found!'}), 400
+        return jsonify({'msg':'Bad request, no ID found!'}), 400
 
     collection = db['requests']
     rows = collection.update_one({'_id':ObjectId(id)}, {'$set': '':json_input[]})
     
     
-    return jsonify({'message':'Request instance conluded'}), 201 """
+    return jsonify({'msg':'Request instance conluded'}), 201 """
 
 @app.route('/admin/report', methods=['GET'])
 def admin_report():
@@ -342,18 +362,18 @@ def admin_report():
 
 @app.route('/admin/register', methods=['POST'])
 def admin_register(): # needs other admin accounts' approval.
-    return jsonify({'message':'hello'}), 200
+    return jsonify({'msg':'hello'}), 200
 
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
-    return jsonify({'message':'hello'}), 200
+    return jsonify({'msg':'hello'}), 200
 
 
 @app.route('/admin/<collection>', methods=['GET'])
 # @jwt_required()
 def admin_main_page(collection):
     if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
+        return jsonify({"msg": "Unknown URL"}), 404
     else:
         col_name = collection
         collection = db[collection]
@@ -379,7 +399,7 @@ def admin_main_page(collection):
 
             return jsonify(rows_list), 200
         else:
-            return jsonify({'message':'instance not found'}), 400
+            return jsonify({'msg':'instance not found'}), 400
     
     if(int(page) < 1): # avoids negatives.
         page = 1
@@ -394,21 +414,21 @@ def admin_main_page(collection):
         rows = collection.find().skip(offset).limit(limit_rows)
         
     else:
-        return jsonify({'message': 'May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
+        return jsonify({'msg': 'May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
     
     rows_list = list(rows)
     
     for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
         x['_id'] = str(x['_id'])
         
-    rows_list = apply_foreign(rows_list,col_name)
+    #rows_list = apply_foreign(rows_list,col_name)
     return jsonify(rows_list), 200
 
 @app.route('/admin/<collection>/add', methods=["GET","POST"])
 # @jwt_required()
 def admin_add_row(collection):   
     if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
+        return jsonify({"msg": "Unknown URL"}), 404
     else:
         collection = db[collection]
     
@@ -416,7 +436,7 @@ def admin_add_row(collection):
         json_input = request.get_json()
         json_input = json_input.pop('_id')
         result = collection.insert_one(json_input)
-        return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
+        return jsonify({"msg": "Row added successfully", "id": str(result.inserted_id)}), 201
     else:
         
         pass
@@ -428,7 +448,7 @@ def admin_add_row(collection):
 def admin_update_row(collection, id):
     
     if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
+        return jsonify({"msg": "Unknown URL"}), 404
     else:
         collection = db[collection]
         
@@ -438,9 +458,9 @@ def admin_update_row(collection, id):
         result = collection.update_one({'_id':ObjectId(id)}, {'$set': json_input})
           
         if result.modified_count >  0:
-            return jsonify({"message": "Updated successfully", "id": id}), 201
+            return jsonify({"msg": "Updated successfully", "id": id}), 201
         else:
-            return jsonify({"message": "No row found with the given ID"}), 404
+            return jsonify({"msg": "No row found with the given ID"}), 404
         
     else:
 
@@ -455,16 +475,16 @@ def admin_update_row(collection, id):
 def admin_delete_row(collection, id):
     
     if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
+        return jsonify({"msg": "Unknown URL"}), 404
     else:
         collection = db[collection]
         
     result = collection.delete_one({'_id': ObjectId(id)})
     
     if result.deleted_count > 0:
-        return jsonify({"message": "Deleted successfully", "id": id}), 201
+        return jsonify({"msg": "Deleted successfully", "id": id}), 201
     else:
-        return jsonify({"message": "No row found with the given ID"}), 404
+        return jsonify({"msg": "No row found with the given ID"}), 404
 
 
 @app.route('/equipment/available', methods=['GET'])
@@ -481,7 +501,7 @@ def get_available():
             available_items.append(item)
 
         if not available_items:
-            return jsonify({"message": "No available items found"}), 404
+            return jsonify({"msg": "No available items found"}), 404
 
         return jsonify(available_items)
 
