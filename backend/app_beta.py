@@ -20,12 +20,12 @@ from functools import wraps
 
 # ---------- User approutes
 
-def check_token(f): # custom-made @jwt_required specifically for verifying presence and validating session.
+""" def check_token(f): # custom-made @jwt_required specifically for verifying presence and validating session.
     @wraps(f)
     def get_header_token(*args, **kwargs):
         token = request.headers.get('Authorization')
-        token = token.replace("Bearer ", "")
-        
+        token = token.replace("Bearer", "")
+        print(token)
         if not token:
             return make_response(jsonify({"msg": "No Session Found"}), 200)
         
@@ -36,25 +36,27 @@ def check_token(f): # custom-made @jwt_required specifically for verifying prese
             return make_response(jsonify({"msg": "Session expired"}), 200)
         
         except jwt.InvalidTokenError:
-            return make_response(jsonify({"msg": "Invalid session"}), 200)
+            return make_response(jsonify({"msg": "Invalid session"}), 200) # pops up every time, will fix.
 
         return f(*args, **kwargs)
 
-    return get_header_token
+    return get_header_token """
     
 @app.route('/verify_presence')
-@check_token
+@jwt_required()
 def verify_presence():
-    token = request.headers.get('Authorization')
+    identity = get_jwt_identity()
     
-    token = jwt.decode(token) # gmail is used as payload.
-    
-    accounts = db['accounts'].find({"gmail": token['sub']})
-    
+    accounts = db['accounts'].find({"gmail": identity})
+    accounts = list(accounts)
+    print(accounts)
+    print(identity)
     if len(accounts) >= 1:
         if len(accounts) > 1:
             print("Redundancy Data detected.")
         return make_response(jsonify({"msg": True}), 200)
+    
+
     
 
     
