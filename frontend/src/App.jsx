@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css'; //react-bootstrap
+
+
+import { useCookies } from 'react-cookie';
 
 import Header from './includes/header.jsx';
 import Home from './pages/home.jsx';
@@ -12,13 +15,15 @@ import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 
 function App(){
+    const [cookies, removeCookie] = useCookies(['presence']);
+    let navigate = useNavigate();
     const location = useLocation();
     const isAdminPage = location.pathname.startsWith('/admin');
 
     const fakeUrl = 'http://127.0.0.1:3001';
     const backendUrl = 'http://127.0.0.1:5000';
     const url = backendUrl;
-
+    
     return (
         <div>
             {!isAdminPage && <Header />}
