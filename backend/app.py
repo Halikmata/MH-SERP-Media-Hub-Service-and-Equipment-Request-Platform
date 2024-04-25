@@ -52,44 +52,40 @@ def register():
     
     # hash the password. and dehash it, will implement soon.
 
-@app.route("/login",methods=["POST"]) 
+@app.route("/login",methods=["POST"])
 def login():
-    data = request.get_json() # contains login credentials (email and password keys)
-    
-    if 'email' not in data or 'password' not in data:
-        return jsonify({"message":"Missing Email or Password"}), 401
-    
-    email = data['email']
-    password = data['password']
+    data = request.get_json()
 
-    accounts = db['accounts'].find({"gmail":email, "password":password})
+    username = data['username']
+    password = data['password']
+    session_const = data['session_const']
+    
+    accounts = db['accounts'].find({"username":username, "password":password})
     accounts = list(accounts)
     
-    if len(accounts) == 0:
-        return jsonify({"message":"Wrong Email or Password"}), 401
-    elif len(accounts) > 0:
+    if len(accounts) <= 0:
+        return jsonify({"msg": False}), 401
+    elif len(accounts) > 0: # if account exists
         
-        if len(accounts) > 1:
-            print("more than 1 rows received, data redundancy detected.") # debugger for accounts collection row duplicates.
-        
-        
-        
-        access_token = create_access_token(identity=accounts[0]['username'])
-        
-        accounts[0]['Authorization'] = access_token
-        
-        for x in accounts: # turns ObjectID to str, to make it possible to jsonify.
+        for x in accounts:
             x['_id'] = str(x['_id'])
             
-        return jsonify(accounts), 200
+        if len(accounts) > 1:
+            print("debug: more than 1 rows received, data redundancy detected.")
         
-    else:
-
+        access_token = create_access_token(identity=accounts[0]['gmail'], account_detail=accounts[0])
         
-        access_token = create_access_token(identity=accounts[0]['username'])
-        return jsonify(access_token=access_token), 200
-
-# the token received in login() should be temporarily stored in the session.
+        response = make_response(jsonify({"msg":True}), 200)
+        
+        if bool(session_const) == True:
+            expire_session = datetime.now() + timedelta(days=7)
+            
+            # change configs in https deployment
+            response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost', expires=expire_session) 
+        else:
+            response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost')
+        
+        return response # this shouldn't send any important credentials at all.
 
 @app.route('/<collection>', methods=['GET'])
 # @jwt_required()
