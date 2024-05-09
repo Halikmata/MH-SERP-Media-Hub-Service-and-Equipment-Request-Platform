@@ -4,7 +4,7 @@ import { Form, Button, Table, Dropdown } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useCookies } from 'react-cookie';
-import { verify_login } from '../../utils.js'
+//import { verify_login } from '../../utils.js'
 import { useNavigate } from 'react-router-dom';
 
 
@@ -28,6 +28,7 @@ function Requests({ url }){
 	end_date: null,
 	});
 
+
 	async function get_requests_table(){
 		const url_link = `${url}/requests`;
 
@@ -43,21 +44,21 @@ function Requests({ url }){
 
 		try {
             const response = await axios.get(url_link, options);
-            console.log(response.data);
-			return response.data
+            //console.log(response.data);
+			setRequest(response.data);
+
         } catch (error) {
-            console.error("Error: ", error); // will remove log
+            console.error("Error: ", error);
+			navigate('/login') // if session is invalid.
         }
 
 	}
 
 
 	useEffect(() => {
+		//verify_login(cookies,navigate);
 
-		verify_login(cookies,navigate);
-
-		
-		//const request_collection = get_requests_table();
+		get_requests_table();
 	},[]);
 
 	function handleChange(e){
@@ -175,15 +176,33 @@ function Requests({ url }){
 					<Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
 						<thead>
 							<tr>
-								<th></th>
-								<th></th>
-								<th></th>
-								<th></th>
-								<th></th>
+								<th>Status</th>{/* foreign value */}
+								<th>Event Affiliation</th>
+								<th>Event Location</th>
+								<th>Event Details</th>
+								<th>Request Start</th>
+								<th>Request End</th>
+								{/* <th>Equipments</th> */}
+								<th>Service</th>
+								<th>Organization</th>
+								<th>Event</th>
 							</tr>
 						</thead>
 						<tbody>
-
+							{requests.map(item => {
+								return (
+								<tr key={item._id || "N/A"}>
+									<td>{item.request_affiliation || "N/A"}</td>
+									<td>{item.event_location || "N/A"}</td>
+									<td>{item.event_details || "N/A"}</td>
+									<td>{item.request_start || "N/A"}</td>
+									<td>{item.request_end || "N/A"}</td>
+									<td>{item.service || "N/A"}</td>
+									<td>{item.organization || "N/A"}</td>
+									<td>{item.event || "N/A"}</td>
+								</tr>
+								);
+							})}
 						</tbody>
 					</Table>
 				</div>

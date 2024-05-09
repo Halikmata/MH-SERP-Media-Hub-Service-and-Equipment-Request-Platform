@@ -216,7 +216,7 @@ const Requests = ({ url }) => {
                           label=""
                           onChange={handleCheckboxChange}
                           checked={selectedEquipment.includes(item.idequipment)}
-                        />
+                        />1
                       </td>
                     </tr>
                   );
