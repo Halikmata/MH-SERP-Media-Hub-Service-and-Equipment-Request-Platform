@@ -63,9 +63,9 @@ export const types = {
             "data_type": "text",
             "label": "Location"
         },
-        "requester_status": {
+        "request_status": {
             "data_type": "xor",
-            "option": ["aproved", "not aproved", "pending"],
+            "option": ["pending", "approved", "declined"],
             "label": "Status"
         }
     },

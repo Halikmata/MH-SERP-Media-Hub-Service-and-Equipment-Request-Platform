@@ -14,10 +14,12 @@
     "@tanstack/react-table": "^8.15.3",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.3",
+    "cookie-js": "^0.0.1",
     "json-server": "^1.0.0-alpha.23",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.2",
     "react-datepicker": "^6.9.0",
+    "react-cookie": "^7.1.4",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3"
   },
@@ -29,6 +31,6 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
-    "vite": "^5.1.4"
+    "vite": "^5.2.9"
   }
 }

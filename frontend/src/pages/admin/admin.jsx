@@ -2,7 +2,13 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AdminTable from './component/AdminTable';
 import AdminHeader from './component/AdminHeader';
-import AddItem from './add'; // Import AddItem component
+import AddItem from './add';
+import EditItem from './edit';
+import Delete from './delete';
+import axios from 'axios';
+
+
+import renderSelectCell from './select';
 
 const Admin = ({ url }) => {
   const pathname = window.location.pathname;
@@ -38,10 +44,9 @@ const Admin = ({ url }) => {
         { field: 'request_end', label: 'End' },
         { field: 'event_location', label: 'Location' },
         {
-          field: 'requester_status',
+          field: 'request_status',
           label: 'Status',
-          cell: renderSelectCell,
-          options: ['approved', 'pending', 'declined']
+          cell: (option) => renderSelectCell(option, ['pending', 'approved', 'declined'], handleSelectChange)
         }
       ]
     },
@@ -80,6 +85,8 @@ const Admin = ({ url }) => {
       )}
       <Routes>
         <Route path="/:collection/add" element={<AddItem url={url + "/admin/"} />} />
+        <Route path="/:collection/update/:id" element={<EditItem url={url + "/admin/"} renderSelectCell={renderSelectCell} />} />
+        <Route path="/:collection/delete/:id" element={<Delete url={url + "/admin/"} />} />
       </Routes>
     </div>
   );
@@ -93,14 +100,7 @@ const formatAmount = (value) => {
   return formattedAmount;
 };
 
-
-
-const renderSelectCell = (value, options) => {
-  return (
-    <select value={value}>
-      {options.map((option, index) => (
-        <option key={index} value={option}>{option}</option>
-      ))}
-    </select>
-  );
+const handleSelectChange = (e) => {
+  const newValue = e.target.value;
+  handleChange(newValue);
 };

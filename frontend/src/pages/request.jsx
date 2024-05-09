@@ -3,8 +3,10 @@ import axios from 'axios';
 import { Form, Button, Table, Dropdown } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useCookies } from 'react-cookie';
 
 const Requests = ({ url }) => {
+  const [cookies] = useCookies(['presence']);
   const [requests, setRequest] = useState([]);
   const [equipment, setEquipment] = useState([]);
   const [equipmentTypes, setEquipmentTypes] = useState([]);
@@ -18,14 +20,33 @@ const Requests = ({ url }) => {
     end_date: null,
   });
 
+  
   useEffect(() => {
-    axios.get(`${url}/requests`)
+    
+    axios.get(`${url}/requests`,{
+      headers: {
+        'Authorization': 'Bearer ' + cookies.presence
+      }
+    })
       .then(response => {
         setRequest(response.data);
       })
       .catch(error => {
-        console.error(error);
-      });
+        if (error.response) {
+           // The request was made and the server responded with a status code
+           // that falls out of the range of 2xx
+           console.error(error.response.data);
+           console.error(error.response.status);
+           console.error(error.response.headers);
+        } else if (error.request) {
+           // The request was made but no response was received
+           console.error(error.request);
+        } else {
+           // Something happened in setting up the request that triggered an Error
+           console.error('Error', error.message);
+        }
+        console.error(error.config);
+       });
   }, []);
 
   useEffect(() => {
@@ -81,17 +102,17 @@ const Requests = ({ url }) => {
 
     const requestData = {
       organization: formData.organization,
-      event: formData.event,
-      location: formData.location,
-      start_date: formData.start_date,
-      end_date: formData.end_date,
+      event_name: formData.event,
+      event_location: formData.location,
+      request_start: formData.start_date,
+      request_end: formData.end_date,
       equipment: selectedEquipment
     };
 
     axios.post(`${url}/requests/add`, requestData)
       .then(response => {
         console.log('Request created successfully:', response.data);
-        setFormData({ organization: '', event: '', location: '', start_date: null, end_date: null });
+        setFormData({ organization: '', event_name: '', event_location: '', request_start: null, request_end: null });
         setSelectedEquipment([]);
       })
       .catch(error => {
@@ -111,7 +132,7 @@ const Requests = ({ url }) => {
         </Form.Group>
 
         {/* Event */}
-        <Form.Group className="mb-3" controlId="event">
+        <Form.Group className="mb-3" controlId="event_name">
           <Form.Label>Event</Form.Label>
           <Form.Control type="text" name="event" value={formData.event} onChange={handleChange} required />
         </Form.Group>

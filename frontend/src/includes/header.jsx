@@ -21,7 +21,8 @@ function Header() {
           </Nav>
           <Nav>
             <Nav.Link as={Link} to="/signup">Sign Up</Nav.Link>
-            <Nav.Link as={Link} to="/login">Log in</Nav.Link>
+            <Nav.Link as={Link} to="/login">Log in</Nav.Link> {/* should disappear if logged in, and log out must pop up, vice versa */}
+            <Nav.Link as={Link} to="/logout">Log out</Nav.Link> {/* non-functional. please trigger /logout app route to remove cookie/session */}
           </Nav>
         </Navbar.Collapse>
       </Navbar>

@@ -1,6 +1,7 @@
-from flask import jsonify, request
+from flask import jsonify, request, make_response
 from bson.objectid import ObjectId
 from bson.decimal128 import Decimal128
+from datetime import datetime, timedelta
 # from pymongo.errors import ConnectionFailure
 
 import jwt
@@ -15,6 +16,16 @@ from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
 )
+
+
+
+@app.route('/signout',methods=['POST'])
+def sign_out(): # sign out redirect to main page.
+    
+    response = make_response(jsonify({"message":"Logged out"}))
+    response.set_cookie('access_token', '', expires=datetime.now() - timedelta(days=1)) # cookie remover.
+    
+    return response
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -302,8 +313,54 @@ def admin_report():
     # rows_list = apply_foreign(rows_list,"requests")
     
     return jsonify(rows_list), 200
-    
 
+
+@app.route('/admin/<collection>/update/<id>', methods=['GET', 'PUT'])
+def admin_update_row(collection, id):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        collection = db[collection]
+        
+    if request.method == "PUT":
+            json_input = request.get_json()
+            
+            json_input.pop('_id', None)
+            
+            result = collection.update_one({'_id': ObjectId(id)}, {'$set': json_input})
+            
+            if result.modified_count > 0:
+                return jsonify({"message": "Updated successfully", "id": id}), 201
+            else:
+                return jsonify({"message": "No row found with the given ID"}), 404
+            
+    else:
+        result = collection.find_one({'_id': ObjectId(id)})
+        
+        if result:
+            result['_id'] = str(result['_id'])  # Convert ObjectId to string
+            return jsonify(result), 200
+        else:
+            return jsonify({"message": "No row found with the given ID"}), 404
+
+
+
+@app.route('/admin/<collection>/delete/<id>', methods=['DELETE'])
+# @jwt_required()
+def admin_delete_row(collection, id):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    
+    collection = db[collection]
+    
+    result = collection.delete_one({'_id': ObjectId(id)})
+    
+    if result.deleted_count > 0:
+        return jsonify({"message": "Deleted successfully", "id": id}), 201
+    else:
+        return jsonify({"message": "No row found with the given ID"}), 404
+    
+    
 # add account profile to request GET and request ADD
 
 # separate app route for login/register --

@@ -1,8 +1,9 @@
 # this py file is an overhaul version that is yet to be finished due to discovering new concerns arising.
 
-from flask import jsonify, request
+from flask import jsonify, request, make_response
 from bson.objectid import ObjectId
 from bson.decimal128 import Decimal128
+from datetime import datetime, timedelta
 
 import jwt
 from __init__ import app, db
@@ -15,9 +16,17 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
-import bcrypt # for encoding and decrypting passwords and other important credentials.
+
 
 # ---------- User approutes
+
+@app.route('/logout',methods=['GET'])
+def sign_out(): # sign out redirect to main page.
+    
+    response = make_response(jsonify({"message":"Logged out"}))
+    response.set_cookie('Authorization', '', expires=datetime.now() - timedelta(days=1)) # cookie remover.
+    
+    return response, 200
 
 @app.route("/register", methods=["POST"]) # beta version
 def register():
@@ -42,59 +51,74 @@ def register():
         create_account = db['accounts'].insert_one(data)
         return jsonify({'message':'Account created!'}), 201
     else:
-        return jsonify({'message':'Account already exists!!'}), 400 # 400 as status code?
+        return jsonify({'message':'Account already exists!!'}), 401 # 400 as status code?
     
     # hash the password. and dehash it, will implement soon.
 
-@app.route("/login",methods=["POST"])  
+@app.route("/login",methods=["POST"])
 def login():
-    data = request.get_json() # contains login credentials (email and password keys)
-    
-    if 'email' not in data or 'password' not in data:
-        return jsonify({"message":"Missing Email or Password"}), 401
-    
-    email = data['email']
-    password = data['password']
+    data = request.get_json()
 
-    accounts = db['accounts'].find({"gmail":email, "password":password})
+    username = data['username']
+    password = data['password']
+    session_const = data['session_const']
+    
+    accounts = db['accounts'].find({"username":username, "password":password})
     accounts = list(accounts)
     
-    if len(accounts) == 0:
-        return jsonify({"message":"Wrong Email or Password"}), 401
-    elif len(accounts) > 0:
+    if len(accounts) <= 0:
+        return jsonify({"message":"Wrong Username or Password"}), 401
+    elif len(accounts) > 0: # if account exists
         
-        if len(accounts) > 1:
-            print("more than 1 rows received, data redundancy detected.") # debugger for accounts collection row duplicates.
-        
-        access_token = create_access_token(identity=accounts[0]['username']) # so token differs from other people because it depends on the username.
-        
-        accounts[0]['Authorization'] = access_token
-        
-        for x in accounts: # turns ObjectID to str, to make it possible to jsonify.
+        for x in accounts:
             x['_id'] = str(x['_id'])
             
-        return jsonify(accounts), 200
+        if len(accounts) > 1:
+            print("debug: more than 1 rows received, data redundancy detected.")
         
-    else:
+        access_token = create_access_token(identity=accounts[0]['gmail'])
+        
+        #response = make_response(jsonify(access_token=access_token,account_detail=accounts))
+        response = make_response(jsonify(access_token=access_token))
+        if bool(session_const) == True:
+            expire_session = datetime.now() + timedelta(days=7)
+            
+            # change configs in https deployment
+            response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost', expires=expire_session) 
+        else:
+            response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost')
+        
+        return response, 200 # this shouldn't send any important credentials at all.
+        
 
-        access_token = create_access_token(identity=accounts[0]['username'])
-        return jsonify(access_token=access_token), 200
+@app.route('/testcookie', methods=['GET'])
+def test():
 
-# the token received in login() should be temporarily stored in the session.
+    response = make_response(jsonify(access_token="test"))
+    response.set_cookie('access_token', "test", httponly=True, secure=False, samesite='None')
+    return response
+
+
 
 @app.route('/', methods=['GET'])
 def landing_page():
     return jsonify({'message':'hello'}), 200 # output: related to "View Updates feature"
 
-# unavailable. There is no proper connection between accounts and request collection. request instances must have account's object id (new attribute for request collection).
-"""@app.route('/requests', methods=['GET'])
-@jwt_required()
+@app.route('/requests', methods=['GET'])
+@jwt_required() # react vite overcomes this security because it access "requests" in react localhost, not python flask jwt. --
 def user_requests():
-    data = request.get_json() # input: user's account object id
+    token = request.headers.get('Authorization')
+    print(f"\n\n\n{token}\n\n\n")
+    #token_decode = token['identity']
+    
+    #print(f"\n\n\n{token_decode}\n\n\n")
+    
+    """ data = request.get_json() # input: user's account email
     
     if data == None:
-        return jsonify({"message":"no user id found"}), 400
-    id = data['_id']
+        return jsonify({"message":"no json data found"}), 400 """
+    
+    #id = data['_id']
     collection = db['requests']
     
     page = int(request.args.get('page', default=1))
@@ -106,22 +130,24 @@ def user_requests():
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
     
+    
+    token_decode = "test"
+    
     if search != None and column != None:
-        query = {f"{column}": {"$regex":f"^{search}.*"}, "{new attribute name}": ObjectId(id)}
+        query = {f"{column}": {"$regex":f"^{search}.*"}, "requester_gmail": token_decode}
         rows = collection.find(query).skip(offset).limit(limit_rows)
-        
-    elif search == None and column == None:
-        rows = collection.find({"{new attribute name}": ObjectId(id)}).skip(offset).limit(limit_rows)
-        
     else:
-        return jsonify({'message': 'May have given search value thrown but no column value, or vice versa.'}), 400
+        query = {f"requester_gmail": token_decode}
+        rows = collection.find(query).skip(offset).limit(limit_rows)
     
     rows_list = list(rows)
     for x in rows_list:
         x['_id'] = str(x['_id'])
-    rows_list = apply_foreign(rows_list, "requests")
+    # rows_list = apply_foreign(rows_list, "requests")
     
-    return jsonify(rows_list), 200 # output: user's current requests"""
+
+    return make_response(jsonify(rows_list), 200)
+
 
 
 @app.route('/requests/add', methods=["GET","POST"])
@@ -139,7 +165,6 @@ def user_add_requests(): # twice a day only.
         
         json_input = request.get_json() # form request
         
-        json_input = json_input.pop('_id')
         result = collection.insert_one(json_input)
         
         return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
@@ -153,14 +178,12 @@ def user_add_requests(): # twice a day only.
         
     return jsonify({'message':'hello'}), 200
 
-# unavailable. There is no proper connection between accounts and request collection. request instances must have account's object id (new attribute for request collection).
-"""@app.route('/requests/delete', methods=['POST'])
+@app.route('/requests/delete', methods=['POST'])
 # @jwt_required() # needs login because its an approute specifically for a user.
 def user_delete_requests():
     
     data = request.get_json() # input: user's account object id and request's objectid
     collection = db['requests']
-    
     
     if data == None:
         return jsonify({"message":"no form data found"}), 400
@@ -171,7 +194,7 @@ def user_delete_requests():
     query = {'_id': ObjectId(id), "{new attribute name}": "{new attribute name}"} # _id = specific request it
     result = collection.delete_one(query)
     
-    return jsonify({'message':'hello'}), 200"""
+    return jsonify({'message':'hello'}), 200
 
 
 @app.route('/equipments', methods=['GET'])
@@ -179,12 +202,27 @@ def equipments():
     collection = db['equipment']
     
     page = int(request.args.get('page', default=1))
+    if(int(page) < 1):
+        page = 1
+    # change total rows in a page here. \/
+    limit_rows = 20
+    offset = (page - 1) * limit_rows
+    column = request.args.get('column',default=None)
+    search = request.args.get('search',default=None)
     
+    if search != None and column != None:
+        query = {f"{column}": {"$regex":f"^{search}.*"}}
+        rows = collection.find(query).skip(offset).limit(limit_rows)
+        
+    else:
+        rows = collection.find().skip(offset).limit(limit_rows)
     
+    rows_list = list(rows)
+    for x in rows_list:
+        x['_id'] = str(x['_id'])
+    # rows_list = apply_foreign(rows_list, "requests")
     
-    
-    
-    return jsonify(rows_list), 200
+    return rows_list
 
 
 
@@ -229,7 +267,6 @@ def admin_request_conclude():
     
     return jsonify({'message':'Request instance conluded'}), 201 """
 
-from datetime import datetime
 @app.route('/admin/report', methods=['GET'])
 def admin_report():
     
@@ -312,7 +349,7 @@ def admin_login():
     return jsonify({'message':'hello'}), 200
 
 
-@app.route('/admin/<collection>', methods=['GET'])
+@app.route('/<collection>', methods=['GET'])
 # @jwt_required()
 def admin_main_page(collection):
     if not verify_collection(collection):
