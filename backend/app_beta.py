@@ -411,7 +411,7 @@ def admin_login():
     return jsonify({'msg':'hello'}), 200
 
 
-@app.route('/admin/<collection>', methods=['GET'])
+@app.route('/<collection>', methods=['GET'])
 # @jwt_required()
 def admin_main_page(collection):
     if not verify_collection(collection):

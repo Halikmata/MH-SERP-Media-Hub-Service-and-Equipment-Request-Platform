@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 
-function Requests({ url }){
+function Requests({ url }) {
 	const [isLoggedIn, SetIsLoggedIn] = useState(false);
 
 	const navigate = useNavigate();
@@ -21,36 +21,36 @@ function Requests({ url }){
 	const [selectedTypes, setSelectedTypes] = useState([]);
 	const [selectedEquipment, setSelectedEquipment] = useState([]);
 	const [formData, setFormData] = useState({
-	organization: '',
-	event: '',
-	location: '',
-	start_date: null,
-	end_date: null,
+		organization: '',
+		event: '',
+		location: '',
+		start_date: null,
+		end_date: null,
 	});
 
 
-	async function get_requests_table(){
+	async function get_requests_table() {
 		const url_link = `${url}/requests`;
 
 		const headers = {
-            "Content-type": "application/json",
-            "Authorization": "Bearer " + cookies.presence
-        };
+			"Content-type": "application/json",
+			"Authorization": "Bearer " + cookies.presence
+		};
 
-        const options = {
-            headers: headers,
-            withCredentials: true
-        };
+		const options = {
+			headers: headers,
+			withCredentials: true
+		};
 
 		try {
-            const response = await axios.get(url_link, options);
-            //console.log(response.data);
+			const response = await axios.get(url_link, options);
+			//console.log(response.data);
 			setRequest(response.data);
 
-        } catch (error) {
-            console.error("Error: ", error);
+		} catch (error) {
+			console.error("Error: ", error);
 			navigate('/login') // if session is invalid.
-        }
+		}
 
 	}
 
@@ -59,35 +59,54 @@ function Requests({ url }){
 		//verify_login(cookies,navigate);
 
 		get_requests_table();
-	},[]);
+	}, []);
 
-	function handleChange(e){
+	function handleChange(e) {
 		const { name, value } = e.target;
 		setFormData({ ...formData, [name]: value });
 	}
 
-	function handleCheckboxChange(e){
+	function handleCheckboxChange(e) {
 		const { value, checked } = e.target;
 
-		if (checked){
+		if (checked) {
 			setSelectedEquipment(prevSelected => [...prevSelected, value]);
-		} else{
+		} else {
 			setSelectedEquipment(prevSelected => prevSelected.filter(item => item !== value));
 		}
 	}
 
-	function handleFilterChange(e){
+	function handleFilterChange(e) {
 		const { value, checked } = e.target;
 
-		if (checked){
+		if (checked) {
 			setSelectedTypes((prevSelectedTypes) => [...prevSelectedTypes, value]);
-		} else{
+		} else {
 			setSelectedTypes((prevSelectedTypes) => prevSelectedTypes.filter((type) => type !== value));
 		}
 	}
 
-	async function handleSubmit(e){
+	async function handleSubmit(e) {
 		e.preventDefault();
+
+		const requestData = {
+			organization: formData.organization,
+			event_name: formData.event,
+			event_location: formData.location,
+			request_start: formData.start_date,
+			request_end: formData.end_date,
+			equipment: selectedEquipment
+		};
+
+		axios.post(`${url}/requests/add`, requestData)
+			.then(response => {
+				console.log('Request created successfully:', response.data);
+				setFormData({ organization: '', event_name: '', event_location: '', request_start: null, request_end: null });
+				setSelectedEquipment([]);
+			})
+			.catch(error => {
+				console.error('Error creating request:', error);
+			});
 
 		const url = `${url}/requests/add`;
 
@@ -115,9 +134,9 @@ function Requests({ url }){
 			<Form onSubmit={handleSubmit}>
 				{/* Organization */}
 				<Form.Group className="mb-3" controlId="organization">
-          			<Form.Label>Organization</Form.Label>
-        	  		<Form.Control type="text" name="organization" value={formData.organization} onChange={handleChange} required />
-		        </Form.Group>
+					<Form.Label>Organization</Form.Label>
+					<Form.Control type="text" name="organization" value={formData.organization} onChange={handleChange} required />
+				</Form.Group>
 
 				{/* Event */}
 				<Form.Group className="mb-3" controlId="event">
@@ -150,27 +169,27 @@ function Requests({ url }){
 
 				{/* <Dropdown>
 					<Dropdown.Toggle variant="secondary" id="dropdown-basic">
-            			Select Equipment Types
-          			</Dropdown.Toggle>
+						Select Equipment Types
+					</Dropdown.Toggle>
 
-					<Dropdown.Menu> 
+					<Dropdown.Menu>
 						<Form>
 							{equipmentTypes.map((type) => (
 								<Form.Check
-								key={type.fk_idequipment_type}
-								type="checkbox"
-								id={type.fk_idequipment_type}
-								label={type.name}
-								value={type.fk_idequipment_type}
-								onChange={handleFilterChange}
-								checked={selectedTypes.includes(type.fk_idequipment_type)}
+									key={type.fk_idequipment_type}
+									type="checkbox"
+									id={type.fk_idequipment_type}
+									label={type.name}
+									value={type.fk_idequipment_type}
+									onChange={handleFilterChange}
+									checked={selectedTypes.includes(type.fk_idequipment_type)}
 								/>
 							))}
 						</Form>
 					</Dropdown.Menu>
-					
+
 					</Dropdown> */}
-				
+
 				<br />
 				<div className='table-responsive'>
 					<Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
@@ -191,16 +210,16 @@ function Requests({ url }){
 						<tbody>
 							{requests.map(item => {
 								return (
-								<tr key={item._id || "N/A"}>
-									<td>{item.request_affiliation || "N/A"}</td>
-									<td>{item.event_location || "N/A"}</td>
-									<td>{item.event_details || "N/A"}</td>
-									<td>{item.request_start || "N/A"}</td>
-									<td>{item.request_end || "N/A"}</td>
-									<td>{item.service || "N/A"}</td>
-									<td>{item.organization || "N/A"}</td>
-									<td>{item.event || "N/A"}</td>
-								</tr>
+									<tr key={item._id || "N/A"}>
+										<td>{item.request_affiliation || "N/A"}</td>
+										<td>{item.event_location || "N/A"}</td>
+										<td>{item.event_details || "N/A"}</td>
+										<td>{item.request_start || "N/A"}</td>
+										<td>{item.request_end || "N/A"}</td>
+										<td>{item.service || "N/A"}</td>
+										<td>{item.organization || "N/A"}</td>
+										<td>{item.event || "N/A"}</td>
+									</tr>
 								);
 							})}
 						</tbody>
@@ -208,9 +227,9 @@ function Requests({ url }){
 				</div>
 				<br />
 
-        		{/* Submit Button */}
+				{/* Submit Button */}
 				<div className='text-center'>
-				<Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
+					<Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
 				</div>
 
 				<br /><br />

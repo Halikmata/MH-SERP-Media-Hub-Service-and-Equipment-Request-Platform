@@ -140,7 +140,7 @@ def index(collection):
     for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
         x['_id'] = str(x['_id'])
         
-    rows_list = apply_foreign(rows_list,col_name)
+    # rows_list = apply_foreign(rows_list,col_name)
 
     return jsonify(rows_list), 200
 
@@ -306,11 +306,57 @@ def admin_report():
     """ for x in rows_list:
         x['_id'] = str(x['_id']) """
     
-    #rows_list = apply_foreign(rows_list,"requests")
+    # rows_list = apply_foreign(rows_list,"requests")
     
     return jsonify(rows_list), 200
-    
 
+
+@app.route('/admin/<collection>/update/<id>', methods=['GET', 'PUT'])
+def admin_update_row(collection, id):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        collection = db[collection]
+        
+    if request.method == "PUT":
+            json_input = request.get_json()
+            
+            json_input.pop('_id', None)
+            
+            result = collection.update_one({'_id': ObjectId(id)}, {'$set': json_input})
+            
+            if result.modified_count > 0:
+                return jsonify({"message": "Updated successfully", "id": id}), 201
+            else:
+                return jsonify({"message": "No row found with the given ID"}), 404
+            
+    else:
+        result = collection.find_one({'_id': ObjectId(id)})
+        
+        if result:
+            result['_id'] = str(result['_id'])  # Convert ObjectId to string
+            return jsonify(result), 200
+        else:
+            return jsonify({"message": "No row found with the given ID"}), 404
+
+
+
+@app.route('/admin/<collection>/delete/<id>', methods=['DELETE'])
+# @jwt_required()
+def admin_delete_row(collection, id):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    
+    collection = db[collection]
+    
+    result = collection.delete_one({'_id': ObjectId(id)})
+    
+    if result.deleted_count > 0:
+        return jsonify({"message": "Deleted successfully", "id": id}), 201
+    else:
+        return jsonify({"message": "No row found with the given ID"}), 404
+    
+    
 # add account profile to request GET and request ADD
 
 # separate app route for login/register --

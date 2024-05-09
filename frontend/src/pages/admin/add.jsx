@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { types } from './types.js';
 
-const EditItem = ({ url }) => {
+const AddItem = ({ url }) => {
     const { collection } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({});
@@ -95,10 +95,10 @@ const EditItem = ({ url }) => {
 
     return (
         <div>
-            <h2>Edit {collection}</h2>
+            <h2>Add {collection}</h2>
             {renderForm()}
         </div>
     );
 };
 
-export default EditItem;
+export default AddItem;

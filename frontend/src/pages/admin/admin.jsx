@@ -1,9 +1,14 @@
-// admin.jsx
 import React from 'react';
-import { Routes, Route} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AdminTable from './component/AdminTable';
 import AdminHeader from './component/AdminHeader';
-import AddItem from './add'; // Import AddItem component
+import AddItem from './add';
+import EditItem from './edit';
+import Delete from './delete';
+import axios from 'axios';
+
+
+import renderSelectCell from './select';
 
 const Admin = ({ url }) => {
   const pathname = window.location.pathname;
@@ -18,7 +23,7 @@ const Admin = ({ url }) => {
         { field: 'model', label: 'Model' },
         { field: 'equipment_type', label: 'Type' },
         { field: 'availability', label: 'Availability' },
-        { field: 'unit_cost', label: 'Cost' }
+        { field: 'unit_cost', label: 'Cost', cell: formatAmount }
       ]
     },
     '/admin/services': {
@@ -38,7 +43,11 @@ const Admin = ({ url }) => {
         { field: 'request_start', label: 'Start' },
         { field: 'request_end', label: 'End' },
         { field: 'event_location', label: 'Location' },
-        { field: 'requester_status', label: 'Status' }
+        {
+          field: 'request_status',
+          label: 'Status',
+          cell: (option) => renderSelectCell(option, ['pending', 'approved', 'declined'], handleSelectChange)
+        }
       ]
     },
     '/admin/accounts': {
@@ -75,10 +84,23 @@ const Admin = ({ url }) => {
         <AdminTable url={url} collection={collection} columns={columns} />
       )}
       <Routes>
-        <Route path="/:collection/add" element={<AddItem url={url+"/admin/"} />} />
+        <Route path="/:collection/add" element={<AddItem url={url + "/admin/"} />} />
+        <Route path="/:collection/update/:id" element={<EditItem url={url + "/admin/"} renderSelectCell={renderSelectCell} />} />
+        <Route path="/:collection/delete/:id" element={<Delete url={url + "/admin/"} />} />
       </Routes>
     </div>
   );
 };
 
 export default Admin;
+
+
+const formatAmount = (value) => {
+  const formattedAmount = `${value} php`;
+  return formattedAmount;
+};
+
+const handleSelectChange = (e) => {
+  const newValue = e.target.value;
+  handleChange(newValue);
+};

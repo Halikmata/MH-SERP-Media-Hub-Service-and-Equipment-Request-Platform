@@ -7,9 +7,9 @@ function AdminHeader() {
   return (
     <header style={headerStyle}>
       <Navbar bg="body" variant="tertiary" expand="lg">
-        <Navbar.Brand as={Link} to="/admin">
+        <Navbar.Brand as={Link} to="/admin" style={{display:'flex', alignContent:'center',margin:"2px 10px"}}>
           <img src={logo} alt="Logo" style={{ width: '50px', marginRight: '20px' }} />
-          <h2>Admin</h2>
+          <h5>Admin</h5>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarSupportedContent" />
         <Navbar.Collapse id="navbarSupportedContent">

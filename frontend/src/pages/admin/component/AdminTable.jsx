@@ -40,11 +40,11 @@ const AdminTable = ({ url, collection, columns, children }) => {
   });
 
   return (
-    <div>
+    <div className="container mt-4">
       <h2>{collection}</h2>
-      <Link to={`${location.pathname}/add`}>Add</Link>
-      <table>
-        <thead>
+      <Link to={`${location.pathname}/add`} className="btn btn-primary mb-2">Add</Link>
+      <table className="table">
+        <thead className="thead-dark">
           <tr>
             {columns.map(({ field, label }) => (
               <th
@@ -66,14 +66,14 @@ const AdminTable = ({ url, collection, columns, children }) => {
         <tbody>
           {sortedData.map(item => (
             <tr key={item._id}>
-              {columns.map(({ field }) => (
+              {columns.map(({ field, cell }) => (
                 <td key={field}>
-                  {item[field]}
+                  {cell ? cell(item[field]) : item[field]}
                 </td>
               ))}
               <td>
-                <Link to={`${location.pathname}/edit/${item._id}`}>Edit</Link>
-                <Link to={`${location.pathname}/delete/${item._id}`}>Delete</Link>
+                <Link to={`${location.pathname}/update/${item._id}`} className="btn btn-sm btn-info mr-2">Edit</Link>
+                <Link to={`${location.pathname}/delete/${item._id}`} className="btn btn-sm btn-danger">Delete</Link>
               </td>
             </tr>
           ))}
