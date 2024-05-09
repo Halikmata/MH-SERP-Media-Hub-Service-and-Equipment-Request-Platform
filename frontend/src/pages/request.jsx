@@ -148,7 +148,7 @@ function Requests({ url }){
 				<h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Your Requests</h2>
 				<br />
 
-				<Dropdown>
+				{/* <Dropdown>
 					<Dropdown.Toggle variant="secondary" id="dropdown-basic">
             			Select Equipment Types
           			</Dropdown.Toggle>
@@ -169,7 +169,7 @@ function Requests({ url }){
 						</Form>
 					</Dropdown.Menu>
 					
-				</Dropdown>
+					</Dropdown> */}
 				
 				<br />
 				<div className='table-responsive'>
