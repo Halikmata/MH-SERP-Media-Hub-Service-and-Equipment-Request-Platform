@@ -26,7 +26,7 @@ function Login() {
 
         const headers = {
             "Content-type": "application/json",
-            "Authorization": "Bearer" + cookies.presence
+            "Authorization": "Bearer " + cookies.presence
         };
 
         const options = {
@@ -41,7 +41,7 @@ function Login() {
             if (response.data['msg'] === true){
                 navigate('/')
             } else{
-                removeCookie('presence')
+                removeCookie('presence') // doesn't work.
             }
         } catch (error) {
             console.error("Error: ", error); // will remove log

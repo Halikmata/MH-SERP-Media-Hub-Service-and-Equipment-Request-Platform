@@ -1,14 +1,13 @@
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useCookies } from 'react-cookie';
+//import { useCookies } from 'react-cookie';
 
-const navigate = useNavigate();
-const [cookies, removeCookie] = useCookies(['presence']);
 
-export async function verify_login(){ // slightly modified version of verify_presence
-    
+
+export async function verify_login(cookies, navigate){ // slightly modified version of verify_presence
+
     if (cookies.presence === undefined){
-        return;
+        return navigate('/login');
     }
 
     const url = 'http://localhost:5000/verify_presence';
@@ -28,12 +27,14 @@ export async function verify_login(){ // slightly modified version of verify_pre
         console.log(response.data);
 
         if (response.data['msg'] === true){
-            navigate('/')
+            return;
         } else{
-            navigate('/login')
+            return navigate('/login')
         }
+
     } catch (error) {
         console.error("Error: ", error); // will remove log
     }
 }
+
 
