@@ -4,10 +4,7 @@ import { Form, Button, Table, Dropdown } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useCookies } from 'react-cookie';
-//import { verify_login } from '../../utils.js'
 import { useNavigate } from 'react-router-dom';
-
-
 
 function Requests({ url }) {
 	const [isLoggedIn, SetIsLoggedIn] = useState(false);
@@ -15,19 +12,38 @@ function Requests({ url }) {
 	const navigate = useNavigate();
 	const [cookies] = useCookies(['presence']);
 
-	const [requests, setRequest] = useState([]);
+	const [services,setServices] = useState([]);
 	const [equipment, setEquipment] = useState([]);
-	const [equipmentTypes, setEquipmentTypes] = useState([]);
-	const [selectedTypes, setSelectedTypes] = useState([]);
-	const [selectedEquipment, setSelectedEquipment] = useState([]);
+	const [requests, setRequest] = useState([]);
 	const [formData, setFormData] = useState({
 		organization: '',
 		event: '',
 		location: '',
+		services: '',
+		equipment: [],
 		start_date: null,
 		end_date: null,
 	});
 
+	async function get_foreign_key() {
+		const url_link = `${url}/requests/add`;
+
+		const headers = {
+			"Content-type": "application/json",
+			"Authorization": "Bearer " + cookies.presence
+		};
+
+		const options = {
+			headers: headers,
+			withCredentials: true
+		};
+
+		const response = await axios.get(url_link, options);
+		const f_dict = response.data
+		
+		setServices(f_dict['services']);
+		setEquipment(f_dict['equipment']);
+	}
 
 	async function get_requests_table() {
 		const url_link = `${url}/requests`;
@@ -44,20 +60,16 @@ function Requests({ url }) {
 
 		try {
 			const response = await axios.get(url_link, options);
-			//console.log(response.data);
 			setRequest(response.data);
 
 		} catch (error) {
-			console.error("Error: ", error);
-			navigate('/login') // if session is invalid.
+			navigate('/login')
 		}
-
+		get_foreign_key();
 	}
 
 
 	useEffect(() => {
-		//verify_login(cookies,navigate);
-
 		get_requests_table();
 	}, []);
 
@@ -90,12 +102,14 @@ function Requests({ url }) {
 		e.preventDefault();
 
 		const requestData = {
+			token: cookies.presence,
 			organization: formData.organization,
 			event_name: formData.event,
 			event_location: formData.location,
+			service: formData.services,
+			equipment: formData.equipment,
 			request_start: formData.start_date,
-			request_end: formData.end_date,
-			equipment: selectedEquipment
+			request_end: formData.end_date
 		};
 
 		axios.post(`${url}/requests/add`, requestData)
@@ -150,6 +164,32 @@ function Requests({ url }) {
 					<Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
 				</Form.Group>
 
+				{/* Services */}
+				<Form.Group className="mb-3" controlId="services">
+					<Form.Label>Services</Form.Label>
+					<Form.Select type="text" name="services" value={formData.services} onChange={handleChange}>{/* required */}
+					<option value="" selected> - None - </option>
+						{services.map(item => {
+							return (
+								<option value={item.fk_idservice} key={item.fk_idservice}>{item.name || "N/A"}</option>
+							);
+						})}
+					</Form.Select>
+				</Form.Group>
+
+				{/* Equipments */}
+				<Form.Group className="mb-3" controlId="equipment">
+					<Form.Label>Equipments</Form.Label>
+					<Form.Select type="text" name="equipment" value={formData.equipment} onChange={handleChange}>{/* required */}
+					<option value="" selected> - None - </option>
+						{equipment.map(item => {
+							return (
+								<option value={item.idequipment} key={item.idequipment}>{item.description || "N/A"}</option>
+							);
+						})}
+					</Form.Select>
+				</Form.Group>
+
 				{/* Start Date */}
 				<Form.Group className="mb-3" controlId="start_date">
 					<Form.Label>Start Date</Form.Label>
@@ -164,31 +204,13 @@ function Requests({ url }) {
 					<DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
 				</Form.Group>
 
+				{/* Submit Button */}
+				<div className='text-center'>
+					<Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
+				</div>
+
 				<h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Your Requests</h2>
 				<br />
-
-				{/* <Dropdown>
-					<Dropdown.Toggle variant="secondary" id="dropdown-basic">
-						Select Equipment Types
-					</Dropdown.Toggle>
-
-					<Dropdown.Menu>
-						<Form>
-							{equipmentTypes.map((type) => (
-								<Form.Check
-									key={type.fk_idequipment_type}
-									type="checkbox"
-									id={type.fk_idequipment_type}
-									label={type.name}
-									value={type.fk_idequipment_type}
-									onChange={handleFilterChange}
-									checked={selectedTypes.includes(type.fk_idequipment_type)}
-								/>
-							))}
-						</Form>
-					</Dropdown.Menu>
-
-					</Dropdown> */}
 
 				<br />
 				<div className='table-responsive'>
@@ -227,10 +249,7 @@ function Requests({ url }) {
 				</div>
 				<br />
 
-				{/* Submit Button */}
-				<div className='text-center'>
-					<Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
-				</div>
+				
 
 				<br /><br />
 			</Form>
