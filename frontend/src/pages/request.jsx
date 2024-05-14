@@ -12,6 +12,8 @@ function Requests({ url }) {
 	const navigate = useNavigate();
 	const [cookies] = useCookies(['presence']);
 
+	
+
 	const [services,setServices] = useState([]);
 	const [equipment, setEquipment] = useState([]);
 	const [requests, setRequest] = useState([]);
@@ -68,7 +70,6 @@ function Requests({ url }) {
 		get_foreign_key();
 	}
 
-
 	useEffect(() => {
 		get_requests_table();
 	}, []);
@@ -76,26 +77,6 @@ function Requests({ url }) {
 	function handleChange(e) {
 		const { name, value } = e.target;
 		setFormData({ ...formData, [name]: value });
-	}
-
-	function handleCheckboxChange(e) {
-		const { value, checked } = e.target;
-
-		if (checked) {
-			setSelectedEquipment(prevSelected => [...prevSelected, value]);
-		} else {
-			setSelectedEquipment(prevSelected => prevSelected.filter(item => item !== value));
-		}
-	}
-
-	function handleFilterChange(e) {
-		const { value, checked } = e.target;
-
-		if (checked) {
-			setSelectedTypes((prevSelectedTypes) => [...prevSelectedTypes, value]);
-		} else {
-			setSelectedTypes((prevSelectedTypes) => prevSelectedTypes.filter((type) => type !== value));
-		}
 	}
 
 	async function handleSubmit(e) {
@@ -112,6 +93,11 @@ function Requests({ url }) {
 			request_end: formData.end_date
 		};
 
+		if (formData.services == "" && formData.equipment == []) {
+			// edit a html element that tells that both shouldn't be empty.
+			return
+		}
+		
 		axios.post(`${url}/requests/add`, requestData)
 			.then(response => {
 				console.log('Request created successfully:', response.data);
@@ -168,7 +154,7 @@ function Requests({ url }) {
 				<Form.Group className="mb-3" controlId="services">
 					<Form.Label>Services</Form.Label>
 					<Form.Select type="text" name="services" value={formData.services} onChange={handleChange}>{/* required */}
-					<option value="" selected> - None - </option>
+					<option value=""> - None - </option>
 						{services.map(item => {
 							return (
 								<option value={item.fk_idservice} key={item.fk_idservice}>{item.name || "N/A"}</option>
@@ -180,8 +166,8 @@ function Requests({ url }) {
 				{/* Equipments */}
 				<Form.Group className="mb-3" controlId="equipment">
 					<Form.Label>Equipments</Form.Label>
-					<Form.Select type="text" name="equipment" value={formData.equipment} onChange={handleChange}>{/* required */}
-					<option value="" selected> - None - </option>
+					<Form.Select type="text" name="equipment" value={formData.equipment} onChange={handleChange} multiple>{/* required */}
+					{/* <option value="" > - None - </option> */}
 						{equipment.map(item => {
 							return (
 								<option value={item.idequipment} key={item.idequipment}>{item.description || "N/A"}</option>
@@ -223,7 +209,7 @@ function Requests({ url }) {
 								<th>Event Details</th>
 								<th>Request Start</th>
 								<th>Request End</th>
-								{/* <th>Equipments</th> */}
+								<th>Equipments</th>
 								<th>Service</th>
 								<th>Organization</th>
 								<th>Event</th>
@@ -238,6 +224,12 @@ function Requests({ url }) {
 										<td>{item.event_details || "N/A"}</td>
 										<td>{item.request_start || "N/A"}</td>
 										<td>{item.request_end || "N/A"}</td>
+										{/* <td>{item.equipment || "N/A"}</td> */}
+										{/* <td>
+											{item.equipment.map(x => {
+												return x + " ";
+											})}
+										</td> */}
 										<td>{item.service || "N/A"}</td>
 										<td>{item.organization || "N/A"}</td>
 										<td>{item.event || "N/A"}</td>
