@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-const AdminTable = ({ url, collection, columns, children }) => {
+const AdminTable = ({ url, collection, columns }) => {
   const [data, setData] = useState([]);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -40,7 +40,7 @@ const AdminTable = ({ url, collection, columns, children }) => {
   });
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 w-75">
       <h2>{collection}</h2>
       <Link to={`${location.pathname}/add`} className="btn btn-primary mb-2">Add</Link>
       <table className="table">
@@ -72,8 +72,8 @@ const AdminTable = ({ url, collection, columns, children }) => {
                 </td>
               ))}
               <td>
-                <Link to={`${location.pathname}/update/${item._id}`} className="btn btn-sm btn-info mr-2">Edit</Link>
-                <Link to={`${location.pathname}/delete/${item._id}`} className="btn btn-sm btn-danger">Delete</Link>
+                <Link to={`${location.pathname}/update/${item._id}`} className="btn btn-sm btn-info mr-2 m-1">Edit</Link>
+                <Link to={`${location.pathname}/delete/${item._id}`} className="btn btn-sm btn-danger m-1">Delete</Link>
               </td>
             </tr>
           ))}

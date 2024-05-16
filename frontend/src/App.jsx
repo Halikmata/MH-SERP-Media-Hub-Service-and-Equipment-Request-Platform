@@ -8,6 +8,7 @@ import { useCookies } from 'react-cookie';
 import Header from './includes/header.jsx';
 import Home from './pages/home.jsx';
 import Equipment from './pages/equipment.jsx';
+import RequestPage from './pages/requestOld.jsx';
 import Requests from './pages/request.jsx';
 import Services from './pages/services.jsx';
 import Admin from './pages/admin/admin.jsx';
@@ -30,7 +31,8 @@ function App(){
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/equipment" element={<Equipment url={url} />} />
-                <Route path="/requests" element={<Requests url={url} />} />
+                <Route path="/requests" element={<RequestPage url={url} />} />
+                <Route path="/myrequests" element={<Requests url={url} />} />
                 <Route path="/services" element={<Services url={url}/>} />
                 <Route path="/signup" element={<Signup url={url} />} />
                 <Route path="/login" element={<Login url={url} />} />

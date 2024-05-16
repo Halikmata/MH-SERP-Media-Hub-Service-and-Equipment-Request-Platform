@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Button, Table, Dropdown } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useCookies } from 'react-cookie';
+import Requests from './request';
 
-const Requests = ({ url }) => {
+const RequestPage = ({ url }) => {
   const [cookies] = useCookies(['presence']);
   const [requests, setRequest] = useState([]);
+  const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
   const [equipmentTypes, setEquipmentTypes] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
@@ -20,10 +23,10 @@ const Requests = ({ url }) => {
     end_date: null,
   });
 
-  
+
   useEffect(() => {
-    
-    axios.get(`${url}/requests`,{
+
+    axios.get(`${url}/requests`, {
       headers: {
         'Authorization': 'Bearer ' + cookies.presence
       }
@@ -33,26 +36,26 @@ const Requests = ({ url }) => {
       })
       .catch(error => {
         if (error.response) {
-           // The request was made and the server responded with a status code
-           // that falls out of the range of 2xx
-           console.error(error.response.data);
-           console.error(error.response.status);
-           console.error(error.response.headers);
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error(error.response.data);
+          console.error(error.response.status);
+          console.error(error.response.headers);
         } else if (error.request) {
-           // The request was made but no response was received
-           console.error(error.request);
+          // The request was made but no response was received
+          console.error(error.request);
         } else {
-           // Something happened in setting up the request that triggered an Error
-           console.error('Error', error.message);
+          // Something happened in setting up the request that triggered an Error
+          console.error('Error', error.message);
         }
         console.error(error.config);
-       });
+      });
 
 
-       // if token invalid or not exists (session)
-       // redirect back to log in
-       //
-       
+    // if token invalid or not exists (session)
+    // redirect back to log in
+    //
+
   }, []);
 
   useEffect(() => {
@@ -128,40 +131,42 @@ const Requests = ({ url }) => {
 
   return (
     <div className="container mt-5">
+      {/* <Requests /> */}
       <h2 className="mb-4" style={{ color: '#FF5733' }}>Request Details</h2>
       <Form onSubmit={handleSubmit}>
+        <div className='w-50'>
+          {/* Organization */}
+          <Form.Group className="mb-3" controlId="organization">
+            <Form.Label>Organization</Form.Label>
+            <Form.Control type="text" name="organization" value={formData.organization} onChange={handleChange} required />
+          </Form.Group>
 
-        {/* Organization */}
-        <Form.Group className="mb-3" controlId="organization">
-          <Form.Label>Organization</Form.Label>
-          <Form.Control type="text" name="organization" value={formData.organization} onChange={handleChange} required />
-        </Form.Group>
+          {/* Event */}
+          <Form.Group className="mb-3" controlId="event">
+            <Form.Label>Event</Form.Label>
+            <Form.Control type="text" name="event" value={formData.event} onChange={handleChange} required />
+          </Form.Group>
 
-        {/* Event */}
-        <Form.Group className="mb-3" controlId="event">
-          <Form.Label>Event</Form.Label>
-          <Form.Control type="text" name="event" value={formData.event} onChange={handleChange} required />
-        </Form.Group>
+          {/* Location */}
+          <Form.Group className="mb-3" controlId="location">
+            <Form.Label>Location</Form.Label>
+            <Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
+          </Form.Group>
 
-        {/* Location */}
-        <Form.Group className="mb-3" controlId="location">
-          <Form.Label>Location</Form.Label>
-          <Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
-        </Form.Group>
+          {/* Start Date */}
+          <Form.Group className="mb-3" controlId="start_date">
+            <Form.Label>Start Date</Form.Label>
+            <br />
+            <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
+          </Form.Group>
 
-        {/* Start Date */}
-        <Form.Group className="mb-3" controlId="start_date">
-          <Form.Label>Start Date</Form.Label>
-          <br />
-          <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
-        </Form.Group>
-
-        {/* End Date */}
-        <Form.Group className="mb-3" controlId="end_date">
-          <Form.Label>End Date</Form.Label>
-          <br />
-          <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
-        </Form.Group>
+          {/* End Date */}
+          <Form.Group className="mb-3" controlId="end_date">
+            <Form.Label>End Date</Form.Label>
+            <br />
+            <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
+          </Form.Group>
+        </div>
 
         <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Equipment List</h2>
         <br />
@@ -216,7 +221,7 @@ const Requests = ({ url }) => {
                           label=""
                           onChange={handleCheckboxChange}
                           checked={selectedEquipment.includes(item.idequipment)}
-                        />1
+                        />
                       </td>
                     </tr>
                   );
@@ -238,4 +243,4 @@ const Requests = ({ url }) => {
   );
 };
 
-export default Requests;
+export default RequestPage;
