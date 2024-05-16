@@ -355,7 +355,40 @@ def admin_delete_row(collection, id):
         return jsonify({"message": "Deleted successfully", "id": id}), 201
     else:
         return jsonify({"message": "No row found with the given ID"}), 404
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
     
+    required_fields = ['first_name', 'middle_name', 'last_name', 'phone_number', 'email', 'status', 'incident_report', 'username', 'password', 'confirm_password', 'user_type']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'message': f'Missing required field: {field}'}), 400
+    
+    if data['password'] != data['confirm_password']:
+        return jsonify({'message': 'Passwords do not match'}), 400
+    
+    # Check if account already exists
+    existing_acc = db['accounts'].find_one({"email": data['email']})
+    if existing_acc:
+        return jsonify({'message': 'Account already exists'}), 400
+    
+    # Additional fields based on user type
+    user_type = data['user_type']
+    if user_type == 'student':
+        required_fields.extend(['college', 'program'])
+    else:
+        required_fields.extend(['office', 'position'])
+    
+    # Validate additional fields
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'message': f'Missing required field: {field}'}), 400
+    
+    # Insert new account into the database
+    db['accounts'].insert_one(data)
+    
+    return jsonify({'message': 'Account created successfully'}), 201
     
 # add account profile to request GET and request ADD
 
