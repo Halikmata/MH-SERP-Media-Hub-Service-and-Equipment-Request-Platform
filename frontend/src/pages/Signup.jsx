@@ -33,7 +33,7 @@ function Signup({url}) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post(`${url}/register`, formData)
+    axios.post(`${url}/signup`, formData)
         .then((response) => {
             console.log('User added successfully:', response.data);
             navigate('/')

@@ -4,7 +4,6 @@ import { Form, Button, Table, Dropdown } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useCookies } from 'react-cookie';
-//import { verify_login } from '../../utils.js'
 import { useNavigate } from 'react-router-dom';
 
 
@@ -14,15 +13,18 @@ function Requests({ url }){
 
 	const navigate = useNavigate();
 	const [cookies] = useCookies(['presence']);
-	const [requests, setRequest] = useState([]);
+
+	
+
+	const [services,setServices] = useState([]);
 	const [equipment, setEquipment] = useState([]);
-	const [equipmentTypes, setEquipmentTypes] = useState([]);
-	const [selectedTypes, setSelectedTypes] = useState([]);
-	const [selectedEquipment, setSelectedEquipment] = useState([]);
+	const [requests, setRequest] = useState([]);
 	const [formData, setFormData] = useState({
 	organization: '',
 	event: '',
 	location: '',
+		services: '',
+		equipment: [],
 	start_date: null,
 	end_date: null,
 	});
@@ -53,10 +55,7 @@ function Requests({ url }){
 
 	}
 
-
 	useEffect(() => {
-		//verify_login(cookies,navigate);
-
 		get_requests_table();
 	},[]);
 
@@ -130,6 +129,32 @@ function Requests({ url }){
 					<Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
 				</Form.Group>
 
+				{/* Services */}
+				<Form.Group className="mb-3" controlId="services">
+					<Form.Label>Services</Form.Label>
+					<Form.Select type="text" name="services" value={formData.services} onChange={handleChange}>{/* required */}
+					<option value=""> - None - </option>
+						{services.map(item => {
+							return (
+								<option value={item.fk_idservice} key={item.fk_idservice}>{item.name || "N/A"}</option>
+							);
+						})}
+					</Form.Select>
+				</Form.Group>
+
+				{/* Equipments */}
+				<Form.Group className="mb-3" controlId="equipment">
+					<Form.Label>Equipments</Form.Label>
+					<Form.Select type="text" name="equipment" value={formData.equipment} onChange={handleChange} multiple>{/* required */}
+					{/* <option value="" > - None - </option> */}
+						{equipment.map(item => {
+							return (
+								<option value={item.idequipment} key={item.idequipment}>{item.description || "N/A"}</option>
+							);
+						})}
+					</Form.Select>
+				</Form.Group>
+
 				{/* Start Date */}
 				<Form.Group className="mb-3" controlId="start_date">
 					<Form.Label>Start Date</Form.Label>
@@ -143,6 +168,11 @@ function Requests({ url }){
 					<br />
 					<DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
 				</Form.Group>
+
+				{/* Submit Button */}
+				<div className='text-center'>
+					<Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
+				</div>
 
 				<h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Your Requests</h2>
 				<br />
@@ -181,7 +211,7 @@ function Requests({ url }){
 								<th>Event Details</th>
 								<th>Request Start</th>
 								<th>Request End</th>
-								{/* <th>Equipments</th> */}
+								<th>Equipments</th>
 								<th>Service</th>
 								<th>Organization</th>
 								<th>Event</th>

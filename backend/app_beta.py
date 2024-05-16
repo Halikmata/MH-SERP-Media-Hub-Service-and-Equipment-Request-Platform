@@ -49,17 +49,29 @@ def verify_presence():
     
     accounts = db['accounts'].find({"gmail": identity})
     accounts = list(accounts)
-    print(accounts)
-    print(identity)
+    print("accounts: ", accounts)
+    print("Identity: ", identity)
     if len(accounts) >= 1:
         if len(accounts) > 1:
             print("Redundancy Data detected.")
         return make_response(jsonify({"msg": True}), 200)
     
 
+""" @app.route('/verify_cookie')
+@jwt_required() """
+def verify_cookie():
+    identity = get_jwt_identity()
     
-
-    
+    accounts = db['accounts'].find({"gmail": identity})
+    accounts = list(accounts)
+    print("accounts: ", accounts)
+    print("Identity: ", identity)
+    if len(accounts) >= 1:
+        if len(accounts) > 1:
+            print("Redundancy Data detected.")
+        return True
+    else:
+        return False
     
     
     
@@ -135,12 +147,12 @@ def login():
         return response # this shouldn't send any important credentials at all.
         
 
-@app.route('/testcookie', methods=['GET'])
+""" @app.route('/testcookie', methods=['GET'])
 def test():
 
     response = make_response(jsonify(access_token="test"))
     response.set_cookie('access_token', "test", httponly=True, secure=False, samesite='None')
-    return response
+    return response """
 
 
 
@@ -151,8 +163,12 @@ def landing_page():
 @app.route('/requests', methods=['GET'])
 @jwt_required() # react vite overcomes this security because it access "requests" in react localhost, not python flask jwt. --
 def user_requests():
+    verify = verify_cookie()
+    if not verify:
+        return make_response(jsonify({'msg':'Not Authorized'}), 401)
+    
     token = request.headers.get('Authorization')
-    print(f"\n\n\n{token}\n\n\n")
+    print(f"\n\n\nrequests: {token}\n\n\n")
     #token_decode = token['identity']
     
     #print(f"\n\n\n{token_decode}\n\n\n")
@@ -174,21 +190,23 @@ def user_requests():
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
     
+    identity = get_jwt_identity()
     
-    token_decode = "test"
+    accounts = db['accounts'].find({"gmail": identity})
     
+
     if search != None and column != None:
-        query = {f"{column}": {"$regex":f"^{search}.*"}, "requester_gmail": token_decode}
+        query = {f"{column}": {"$regex":f"^{search}.*"}, "requester_gmail": identity}
         rows = collection.find(query).skip(offset).limit(limit_rows)
     else:
-        query = {f"requester_gmail": token_decode}
+        query = {f"requester_gmail": identity}
         rows = collection.find(query).skip(offset).limit(limit_rows)
     
     rows_list = list(rows)
     for x in rows_list:
         x['_id'] = str(x['_id'])
     # rows_list = apply_foreign(rows_list, "requests")
-    
+    print(f'\n\n{rows_list}\n\n')
 
     return make_response(jsonify(rows_list), 200)
 

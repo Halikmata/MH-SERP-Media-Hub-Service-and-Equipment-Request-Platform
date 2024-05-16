@@ -1,7 +1,7 @@
 from flask import jsonify, request, make_response
 from bson.objectid import ObjectId
 from bson.decimal128 import Decimal128
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 # from pymongo.errors import ConnectionFailure
 
 import jwt
@@ -51,41 +51,86 @@ def register():
         return jsonify({'message':'Account already exists!!'}), 400 # 400 as status code?
     
     # hash the password. and dehash it, will implement soon.
+    
+    
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    
+    required_fields = ['first_name', 'last_name', 'phone_number', 'email', 'status', 'incident_report', 'username', 'password', 'confirm_password', 'user_type']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'message': f'Missing required field: {field}'}), 400
+    
+    if data['password'] != data['confirm_password']:
+        return jsonify({'message': 'Passwords do not match'}), 400
+    
+    # Check if account already exists
+    existing_acc = db['accounts'].find_one({"email": data['email']})
+    if existing_acc:
+        return jsonify({'message': 'Account already exists'}), 400
+    
+    # Additional fields based on user type
+    user_type = data['user_type']
+    if user_type == 'student':
+        required_fields.extend(['college', 'program'])
+    else:
+        required_fields.extend(['office', 'position'])
+    
+    # Validate additional fields
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'message': f'Missing required field: {field}'}), 400
+        
+    del data['confirm_password']
+        
+    # Set the date_created field with current date
+    data['date_created'] = datetime.now(timezone.utc)
 
-@app.route("/login",methods=["POST"])
+    # Insert new account into the database
+    db['accounts'].insert_one(data)
+    
+    return jsonify({'message': 'Account created successfully'}), 201
+
+@app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
 
     username = data['username']
     password = data['password']
-    session_const = data['session_const']
+    session_const = data.get('session_const', False)
     
-    accounts = db['accounts'].find({"username":username, "password":password})
-    accounts = list(accounts)
+    accounts = list(db['accounts'].find({"username": username, "password": password}))
     
-    if len(accounts) <= 0:
+    if len(accounts) == 0:
         return jsonify({"msg": False}), 401
-    elif len(accounts) > 0: # if account exists
-        
-        for x in accounts:
-            x['_id'] = str(x['_id'])
-            
-        if len(accounts) > 1:
-            print("debug: more than 1 rows received, data redundancy detected.")
-        
-        access_token = create_access_token(identity=accounts[0]['gmail'], account_detail=accounts[0])
-        
-        response = make_response(jsonify({"msg":True}), 200)
-        
-        if bool(session_const) == True:
-            expire_session = datetime.now() + timedelta(days=7)
-            
-            # change configs in https deployment
-            response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost', expires=expire_session) 
-        else:
-            response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost')
-        
-        return response # this shouldn't send any important credentials at all.
+    
+    if len(accounts) > 1:
+        print("debug: more than 1 rows received, data redundancy detected.")
+    
+    account = accounts[0]
+    account['_id'] = str(account['_id'])
+
+    # Create access token with additional claims
+    additional_claims = {"account_detail": account}
+    access_token = create_access_token(identity=account['email'], additional_claims=additional_claims)
+    
+    
+    response_data = {
+        "msg": True,
+        "access_token": access_token,
+        "user": account
+    }
+    
+    response = make_response(jsonify(response_data), 200)
+    
+    if session_const:
+        expire_session = datetime.now(timezone.utc) + timedelta(days=7)
+        response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost', expires=expire_session)
+    else:
+        response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost')
+    
+    return response
 
 @app.route('/<collection>', methods=['GET'])
 # @jwt_required()
@@ -355,7 +400,8 @@ def admin_delete_row(collection, id):
         return jsonify({"message": "Deleted successfully", "id": id}), 201
     else:
         return jsonify({"message": "No row found with the given ID"}), 404
-    
+
+
     
 # add account profile to request GET and request ADD
 
