@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Button, Table, Dropdown } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useCookies } from 'react-cookie';
-import Requests from './request';
+import NotLoggedIn from '../includes/notLoggedIn';
+
 
 const RequestPage = ({ url }) => {
   const [cookies] = useCookies(['presence']);
@@ -20,8 +21,19 @@ const RequestPage = ({ url }) => {
     event: '',
     location: '',
     start_date: null,
-    end_date: null,
+    end_date: null
   });
+
+  const userDataString = sessionStorage.getItem('userData');
+  const userData = JSON.parse(userDataString);
+
+  const { first_name, middle_name, last_name } = userData;
+
+  let requester_full_name = first_name;
+  if (middle_name) {
+    requester_full_name += ' ' + middle_name.charAt(0);
+  }
+  requester_full_name += ' ' + last_name;
 
 
   useEffect(() => {
@@ -77,6 +89,7 @@ const RequestPage = ({ url }) => {
       .catch(error => {
         console.error(error);
       });
+
   }, []);
 
   const handleChange = (e) => {
@@ -111,11 +124,16 @@ const RequestPage = ({ url }) => {
 
     const requestData = {
       organization: formData.organization,
-      event: formData.event,
-      location: formData.location,
-      start_date: formData.start_date,
-      end_date: formData.end_date,
-      equipment: selectedEquipment
+      event_name: formData.event,
+      event_location: formData.location,
+      event_start: formData.start_date,
+      event_end: formData.end_date,
+      requester_full_name: requester_full_name,
+      requester_email: userData.email,
+      requester_phone_number: userData.phone_number,
+      requester_status: userData.status,
+      equipment: selectedEquipment,
+
     };
 
     axios.post(`${url}/requests/add`, requestData)
@@ -127,40 +145,37 @@ const RequestPage = ({ url }) => {
       .catch(error => {
         console.error('Error creating request:', error);
       });
+      navigate('/myrequests');
   };
 
   return (
     <div className="container mt-5">
-      {/* <Requests /> */}
+      <NotLoggedIn>Log in to make request</NotLoggedIn><br />
+      <Link className='btn btn-primary' to="/myrequests">View My Requests</Link>
       <h2 className="mb-4" style={{ color: '#FF5733' }}>Request Details</h2>
       <Form onSubmit={handleSubmit}>
         <div className='w-50'>
-          {/* Organization */}
           <Form.Group className="mb-3" controlId="organization">
-            <Form.Label>Organization</Form.Label>
+            <Form.Label>Organizer/Contact Org</Form.Label>
             <Form.Control type="text" name="organization" value={formData.organization} onChange={handleChange} required />
           </Form.Group>
 
-          {/* Event */}
           <Form.Group className="mb-3" controlId="event">
             <Form.Label>Event</Form.Label>
             <Form.Control type="text" name="event" value={formData.event} onChange={handleChange} required />
           </Form.Group>
 
-          {/* Location */}
           <Form.Group className="mb-3" controlId="location">
             <Form.Label>Location</Form.Label>
             <Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
           </Form.Group>
 
-          {/* Start Date */}
           <Form.Group className="mb-3" controlId="start_date">
             <Form.Label>Start Date</Form.Label>
             <br />
             <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
           </Form.Group>
 
-          {/* End Date */}
           <Form.Group className="mb-3" controlId="end_date">
             <Form.Label>End Date</Form.Label>
             <br />
@@ -233,7 +248,6 @@ const RequestPage = ({ url }) => {
           </Table>
         </div>
         <br />
-        {/* Submit Button */}
         <div className="text-center">
           <Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
         </div>

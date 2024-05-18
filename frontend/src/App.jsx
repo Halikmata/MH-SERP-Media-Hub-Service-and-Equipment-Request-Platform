@@ -14,6 +14,7 @@ import Services from './pages/services.jsx';
 import Admin from './pages/admin/admin.jsx';
 import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
+import NoPage from './includes/noPage.jsx';
 
 function App(){
     const [cookies, removeCookie] = useCookies(['presence']);
@@ -30,8 +31,9 @@ function App(){
             {!isAdminPage && <Header />}
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/*" element={<NoPage/>} />
                 <Route path="/equipment" element={<Equipment url={url} />} />
-                <Route path="/requests" element={<RequestPage url={url} />} />
+                <Route path="/request" element={<RequestPage url={url} />} />
                 <Route path="/myrequests" element={<Requests url={url} />} />
                 <Route path="/services" element={<Services url={url}/>} />
                 <Route path="/signup" element={<Signup url={url} />} />
