@@ -10,8 +10,8 @@ const EditItem = ({ url, renderSelectCell }) => {
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(true);
 
-    
-    function onCancel(){
+
+    function onCancel() {
         navigate(`/admin/${collection}`);
     }
 
@@ -35,7 +35,7 @@ const EditItem = ({ url, renderSelectCell }) => {
             case 'text':
             case 'date':
             case 'number':
-                return <input type={fieldType} name={field} value={formData[field] || ''} onChange={handleChange} />;
+                return <input className="form-control m-2" type={fieldType} name={field} value={formData[field] || ''} onChange={handleChange} />;
             case 'xor':
                 return (
                     <select name={field} value={formData[field] || ''} onChange={handleChange}>
@@ -112,36 +112,46 @@ const EditItem = ({ url, renderSelectCell }) => {
 
         const collectionTypes = types[collection] || {};
         return (
-            <form onSubmit={handleSubmit}>
-                {Object.entries(collectionTypes).map(([field, config]) => (
-                    <div key={field}>
-                        <label>{config["label"]}: </label>
-                        {renderInput(field, config)}
+            <div className='container'>
+                <div className='row justify-content-center'>
+                    <div className='col-md-6'>
+                        <div className='card mt-5'>
+                            <div className='card-body'>
+                                <form onSubmit={handleSubmit}>
+                                    {Object.entries(collectionTypes).map(([field, config]) => (
+                                        <div key={field}>
+                                            <label>{config["label"]}: </label>
+                                            {renderInput(field, config)}
+                                        </div>
+                                    ))}
+                                    <Button className="m-2" type="submit">Submit</Button>
+                                    <Button className="m-2"variant="secondary" onClick={onCancel}>Cancel</Button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                ))}
-                <Button type="submit">Submit</Button>
-            </form>
+                </div>
+            </div>
         );
     };
 
     const handleSelectChange = (field, value) => {
         setFormData({ ...formData, [field]: value });
-    
+
         axios.post(`${url}${collection}/update/${id}`, { [field]: value })
-          .then((response) => {
-            console.log('Item updated successfully:', response.data);
-            navigate(`/admin/${collection}`);
-          })
-          .catch((error) => {
-            console.error('Error updating item:', error);
-          });
-      };
+            .then((response) => {
+                console.log('Item updated successfully:', response.data);
+                navigate(`/admin/${collection}`);
+            })
+            .catch((error) => {
+                console.error('Error updating item:', error);
+            });
+    };
 
     return (
         <div>
             <h2>Edit {collection}</h2>
             {renderForm()}
-            <Button variant="secondary" onClick={onCancel}>Cancel</Button>
         </div>
     );
 };

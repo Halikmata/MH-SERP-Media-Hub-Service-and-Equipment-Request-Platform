@@ -102,6 +102,7 @@ function Login() {
             console.log(response.data);
 
             if (response.data['msg'] === true){
+                sessionStorage.setItem('userData', JSON.stringify(response.data['user']));
                 navigate('/'); // goal: return to previous page, navigate(-1); uses browser window history feature, not recommended.
             }
         } catch (error) {
