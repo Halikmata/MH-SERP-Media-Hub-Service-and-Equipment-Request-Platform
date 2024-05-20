@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
 
 function Login() {
     let navigate = useNavigate();
-    
-    
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const fromValue = queryParams.get('from');
+
     const user_form_input = {
         username: '',
         password: '',
@@ -117,8 +119,7 @@ function Login() {
                 <div className='col-md-6'>
                     <div className='card mt-5'>
                         <div className='card-body'>
-                            <h2 className='text-center'>Log In</h2>
-
+                            <h2 className='text-center'>{fromValue == 'request' ? ('Log in to make a request'):('Log In')}</h2>
                             <form onSubmit={handleSubmit}>
                                 <div className='mb-3'>
                                     <input type="text" name="username" className="form-control" placeholder="Username"

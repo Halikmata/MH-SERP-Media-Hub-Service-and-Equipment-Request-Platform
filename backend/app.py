@@ -113,7 +113,7 @@ def login():
 
     # Create access token with additional claims
     additional_claims = {"account_detail": account}
-    access_token = create_access_token(identity=account['email'], additional_claims=additional_claims)
+    access_token = create_access_token(identity=account['email'])
     
     
     response_data = {
@@ -190,7 +190,7 @@ def index(collection):
     return jsonify(rows_list), 200
 
 @app.route('/<collection>/add', methods=["GET","POST"])
-#@jwt_required()
+# @jwt_required()
 def add_row(collection):   
     if not verify_collection(collection):
         return jsonify({"message": "Unknown URL"}), 404

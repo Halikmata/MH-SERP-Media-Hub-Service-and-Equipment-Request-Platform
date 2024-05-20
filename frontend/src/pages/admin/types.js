@@ -51,11 +51,11 @@ export const types = {
             "data_type": "text",
             "label": "Event Affifliation"
         },
-        "request_start": {
+        "event_start": {
             "data_type": "date",
             "label": "Start Date"
         },
-        "request_end": {
+        "event_end": {
             "data_type": "date",
             "label": "End Date"
         },
