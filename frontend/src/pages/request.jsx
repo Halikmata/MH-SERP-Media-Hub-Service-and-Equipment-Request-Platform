@@ -65,7 +65,7 @@ function Requests({ url }) {
 			setRequest(response.data);
 
 		} catch (error) {
-			navigate('/login')
+			navigate('/login');
 		}
 		get_foreign_key();
 	}
