@@ -1,5 +1,3 @@
-# this py file is an overhaul version that is yet to be finished due to discovering new concerns arising.
-
 from flask import jsonify, request, make_response
 from bson.objectid import ObjectId
 from bson.decimal128 import Decimal128
@@ -7,18 +5,16 @@ from datetime import datetime, timedelta
 
 import jwt
 from __init__ import app, db
-from utils import verify_collection
+from utils import verify_collection, verify_date
 
 from foreign import apply_foreign
 
 from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
+    jwt_required, create_access_token,
     get_jwt_identity
 )
 
 from functools import wraps
-
-# ---------- User approutes
 
 """ def check_token(f): # custom-made @jwt_required specifically for verifying presence and validating session.
     @wraps(f)
@@ -49,33 +45,26 @@ def verify_presence():
     
     accounts = db['accounts'].find({"gmail": identity})
     accounts = list(accounts)
-    print("accounts: ", accounts)
-    print("Identity: ", identity)
+
     if len(accounts) >= 1:
         if len(accounts) > 1:
             print("Redundancy Data detected.")
         return make_response(jsonify({"msg": True}), 200)
     
 
-""" @app.route('/verify_cookie')
-@jwt_required() """
 def verify_cookie():
     identity = get_jwt_identity()
     
     accounts = db['accounts'].find({"gmail": identity})
     accounts = list(accounts)
-    print("accounts: ", accounts)
-    print("Identity: ", identity)
+
     if len(accounts) >= 1:
         if len(accounts) > 1:
             print("Redundancy Data detected.")
         return True
     else:
-        return False
+        return False  
     
-    
-    
-
 @app.route('/logout',methods=['GET'])
 def sign_out(): # sign out redirect to main page.
     
@@ -145,30 +134,21 @@ def login():
             response.set_cookie('presence', access_token, httponly=False, secure=False, samesite='None', domain='localhost')
         
         return response # this shouldn't send any important credentials at all.
-        
-
-""" @app.route('/testcookie', methods=['GET'])
-def test():
-
-    response = make_response(jsonify(access_token="test"))
-    response.set_cookie('access_token', "test", httponly=True, secure=False, samesite='None')
-    return response """
-
 
 
 @app.route('/', methods=['GET'])
 def landing_page():
     return jsonify({'msg':'hello'}), 200 # output: related to "View Updates feature"
 
-@app.route('/requests', methods=['GET'])
-@jwt_required() # react vite overcomes this security because it access "requests" in react localhost, not python flask jwt. --
+@app.route('/requests', methods=['GET']) # broad error catch fix --------------------------------------------------
+@jwt_required()
 def user_requests():
     verify = verify_cookie()
     if not verify:
         return make_response(jsonify({'msg':'Not Authorized'}), 401)
     
     token = request.headers.get('Authorization')
-    print(f"\n\n\nrequests: {token}\n\n\n")
+
     #token_decode = token['identity']
     
     #print(f"\n\n\n{token_decode}\n\n\n")
@@ -213,32 +193,73 @@ def user_requests():
 
 
 @app.route('/requests/add', methods=["GET","POST"])
-# @jwt_required()
-def user_add_requests(): # twice a day only.
-    
-    data = request.get_json() # input: request collection attribute (including a new attribute that acts as foreign key <-- primary key from account's objectid)
-    
-    if data == None:
-        return jsonify({"msg":"no form data found"}), 400
-    
-    collection = db['requests']
+@jwt_required()
+def user_add_requests(): # account only can make request twice a day only. check if there's existing new request to date.
     
     if request.method == "POST":
         
-        json_input = request.get_json() # form request
+        data = request.get_json() # input: request collection attribute (including a new attribute that acts as foreign key <-- primary key from account's objectid)
+    
+        if data == None:
+            return jsonify({"msg":"no form data found"}), 400
+        
+        collection = db['requests']
+        
+        identity = get_jwt_identity()
+        json_input = request.get_json()
+        
+        accounts = db['accounts']
+        
+        query = {"gmail": identity}
+        acc_details = accounts.find(query)
+        
+        if len(acc_details['middle_name']) < 1:
+            json_input['requester_full_name'] = f"{acc_details['first_name']} {acc_details['last_name']}"
+        else:    
+            json_input['requester_full_name'] = f"{acc_details['first_name']} {acc_details['middle_name']} {acc_details['last_name']}"
+        
+        json_input['requester_phone_number'] = acc_details['phone_number']
+        json_input['requester_gmail'] = identity
+        json_input['requester_status'] = "3" # user
+        json_input['requester_affiliation'] = acc_details
         
         result = collection.insert_one(json_input)
         
-        return jsonify({"msg": "Row added successfully", "id": str(result.inserted_id)}), 201
+        # modify equipment instance status iteration
+        
+        if result:
+            return jsonify({"msg": "Instance added successfully"}), 201
+        else:
+            return jsonify({"msg": "Instance failed to add"}), 400
     else:
         
-        pass
-        #return jsonify({'msg':'hello'}), 200
-        # will add GET request for acquiring choose-able options
-    
-    # on-progress
+        foreign_dict = {}
         
-    return jsonify({'msg':'hello'}), 200
+        services = db['services']
+        
+        rows = services.find()
+        rows = list(rows)
+        
+        foreign_dict['services'] = rows
+        
+        equipments = db['equipment']
+        
+        rows = equipments.find()
+        rows = list(rows)
+        
+        foreign_dict['equipment'] = rows # choose instances that are only available.
+        
+        for x in foreign_dict['services']:
+            x.pop("_id", None)
+            
+        for x in foreign_dict['equipment']:
+            x.pop("_id", None)
+        
+        
+        
+        print(f"test: {foreign_dict}")
+        return make_response(jsonify(foreign_dict), 200) # returns services and equipment. dictionary in a dictionary.
+        # will add GET request for acquiring choose-able options
 
 @app.route('/requests/delete', methods=['POST'])
 # @jwt_required() # needs login because its an approute specifically for a user.
