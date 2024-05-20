@@ -13,6 +13,7 @@ function Requests({ url }) {
 	const navigate = useNavigate();
 	const [cookies] = useCookies(['presence']);
 	const [requests, setRequest] = useState([]);
+	
 	async function get_requests_table() {
 		const url_link = `${url}/requests`;
 

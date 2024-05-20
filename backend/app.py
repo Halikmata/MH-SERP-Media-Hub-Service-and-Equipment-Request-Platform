@@ -92,6 +92,19 @@ def signup():
     
     return jsonify({'message': 'Account created successfully'}), 201
 
+@app.route('/verify_presence') # crucial for login restrictions
+@jwt_required()
+def verify_presence():
+    identity = get_jwt_identity()
+    
+    accounts = db['accounts'].find({"gmail": identity})
+    accounts = list(accounts)
+
+    if len(accounts) >= 1:
+        if len(accounts) > 1:
+            print("Redundancy Data detected.")
+        return make_response(jsonify({"msg": True}), 200)
+    
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
