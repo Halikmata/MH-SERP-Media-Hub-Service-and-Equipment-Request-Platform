@@ -48,6 +48,30 @@ function Requests({ url }) {
             });
     }
 
+    async function get_requests_table_beta() {
+		const url_link = `${url}/myrequests`;
+
+		const headers = {
+			"Content-type": "application/json",
+			"Authorization": "Bearer " + cookies.presence
+		};
+
+		const options = {
+			headers: headers,
+			withCredentials: true
+		};
+
+		try {
+			const response = await axios.get(url_link, options);
+			//console.log(response.data);
+			setRequest(response.data);
+
+		} catch (error) {
+			console.error("Error: ", error);
+			navigate('/login') // if session is invalid.
+		}
+	}
+
     useEffect(() => {
         if (isLoggedIn) {
             getRequestsTable();
