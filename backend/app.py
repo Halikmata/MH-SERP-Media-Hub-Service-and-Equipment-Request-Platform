@@ -57,7 +57,7 @@ def register():
 def signup():
     data = request.get_json()
     
-    required_fields = ['first_name', 'last_name', 'phone_number', 'email', 'status', 'incident_report', 'username', 'password', 'confirm_password', 'user_type']
+    required_fields = ['first_name', 'last_name', 'phone_number', 'email', 'status', 'incident_report', 'username', 'password', 'confirm_password', 'college', 'program', 'user_type']
     for field in required_fields:
         if field not in data:
             return jsonify({'message': f'Missing required field: {field}'}), 400
@@ -167,7 +167,7 @@ def index(collection):
     if(int(page) < 1): # avoids negatives.
         page = 1
     
-    limit_rows = 20 # change total rows in a page here.
+    limit_rows = 100 # change total rows in a page here.
     offset = (page - 1) * limit_rows
     rows = collection.find().skip(offset).limit(limit_rows) # ඞ
     
@@ -188,6 +188,25 @@ def index(collection):
     # rows_list = apply_foreign(rows_list,col_name)
 
     return jsonify(rows_list), 200
+
+
+@app.route('/admin/<collection>/<id>', methods=["GET"])
+def get_row(collection, id):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        collection = db[collection]
+        try:
+            obj_id = ObjectId(id)
+            document = collection.find_one({"_id": obj_id})
+            if document:
+                document["_id"] = str(document["_id"])
+                return jsonify(document), 200
+            else:
+                return jsonify({"message": "No row found with the given ID"}), 404
+        except Exception as e:
+            return jsonify({"message": "Invalid ID format"}), 400
+        
 
 @app.route('/<collection>/add', methods=["GET","POST"])
 # @jwt_required()
@@ -450,7 +469,42 @@ def add_request(collection="requests"):
     else:
         pass
         
-        
+
+@app.route('/get_data/<collection_name>')
+def get_data(collection_name):
+    conditions = request.args.to_dict()
+
+    collection = db[collection_name]
+
+    documents = collection.find(conditions)
+
+    data = [{**doc, '_id': str(doc['_id'])} for doc in documents]
+
+    return jsonify(data)
+
+
+@app.route('/get_org/<college>')
+def get_org(college):
+    conditions = request.args.to_dict()
+
+    query = {
+        '$or': [
+            {'idcollegeoffice': college},
+            {'idcollegeoffice': {'$exists': False}},
+            {'idcollegeoffice': ''}
+        ]
+    }
+
+    combined_conditions = {**conditions, **query}
+
+    collection = db['organization']
+    documents = collection.find(combined_conditions)
+
+    data = [{**doc, '_id': str(doc['_id'])} for doc in documents]
+
+    return jsonify(data)
+
+
     
 # add account profile to request GET and request ADD
 

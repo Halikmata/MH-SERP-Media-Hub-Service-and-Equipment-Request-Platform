@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function Signup({url}) {
+function Signup({ url }) {
   const [formData, setFormData] = useState({
     first_name: '',
     middle_name: '',
@@ -17,9 +17,54 @@ function Signup({url}) {
     user_type: 'Student', // Default value
     college: '', // Only for students
     program: '', // Only for students
+    other_org: '', // Only for students
     office: '', // Only for faculty/staff
     position: '' // Only for faculty/staff
   });
+
+  const [colleges, setColleges] = useState([]);
+  const [organizations, setOrganizations] = useState([]);
+  const [programs, setPrograms] = useState([]);
+  const [otherOrgs, setOtherOrgs] = useState([]);
+  const [isProgramDisabled, setIsProgramDisabled] = useState(true);
+
+  useEffect(() => {
+    axios.get(`${url}/get_data/college_office?type=college`)
+      .then((response) => {
+        setColleges(response.data); // Assuming the response contains item data
+      })
+      .catch((error) => {
+        console.error('Error fetching item:', error);
+      });
+  }, [url]);
+
+  const handleCollegeChange = (e) => {
+    const selectedCollege = e.target.value;
+    setFormData(prevData => ({
+      ...prevData,
+      college: selectedCollege,
+      program: '', // Reset program when college changes
+      other_org: '' // Reset other_org when college changes
+    }));
+
+    if (selectedCollege) {
+      axios.get(`${url}/get_org/${selectedCollege}`)
+        .then((response) => {
+          setOrganizations(response.data);
+          setPrograms(response.data.filter(org => org.program));
+          setOtherOrgs(response.data.filter(org => !org.program));
+          setIsProgramDisabled(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching item:', error);
+        });
+    } else {
+      setOrganizations([]);
+      setPrograms([]);
+      setOtherOrgs([]);
+      setIsProgramDisabled(true);
+    }
+  };
 
   const navigate = useNavigate();
 
@@ -34,13 +79,13 @@ function Signup({url}) {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios.post(`${url}/signup`, formData)
-        .then((response) => {
-            console.log('User added successfully:', response.data);
-            navigate('/')
-        })
-        .catch((error) => {
-            console.error('Error adding item:', error);
-        });
+      .then((response) => {
+        console.log('User added successfully:', response.data);
+        navigate('/login')
+      })
+      .catch((error) => {
+        console.error('Error adding item:', error);
+      });
   };
 
   return (
@@ -76,23 +121,47 @@ function Signup({url}) {
                   <input type="password" name="confirm_password" className="form-control" placeholder="Confirm Password" value={formData.confirm_password} onChange={handleInputChange} required />
                 </div>
                 <div className="mb-3">
-                  <select name="userType" className="form-select" value={formData.userType} onChange={handleInputChange}>
+                  <select name="user_type" className="form-select" value={formData.user_type} onChange={handleInputChange} required>
                     <option value="Student">Student</option>
                     <option value="Faculty">Faculty</option>
-                    <option value="Staff">Staff</option>  
+                    <option value="Staff">Staff</option>
                   </select>
                 </div>
-                {formData.userType === 'Student' && (
+                {formData.user_type === 'Student' && (
                   <>
                     <div className="mb-3">
-                      <input type="text" name="college" className="form-control" placeholder="College" value={formData.college} onChange={handleInputChange} />
+                      <select name="college" className="form-select" value={formData.college} onChange={handleCollegeChange} required>
+                        <option value="" disabled>Select College</option>
+                        {colleges.map(college => (
+                          <option key={college._id.$oid} value={college.fk_idcollegeoffice}>
+                            {college.acronym || college.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="mb-3">
-                      <input type="text" name="program" className="form-control" placeholder="Program" value={formData.program} onChange={handleInputChange} />
+                      <select name="program" className="form-select" value={formData.program} onChange={handleInputChange} disabled={isProgramDisabled} required>
+                        <option value="" disabled>Select Program</option>
+                        {programs.map(program => (
+                          <option key={program._id.$oid} value={program.fk_org_id}>
+                            {program.program}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="mb-3">
+                      <select name="other_org" className="form-select" value={formData.other_org} onChange={handleInputChange} disabled={isProgramDisabled}>
+                        <option value="" disabled>Organization (optional)</option>
+                        {otherOrgs.map(org => (
+                          <option key={org._id.$oid} value={org.fk_org_id}>
+                            {org.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </>
                 )}
-                {formData.userType !== 'Student' && (
+                {formData.user_type !== 'Student' && (
                   <>
                     <div className="mb-3">
                       <input type="text" name="office" className="form-control" placeholder="Office" value={formData.office} onChange={handleInputChange} />

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import './AdminTable.css';
 
 const AdminTable = ({ url, collection, columns }) => {
   const [data, setData] = useState([]);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
@@ -39,6 +41,11 @@ const AdminTable = ({ url, collection, columns }) => {
     return 0;
   });
 
+  const handleRowClick = (id) => {
+    navigate(`${location.pathname}/${id}`);
+  };
+
+
   return (
     <div className="container mt-4 w-75">
       <h2>{collection}</h2>
@@ -65,14 +72,13 @@ const AdminTable = ({ url, collection, columns }) => {
         </thead>
         <tbody>
           {sortedData.map(item => (
-            <tr key={item._id}>
+            <tr key={item._id} className='tableRow' onClick={() => handleRowClick(item._id)}>
               {columns.map(({ field, cell }) => (
                 <td key={field}>
                   {cell ? cell(item[field]) : item[field]}
                 </td>
               ))}
               <td>
-                <Link to={`${location.pathname}/update/${item._id}`} className="btn btn-sm btn-info mr-2 m-1">Edit</Link>
                 <Link to={`${location.pathname}/delete/${item._id}`} className="btn btn-sm btn-danger m-1">Delete</Link>
               </td>
             </tr>
