@@ -208,8 +208,6 @@ def user_add_requests(): # account only can make request twice a day only. check
         
         result = collection.insert_one(json_input)
         
-        # modify equipment instance status iteration
-        
         if result:
             return jsonify({"msg": "Instance added successfully"}), 201
         else:
@@ -227,7 +225,7 @@ def user_add_requests(): # account only can make request twice a day only. check
         
         equipments = db['equipment']
         
-        rows = equipments.find()
+        rows = equipments.find({"availability":"1"})
         rows = list(rows)
         
         foreign_dict['equipment'] = rows # choose instances that are only available.
