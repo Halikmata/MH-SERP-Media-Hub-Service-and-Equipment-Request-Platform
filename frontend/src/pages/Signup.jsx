@@ -51,9 +51,12 @@ function Signup({ url }) {
       axios.get(`${url}/get_org/${selectedCollege}`)
         .then((response) => {
           setOrganizations(response.data);
-          setPrograms(response.data.filter(org => org.program));
-          setOtherOrgs(response.data.filter(org => !org.program));
-          setIsProgramDisabled(false);
+          const programs = response.data.filter(org => org.program);
+          const otherOrgs = response.data.filter(org => !org.program);
+
+          setPrograms(programs);
+          setOtherOrgs(otherOrgs);
+          setIsProgramDisabled(programs.length === 0);
         })
         .catch((error) => {
           console.error('Error fetching item:', error);
@@ -78,13 +81,35 @@ function Signup({ url }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const requiredFields = ['first_name', 'last_name', 'phone_number', 'email', 'username', 'password', 'confirm_password', 'user_type', 'college'];
+    if (!isProgramDisabled) {
+      requiredFields.push('program');
+    }
+    const emptyFields = requiredFields.filter(field => !formData[field]);
+
+    if (emptyFields.length > 0) {
+      alert(`Please fill in all the required fields!`);
+      return;
+    }
+
+    if (formData.password !== formData.confirm_password) {
+      alert("Password and Confirm Password do not match.");
+      return;
+    }
+
     axios.post(`${url}/signup`, formData)
       .then((response) => {
         console.log('User added successfully:', response.data);
-        navigate('/login')
+        navigate('/login');
       })
       .catch((error) => {
-        console.error('Error adding item:', error);
+    console.error('Error adding item:', error);
+    if (error.response && error.response.data && error.response.data.message) {
+      alert('Error creating account: \n' + error.response.data.message);
+    } else {
+      alert('Error creating account. Please try again later.');
+    }
       });
   };
 
@@ -94,13 +119,13 @@ function Signup({ url }) {
         <div className="col-md-6">
           <div className="card mt-5">
             <div className="card-body">
-              <h2 className="text-center">Sign Up</h2>
+              <h2 className="text-center">Sign Up</h2><br />
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <input type="text" name="first_name" className="form-control" placeholder="First Name" value={formData.first_name} onChange={handleInputChange} required />
                 </div>
                 <div className="mb-3">
-                  <input type="text" name="middle_name" className="form-control" placeholder="Middle Name" value={formData.middle_name} onChange={handleInputChange} />
+                  <input type="text" name="middle_name" className="form-control" placeholder="Middle Name (optional)" value={formData.middle_name} onChange={handleInputChange} />
                 </div>
                 <div className="mb-3">
                   <input type="text" name="last_name" className="form-control" placeholder="Last Name" value={formData.last_name} onChange={handleInputChange} required />
@@ -140,7 +165,14 @@ function Signup({ url }) {
                       </select>
                     </div>
                     <div className="mb-3">
-                      <select name="program" className="form-select" value={formData.program} onChange={handleInputChange} disabled={isProgramDisabled} required>
+                      <select
+                        name="program"
+                        className="form-select"
+                        value={formData.program}
+                        onChange={handleInputChange}
+                        disabled={isProgramDisabled || programs.length === 0}
+                        required={!isProgramDisabled}
+                      >
                         <option value="" disabled>Select Program</option>
                         {programs.map(program => (
                           <option key={program._id.$oid} value={program.fk_org_id}>
@@ -150,7 +182,13 @@ function Signup({ url }) {
                       </select>
                     </div>
                     <div className="mb-3">
-                      <select name="other_org" className="form-select" value={formData.other_org} onChange={handleInputChange} disabled={isProgramDisabled}>
+                      <select
+                        name="other_org"
+                        className="form-select"
+                        value={formData.other_org}
+                        onChange={handleInputChange}
+                        disabled={isProgramDisabled}
+                      >
                         <option value="" disabled>Organization (optional)</option>
                         {otherOrgs.map(org => (
                           <option key={org._id.$oid} value={org.fk_org_id}>
@@ -164,10 +202,10 @@ function Signup({ url }) {
                 {formData.user_type !== 'Student' && (
                   <>
                     <div className="mb-3">
-                      <input type="text" name="office" className="form-control" placeholder="Office" value={formData.office} onChange={handleInputChange} />
+                      <input type="text" name="office" className="form-control" placeholder="Office" value={formData.office} onChange={handleInputChange} required />
                     </div>
                     <div className="mb-3">
-                      <input type="text" name="position" className="form-control" placeholder="Position" value={formData.position} onChange={handleInputChange} />
+                      <input type="text" name="position" className="form-control" placeholder="Position" value={formData.position} onChange={handleInputChange} required />
                     </div>
                   </>
                 )}

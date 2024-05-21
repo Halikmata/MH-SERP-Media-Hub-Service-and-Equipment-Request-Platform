@@ -3,6 +3,7 @@ from bson.objectid import ObjectId
 from bson.decimal128 import Decimal128
 from datetime import datetime, timezone, timedelta
 # from pymongo.errors import ConnectionFailure
+import re
 
 import jwt
 from __init__ import app, db
@@ -70,6 +71,31 @@ def signup():
     if existing_acc:
         return jsonify({'message': 'Account already exists'}), 400
     
+    # Input validations
+    if not re.match(r'^[A-Za-z\s]*$', data['first_name']):
+        return jsonify({'message': 'First name should only contain letters and spaces'}), 400
+
+    if not re.match(r'^[A-Za-z\s]*$', data['middle_name']):
+        return jsonify({'message': 'Middle name should only contain letters and spaces'}), 400
+
+    if not re.match(r'^[A-Za-z\s]*$', data['last_name']):
+        return jsonify({'message': 'Last name should only contain letters and spaces'}), 400
+    
+    if not re.match(r'^(\+63|0)?\d{10}$', data['phone_number']):
+        return jsonify({'message': 'Invalid phone number format'}), 400
+
+    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data['email']):
+         return jsonify({'message': 'Invalid email format'}), 400
+     
+    if not re.match(r'.+@psu\.palawan\.edu\.ph$', data['email']):
+         return jsonify({'message': 'Corporate email is required in creating account'}), 400
+
+    if not re.match(r'^[a-zA-Z0-9_]+$', data['username']):
+        return jsonify({'message': 'Username must not contain special characters'}), 400
+    
+    if len(data['password']) < 8:
+        return jsonify({'message': 'Password must be at least 8 characters long'}), 400
+    
     # Additional fields based on user type
     user_type = data['user_type']
     if user_type == 'student':
@@ -109,12 +135,11 @@ def verify_presence():
 def login():
     data = request.get_json()
 
-    username = data['username']
+    username = data['username_email']
     password = data['password']
     session_const = data.get('session_const', False)
     
-    accounts = list(db['accounts'].find({"username": username, "password": password}))
-    
+    accounts = list(db['accounts'].find({"$or": [{"username": username}, {"email": username}], "password": password}))    
     if len(accounts) == 0:
         return jsonify({"msg": False}), 401
     
@@ -180,7 +205,7 @@ def index(collection):
     if(int(page) < 1): # avoids negatives.
         page = 1
     
-    limit_rows = 100 # change total rows in a page here.
+    limit_rows = 50 # change total rows in a page here.
     offset = (page - 1) * limit_rows
     rows = collection.find().skip(offset).limit(limit_rows) # ඞ
     
@@ -437,11 +462,35 @@ def admin_delete_row(collection, id):
 def my_requests(email):
     try:
         requests_collection = db['requests']
+        equipment_collection = db['equipment']
+        services_collection = db['services']
+        
         requests = requests_collection.find({'requester_email': email})
         
         requests_list = []
         for request in requests:
             request['_id'] = str(request['_id'])
+            
+            if 'equipment' in request:
+                equipment_names = []
+                for eq_id in request['equipment']:
+                    equipment = equipment_collection.find_one({'idequipment': eq_id})
+                    if equipment:
+                        equipment_names.append(equipment['description'])
+                    else:
+                        equipment_names.append("Unknown Equipment")
+                request['equipment'] = equipment_names
+
+            if 'services' in request:
+                service_names = []
+                for service_id in request['services']:
+                    service = services_collection.find_one({'fk_idservice': service_id})
+                    if service:
+                        service_names.append(service['name'])
+                    else:
+                        service_names.append("Unknown Service")
+                request['services'] = service_names
+
             requests_list.append(request)
         
         if not requests_list:

@@ -12,9 +12,12 @@ const RequestPage = ({ url }) => {
   const [requests, setRequest] = useState([]);
   const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
+  const [services, setServices] = useState([]);
   const [equipmentTypes, setEquipmentTypes] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedEquipment, setSelectedEquipment] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
+
   const [formData, setFormData] = useState({
     organization: '',
     event: '',
@@ -45,9 +48,16 @@ const RequestPage = ({ url }) => {
       })
       .catch(error => {
         console.error(error);
-        return (
-          <NotLoggedIn>You need to log in</NotLoggedIn>
-        )
+      });
+  }, [url]);
+
+  useEffect(() => {
+    axios.get(`${url}/services`)
+      .then(response => {
+        setServices(response.data);
+      })
+      .catch(error => {
+        console.error(error);
       });
   }, [url]);
 
@@ -82,6 +92,17 @@ const RequestPage = ({ url }) => {
     }
   };
 
+  const handleServiceChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setSelectedServices(prevSelected => [...prevSelected, value]);
+    } else {
+      setSelectedServices(prevSelected =>
+        prevSelected.filter(item => item !== value)
+      );
+    }
+  };
+
   const handleFilterChange = (event) => {
     const { value, checked } = event.target;
     if (checked) {
@@ -111,6 +132,7 @@ const RequestPage = ({ url }) => {
       requester_status: userData.status,
       request_status: 0,
       equipment: selectedEquipment,
+      services: selectedServices
     };
 
     axios.post(`${url}/requests/add`, requestData)
@@ -229,6 +251,33 @@ const RequestPage = ({ url }) => {
               })}
             </tbody>
           </Table>
+          <br />
+          <Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Add</th>
+              </tr>
+            </thead>
+            <tbody>
+              {services.map(item => (
+                <tr key={item._id}>
+                  <td>{item.name}</td>
+                  <td>
+                    <Form.Check
+                      type="checkbox"
+                      id={item.fk_idservice}
+                      value={item.fk_idservice}
+                      label=""
+                      onChange={handleServiceChange}
+                      checked={selectedServices.includes(item.fk_idservice)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+
         </div>
         <br />
         <div className="text-center">

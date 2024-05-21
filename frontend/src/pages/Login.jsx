@@ -10,13 +10,14 @@ function Login() {
     const fromValue = queryParams.get('from');
 
     const user_form_input = {
-        username: '',
+        username_email: '',
         password: '',
         session_const: false
     };
     const [formData, setFormData] = useState(user_form_input);
     const [buttonColor, setButtonColor] = useState('orange');
     const [cookies, removeCookie] = useCookies(['presence']);
+    const [showPassword, setShowPassword] = useState(false); // State to toggle show password
 
     async function verify_presence(){ // cookie checker, if true, then direct back to homepage. facebook style.
 
@@ -109,9 +110,16 @@ function Login() {
             }
         } catch (error) {
             console.error("Error: ", error); // will remove log
+            if (error.response && error.response.status === 401) {
+                alert("Incorrect credentials. Please try again.");
+            }
         }
     }
 
+    // Function to toggle show/hide password
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     return (
         <div className='container'>
@@ -122,13 +130,18 @@ function Login() {
                             <h2 className='text-center'>{fromValue == 'request' ? ('Log in to make a request'):('Log In')}</h2>
                             <form onSubmit={handleSubmit}>
                                 <div className='mb-3'>
-                                    <input type="text" name="username" className="form-control" placeholder="Username"
-                                    value={formData.username} onChange={handleInputChange} required />
+                                    <input type="text" name="username_email" className="form-control" placeholder="Username or email"
+                                    value={formData.username_email} onChange={handleInputChange} required />
                                 </div>
 
                                 <div className='mb-3'>
-                                    <input type="password" name="password" className="form-control" placeholder="Password"
-                                    value={formData.password} onChange={handleInputChange} required />
+                                    <div className="input-group">
+                                        <input type={showPassword ? "text" : "password"} name="password" className="form-control" placeholder="Password"
+                                        value={formData.password} onChange={handleInputChange} required />
+                                        <button className="btn" style={grayOutline} type="button" onClick={toggleShowPassword}>
+                                            {showPassword ? "Hide" : "Show"}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className='mb-3'>
@@ -155,5 +168,9 @@ function Login() {
         </div>
     ) // return
 } // function login
+
+const grayOutline={
+    borderColor: "#CDCDCD"
+}
 
 export default Login;

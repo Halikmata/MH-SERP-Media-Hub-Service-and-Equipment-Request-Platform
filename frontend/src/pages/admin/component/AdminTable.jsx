@@ -42,7 +42,7 @@ const AdminTable = ({ url, collection, columns }) => {
   });
 
   const handleRowClick = (id) => {
-    navigate(`${location.pathname}/${id}`);
+    navigate(`${location.pathname}/update/${id}`);
   };
 
 
