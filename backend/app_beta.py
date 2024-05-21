@@ -335,12 +335,108 @@ def apply_volunteer():
 
 # on progress ------------
 
+def admin_jwt_required(f): # custom-made @jwt_required specifically for verifying presence and validating session.
+    @wraps(f)
+    def get_header_token(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        
+        if not token or not token.startswith('Bearer '):
+            return make_response(jsonify({"msg": "No Session Found"}), 401) 
+        else:
+            token = token[7:]
+            
+        try:
+            # data = jwt.decode(token, app.config['SECRET_KEY'])
+            identity = get_jwt_identity()
+            
+            accounts = db['accounts']
+            
+            query = {'email':identity}
+            result = accounts.find(query)
+            
+            result = list(result)
+            
+            if len(result) > 1:
+                print('debug: multiple instance detected! [in admin_jwt_required]')
+            
+            acc_status = result[0]['status']
+            
+            if acc_status not in ["1","2"]: # if not admin or developer
+                return make_response(jsonify({"msg": "Unauthorized Account"}), 401)
+            
+        except jwt.ExpiredSignatureError:
+            return make_response(jsonify({"msg": "Session expired"}), 401)
+        
+        except jwt.InvalidTokenError:
+            return make_response(jsonify({"msg": "Invalid session"}), 401) # issue?
+
+        return f(*args, **kwargs)
+
+    return get_header_token
+
+
+def get_top_5_requesters(): # top 5 requesters with highest request quantity
+    accounts = db['accounts']
+    requests = db['requests']
+    query = {
+        {"$group":{
+            "name": "$requester_email", # email will be replaced with name in loop
+            "total_requests":{"$sum": 1}
+        }},
+        {"$sort":{"total_requests": -1}},
+        {"$limit":5}
+    }
+    count_requests = requests.aggregate(query)
+    count_requests = list(count_requests)
+    
+    for x in count_requests:
+        query = {'email': x['name']}
+        result = accounts.find(query)
+        acc = list(result)[0]
+        
+        name = f"{acc['fname']} {acc['mname']} {acc['lname']}"
+        x['name'] = name
+        
+    return count_requests
+
+def get_top_5_equipments(): # most borrowed equipment per month of current year --
+    equipment = db['equipment']
+    request = db['requests']
+    
+    query = {}
+    
+    results = request.aggregate()
+    
+    return
+    
+
 @app.route('/admin')
+@admin_jwt_required
 def admin_index():
     
-    collections = db.list_collection_names() # lists down all collection (this is for sidebar)
+    equipment = db['equipment']
+    services = db['services']
+    accounts = db['accounts']
+    #organization = db['organization']
+    info = {}
+    
+    acc_results = accounts.find() # list of accounts
+    acc_results = list(acc_results)
+    
+    info['top_5'] = get_top_5_requesters()
+    
+    info['frequent_equipments'] = get_top_5_equipments() # incomplete
+    
+    
+    
+    
+    
+    
+    
+    
+    return make_response(jsonify(info), 200)
 
-    return jsonify({'collections':collections}), 200
+    
 
 """ @app.route('/admin/requests/conclude', methods=['POST']) # this assumes that admins are the ones that declare requests as finished.
 def admin_request_conclude():
@@ -356,7 +452,10 @@ def admin_request_conclude():
     
     return jsonify({'msg':'Request instance conluded'}), 201 """
 
+
+    
 @app.route('/admin/report', methods=['GET'])
+@admin_jwt_required
 def admin_report():
     
     collection = db['requests']
