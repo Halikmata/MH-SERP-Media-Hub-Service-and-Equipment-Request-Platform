@@ -228,19 +228,17 @@ def user_add_requests(): # account only can make request twice a day only. check
         rows = equipments.find({"availability":"1"})
         rows = list(rows)
         
-        foreign_dict['equipment'] = rows # choose instances that are only available.
+        foreign_dict['equipment'] = rows
         
         for x in foreign_dict['services']:
             x.pop("_id", None)
             
         for x in foreign_dict['equipment']:
             x.pop("_id", None)
-        
-        
-        
+              
         print(f"test: {foreign_dict}")
         return make_response(jsonify(foreign_dict), 200) # returns services and equipment. dictionary in a dictionary.
-        # will add GET request for acquiring choose-able options
+
 
 @app.route('/requests/delete', methods=['POST'])
 # @jwt_required() # needs login because its an approute specifically for a user.
