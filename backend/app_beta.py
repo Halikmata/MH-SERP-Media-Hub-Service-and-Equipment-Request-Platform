@@ -188,6 +188,20 @@ def user_limit_requests():
     
     
 
+def verify_date(start_date, end_date): # used in /request/add
+    
+    current_date = datetime.now().date()
+    
+    # start_date must not be less than current date.
+    
+    # start_date must not be more than end_date.
+    
+    # days between start_date and end_date must be less than or equal to ?
+    
+    # max length between current date and start_date is ?
+    
+    pass
+
 @app.route('/requests/add', methods=["GET","POST"])
 @jwt_required()
 def user_add_requests(): # account only can make request twice a day only. check if there's existing new request to date.
