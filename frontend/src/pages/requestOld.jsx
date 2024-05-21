@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Button, Table, Dropdown } from 'react-bootstrap';
+import { Form, Button, Accordion, Table, Dropdown } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -126,6 +126,18 @@ const RequestPage = ({ url }) => {
     navigate('/myrequests');
   };
 
+  const groupEquipmentByType = (equipment) => {
+    return equipment.reduce((acc, eq) => {
+      const type = eq.equipment_type;
+      if (!acc[type]) {
+        acc[type] = [];
+      }
+      acc[type].push(eq);
+      return acc;
+    }, {});
+  };
+
+  const groupedEquipment = groupEquipmentByType(equipment);
 
   return (
     <div className="container mt-5">
@@ -168,68 +180,45 @@ const RequestPage = ({ url }) => {
 
         <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Equipment List</h2>
         <br />
-        <Dropdown>
-          <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-            Select Equipment Types
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Form>
-              {equipmentTypes.map((type) => (
-                <Form.Check
-                  key={type.fk_idequipment_type}
-                  type="checkbox"
-                  id={type.fk_idequipment_type}
-                  label={type.name}
-                  value={type.fk_idequipment_type}
-                  onChange={handleFilterChange}
-                  checked={selectedTypes.includes(type.fk_idequipment_type)}
-                />
-              ))}
-            </Form>
-          </Dropdown.Menu>
-        </Dropdown>
-        <br />
-        <div className="table-responsive">
-          <Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Type</th>
-                <th>Add</th>
-              </tr>
-            </thead>
-            <tbody>
-              {equipment.map(item => {
-                if (selectedTypes.includes(item.equipment_type)) {
-                  const typeName = equipmentTypes.find(type => type.fk_idequipment_type === item.equipment_type)?.name;
-                  return (
-                    <tr key={item._id}>
-                      <td>{item.idequipment}</td>
-                      <td>{item.brand}</td>
-                      <td>{item.model}</td>
-                      <td>{typeName}</td>
-                      <td>
-                        <Form.Check
-                          type="checkbox"
-                          id={item.idequipment}
-                          value={item.idequipment}
-                          label=""
-                          onChange={handleCheckboxChange}
-                          checked={selectedEquipment.includes(item.idequipment)}
-                        />
-                      </td>
+        <Accordion defaultActiveKey="0">
+          {equipmentTypes.map((type, idx) => (
+            <Accordion.Item eventKey={idx.toString()} key={type.fk_idequipment_type}>
+              <Accordion.Header>{type.name}</Accordion.Header>
+              <Accordion.Body>
+                <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Brand</th>
+                      <th>Model</th>
+                      <th>Add</th>
                     </tr>
-                  );
-                } else {
-                  return null;
-                }
-              })}
-            </tbody>
-          </Table>
-        </div>
+                  </thead>
+                  <tbody>
+                    {groupedEquipment[type.fk_idequipment_type]?.map(item => (
+                      <tr key={item.idequipment}>
+                        <td>{item.idequipment}</td>
+                        <td>{item.brand}</td>
+                        <td>{item.model}</td>
+                        <td>
+                          <Form.Check
+                            type="checkbox"
+                            id={item.idequipment}
+                            value={item.idequipment}
+                            label=""
+                            onChange={handleCheckboxChange}
+                            checked={selectedEquipment.includes(item.idequipment)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Accordion.Body>
+            </Accordion.Item>
+          ))}
+        </Accordion>
+
         <br />
         <div className="text-center">
           <Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
