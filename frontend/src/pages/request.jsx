@@ -49,7 +49,7 @@ function Requests({ url }) {
     }
 
     async function get_requests_table_beta() {
-		const url_link = `${url}/requests`;
+		const url_link = `${url}/myrequests`;
 
 		const headers = {
 			"Content-type": "application/json",
