@@ -148,17 +148,7 @@ def user_requests():
         return make_response(jsonify({'msg':'Not Authorized'}), 401)
     
     token = request.headers.get('Authorization')
-
-    #token_decode = token['identity']
     
-    #print(f"\n\n\n{token_decode}\n\n\n")
-    
-    """ data = request.get_json() # input: user's account email
-    
-    if data == None:
-        return jsonify({"msg":"no json data found"}), 400 """
-    
-    #id = data['_id']
     collection = db['requests']
     
     page = int(request.args.get('page', default=1))
@@ -174,7 +164,6 @@ def user_requests():
     
     accounts = db['accounts'].find({"gmail": identity})
     
-
     if search != None and column != None:
         query = {f"{column}": {"$regex":f"^{search}.*"}, "requester_gmail": identity}
         rows = collection.find(query).skip(offset).limit(limit_rows)

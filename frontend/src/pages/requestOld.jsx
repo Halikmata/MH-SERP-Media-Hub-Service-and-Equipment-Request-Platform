@@ -20,55 +20,11 @@ const RequestPage = ({ url }) => {
     organization: '',
     event: '',
     location: '',
+    details: '',
     start_date: null,
     end_date: null
   });
 
-  const userDataString = sessionStorage.getItem('userData');
-  const userData = JSON.parse(userDataString);
-
-  const { first_name, middle_name, last_name } = userData;
-
-  let requester_full_name = first_name;
-  if (middle_name) {
-    requester_full_name += ' ' + middle_name.charAt(0);
-  }
-  requester_full_name += ' ' + last_name;
-
-
-  useEffect(() => {
-
-    axios.get(`${url}/requests`, {
-      headers: {
-        'Authorization': 'Bearer ' + cookies.presence
-      }
-    })
-      .then(response => {
-        setRequest(response.data);
-      })
-      .catch(error => {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.error(error.response.data);
-          console.error(error.response.status);
-          console.error(error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.error(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.error('Error', error.message);
-        }
-        console.error(error.config);
-      });
-
-
-    // if token invalid or not exists (session)
-    // redirect back to log in
-    //
-
-  }, []);
 
   useEffect(() => {
     axios.get(`${url}/equipment_type`)
@@ -78,6 +34,9 @@ const RequestPage = ({ url }) => {
       })
       .catch(error => {
         console.error(error);
+        return (
+          <NotLoggedIn>You need to log in</NotLoggedIn>
+        )
       });
   }, []);
 
@@ -88,9 +47,28 @@ const RequestPage = ({ url }) => {
       })
       .catch(error => {
         console.error(error);
+        return (
+          <NotLoggedIn>You need to log in</NotLoggedIn>
+        )
       });
 
   }, []);
+
+  const userDataString = sessionStorage.getItem('userData');
+
+  if (!userDataString) {
+    navigate('/login?from=request')
+  }
+  else{
+    const userData = JSON.parse(userDataString);
+    const { first_name, middle_name, last_name } = userData;
+    let requester_full_name = first_name;
+    if (middle_name) {
+      requester_full_name += ' ' + middle_name.charAt(0);
+    }
+    requester_full_name += ' ' + last_name;
+  }
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -123,9 +101,10 @@ const RequestPage = ({ url }) => {
     e.preventDefault();
 
     const requestData = {
-      organization: formData.organization,
+      event_affiliation: formData.organization,
       event_name: formData.event,
       event_location: formData.location,
+      event_details: formData.details,
       event_start: formData.start_date,
       event_end: formData.end_date,
       requester_full_name: requester_full_name,
@@ -145,12 +124,11 @@ const RequestPage = ({ url }) => {
       .catch(error => {
         console.error('Error creating request:', error);
       });
-      navigate('/myrequests');
+    navigate('/myrequests');
   };
 
   return (
     <div className="container mt-5">
-      <NotLoggedIn>Log in to make request</NotLoggedIn><br />
       <Link className='btn btn-primary' to="/myrequests">View My Requests</Link>
       <h2 className="mb-4" style={{ color: '#FF5733' }}>Request Details</h2>
       <Form onSubmit={handleSubmit}>
@@ -168,6 +146,11 @@ const RequestPage = ({ url }) => {
           <Form.Group className="mb-3" controlId="location">
             <Form.Label>Location</Form.Label>
             <Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="details">
+            <Form.Label>Details</Form.Label>
+            <Form.Control type="text" name="details" value={formData.details} onChange={handleChange} placeholder='(optional)' />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="start_date">
