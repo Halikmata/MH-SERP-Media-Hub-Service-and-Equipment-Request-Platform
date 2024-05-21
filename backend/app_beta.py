@@ -174,6 +174,19 @@ def user_requests():
     return make_response(jsonify(rows_list), 200)
 
 
+@app.route('/request/limitcheck', methods=["GET"]) # users can only create two requests per day
+@jwt_required()
+def user_limit_requests():
+    identity = get_jwt_identity()
+    
+    current_date = datetime.now().date()
+    collection = db['requests']
+    
+    query = {f"requester_email": identity}
+    rows = collection.find(query)
+    pass # needs a new collection that traces user actions.
+    
+    
 
 @app.route('/requests/add', methods=["GET","POST"])
 @jwt_required()
