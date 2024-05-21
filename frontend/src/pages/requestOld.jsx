@@ -12,9 +12,12 @@ const RequestPage = ({ url }) => {
   const [requests, setRequest] = useState([]);
   const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
+  const [services, setServices] = useState([]);
   const [equipmentTypes, setEquipmentTypes] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedEquipment, setSelectedEquipment] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
+
   const [formData, setFormData] = useState({
     organization: '',
     event: '',
@@ -45,9 +48,16 @@ const RequestPage = ({ url }) => {
       })
       .catch(error => {
         console.error(error);
-        return (
-          <NotLoggedIn>You need to log in</NotLoggedIn>
-        )
+      });
+  }, [url]);
+
+  useEffect(() => {
+    axios.get(`${url}/services`)
+      .then(response => {
+        setServices(response.data);
+      })
+      .catch(error => {
+        console.error(error);
       });
   }, [url]);
 
@@ -82,6 +92,17 @@ const RequestPage = ({ url }) => {
     }
   };
 
+  const handleServiceChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setSelectedServices(prevSelected => [...prevSelected, value]);
+    } else {
+      setSelectedServices(prevSelected =>
+        prevSelected.filter(item => item !== value)
+      );
+    }
+  };
+
   const handleFilterChange = (event) => {
     const { value, checked } = event.target;
     if (checked) {
@@ -111,6 +132,7 @@ const RequestPage = ({ url }) => {
       requester_status: userData.status,
       request_status: 0,
       equipment: selectedEquipment,
+      services: selectedServices
     };
 
     axios.post(`${url}/requests/add`, requestData)
@@ -219,6 +241,95 @@ const RequestPage = ({ url }) => {
           ))}
         </Accordion>
 
+        <Dropdown>
+          <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+            Select Equipment Types
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            <Form>
+              {equipmentTypes.map((type) => (
+                <Form.Check
+                  key={type.fk_idequipment_type}
+                  type="checkbox"
+                  id={type.fk_idequipment_type}
+                  label={type.name}
+                  value={type.fk_idequipment_type}
+                  onChange={handleFilterChange}
+                  checked={selectedTypes.includes(type.fk_idequipment_type)}
+                />
+              ))}
+            </Form>
+          </Dropdown.Menu>
+        </Dropdown>
+        <br />
+        <div className="table-responsive">
+          <Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Type</th>
+                <th>Add</th>
+              </tr>
+            </thead>
+            <tbody>
+              {equipment.map(item => {
+                if (selectedTypes.includes(item.equipment_type)) {
+                  const typeName = equipmentTypes.find(type => type.fk_idequipment_type === item.equipment_type)?.name;
+                  return (
+                    <tr key={item._id}>
+                      <td>{item.idequipment}</td>
+                      <td>{item.brand}</td>
+                      <td>{item.model}</td>
+                      <td>{typeName}</td>
+                      <td>
+                        <Form.Check
+                          type="checkbox"
+                          id={item.idequipment}
+                          value={item.idequipment}
+                          label=""
+                          onChange={handleCheckboxChange}
+                          checked={selectedEquipment.includes(item.idequipment)}
+                        />
+                      </td>
+                    </tr>
+                  );
+                } else {
+                  return null;
+                }
+              })}
+            </tbody>
+          </Table>
+          <br />
+          <Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Add</th>
+              </tr>
+            </thead>
+            <tbody>
+              {services.map(item => (
+                <tr key={item._id}>
+                  <td>{item.name}</td>
+                  <td>
+                    <Form.Check
+                      type="checkbox"
+                      id={item.fk_idservice}
+                      value={item.fk_idservice}
+                      label=""
+                      onChange={handleServiceChange}
+                      checked={selectedServices.includes(item.fk_idservice)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+
+        </div>
         <br />
         <div className="text-center">
           <Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>

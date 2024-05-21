@@ -48,6 +48,30 @@ function Requests({ url }) {
             });
     }
 
+    async function get_requests_table_beta() {
+        const url_link = `${url}/myrequests`;
+
+        const headers = {
+            "Content-type": "application/json",
+            "Authorization": "Bearer " + cookies.presence
+        };
+
+        const options = {
+            headers: headers,
+            withCredentials: true
+        };
+
+        try {
+            const response = await axios.get(url_link, options);
+            //console.log(response.data);
+            setRequest(response.data);
+
+        } catch (error) {
+            console.error("Error: ", error);
+            navigate('/login') // if session is invalid.
+        }
+    }
+
     useEffect(() => {
         if (isLoggedIn) {
             getRequestsTable();
@@ -59,7 +83,7 @@ function Requests({ url }) {
             <Link className='btn btn-primary' to="/request">Create Request</Link>
             <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Your Requests</h2>
             <div className='table-responsive'>
-                <Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
+                <Table striped bordered hover style={{ maxWidth: '1000px', margin: 'auto' }}>
                     <thead>
                         <tr>
                             <th>Name</th>{/* foreign value */}
@@ -69,7 +93,7 @@ function Requests({ url }) {
                             <th>Event Details</th>
                             <th>Event Start</th>
                             <th>Event End</th>
-                            <th>Equipments</th>
+                            <th>Equipment</th>
                             <th>Service</th>
                         </tr>
                     </thead>
@@ -87,11 +111,18 @@ function Requests({ url }) {
                                     {item.equipment ? item.equipment.map((eq, index) => (
                                         <React.Fragment key={index}>
                                             {typeof eq === "object" ? JSON.stringify(eq) : eq}
-                                            <br />
+                                            <br /><br />
                                         </React.Fragment>
                                     )) : ""}
                                 </td>
-                                <td>{item.services || ""}</td>
+                                <td>
+                                    {item.services ? item.services.map((ser, index) => (
+                                        <React.Fragment key={index}>
+                                            {typeof ser === "object" ? JSON.stringify(ser) : ser}
+                                            <br /><br />
+                                        </React.Fragment>
+                                    )) : ""}
+                                </td>
                             </tr>
                         ))}
                     </tbody>

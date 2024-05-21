@@ -10,7 +10,7 @@ export const types = {
         },
         "type": {
             "data_type": "foreign_xor",
-            "label": "Model",
+            'label':'Type',
             "option": [
                 {
                     "_id": {
@@ -40,6 +40,11 @@ export const types = {
         }
     },
     "requests": {
+        "request_status": {
+            "data_type": "xor",
+            "option": ["pending", "approved", "declined"],
+            "label": "Status"
+        },
         "event_name": {
             "data_type": "text",
             "label": "Event"
@@ -50,22 +55,28 @@ export const types = {
         },
         "event_affiliation": {
             "data_type": "text",
-            "label": "Event Affifliation"
+            "label": "Event Organizer"
+        },
+        "event_start": {
+            "data_type": "date",
+            "label": "Start"
+        },
+        "event_end": {
+            "data_type": "date",
+            "label": "End"
         },
         "event_location": {
             "data_type": "text",
             "label": "Location"
         },
-        "request_status": {
-            "editable" : 1,
-            "data_type": "xor",
-            "option": ["pending", "approved", "declined"],
-            "label": "Status"
+        "equipment": {
+            "data_type": "list",
+            "label": "Equipment"
         }
     },
     "accounts": {
         "status": {
-            "data_type": "text",
+            "data_type": "list",
             "label": "Status"
         }
     },
@@ -87,7 +98,7 @@ export const types = {
             "label": "Accronym"
         }
     },
-
+    
     "college_office": {
         "name": {
             "data_type": "text",

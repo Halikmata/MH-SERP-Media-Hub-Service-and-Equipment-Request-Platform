@@ -147,18 +147,6 @@ def user_requests():
     if not verify:
         return make_response(jsonify({'msg':'Not Authorized'}), 401)
     
-    token = request.headers.get('Authorization')
-
-    #token_decode = token['identity']
-    
-    #print(f"\n\n\n{token_decode}\n\n\n")
-    
-    """ data = request.get_json() # input: user's account email
-    
-    if data == None:
-        return jsonify({"msg":"no json data found"}), 400 """
-    
-    #id = data['_id']
     collection = db['requests']
     
     page = int(request.args.get('page', default=1))
@@ -172,25 +160,47 @@ def user_requests():
     
     identity = get_jwt_identity()
     
-    accounts = db['accounts'].find({"gmail": identity})
-    
-
     if search != None and column != None:
-        query = {f"{column}": {"$regex":f"^{search}.*"}, "requester_gmail": identity}
+        query = {f"{column}": {"$regex":f"^{search}.*"}, "requester_email": identity}
         rows = collection.find(query).skip(offset).limit(limit_rows)
     else:
-        query = {f"requester_gmail": identity}
+        query = {f"requester_email": identity}
         rows = collection.find(query).skip(offset).limit(limit_rows)
     
     rows_list = list(rows)
     for x in rows_list:
         x['_id'] = str(x['_id'])
-    # rows_list = apply_foreign(rows_list, "requests")
-    print(f'\n\n{rows_list}\n\n')
 
     return make_response(jsonify(rows_list), 200)
 
 
+@app.route('/request/activity', methods=["GET"]) # users can only create two requests per day ---- used in /request/add
+@jwt_required()
+def user_limit_requests():
+    identity = get_jwt_identity()
+    
+    current_date = datetime.now().date()
+    collection = db['requests']
+    
+    query = {f"requester_email": identity}
+    rows = collection.find(query)
+    pass # needs a new collection that traces user actions.
+    
+    
+
+def verify_date(start_date, end_date): # used in /request/add
+    
+    current_date = datetime.now().date()
+    
+    # start_date must not be less than current date.
+    
+    # start_date must not be more than end_date.
+    
+    # days between start_date and end_date must be less than or equal to ?
+    
+    # max length between current date and start_date is ?
+    
+    pass
 
 @app.route('/requests/add', methods=["GET","POST"])
 @jwt_required()
@@ -225,8 +235,6 @@ def user_add_requests(): # account only can make request twice a day only. check
         
         result = collection.insert_one(json_input)
         
-        # modify equipment instance status iteration
-        
         if result:
             return jsonify({"msg": "Instance added successfully"}), 201
         else:
@@ -244,24 +252,22 @@ def user_add_requests(): # account only can make request twice a day only. check
         
         equipments = db['equipment']
         
-        rows = equipments.find()
+        rows = equipments.find({"availability":"1"})
         rows = list(rows)
         
-        foreign_dict['equipment'] = rows # choose instances that are only available.
+        foreign_dict['equipment'] = rows
         
         for x in foreign_dict['services']:
             x.pop("_id", None)
             
         for x in foreign_dict['equipment']:
             x.pop("_id", None)
-        
-        
-        
+              
         print(f"test: {foreign_dict}")
         return make_response(jsonify(foreign_dict), 200) # returns services and equipment. dictionary in a dictionary.
-        # will add GET request for acquiring choose-able options
 
-@app.route('/requests/delete', methods=['POST'])
+
+""" @app.route('/requests/delete', methods=['POST'])
 # @jwt_required() # needs login because its an approute specifically for a user.
 def user_delete_requests():
     
@@ -277,7 +283,7 @@ def user_delete_requests():
     query = {'_id': ObjectId(id), "{new attribute name}": "{new attribute name}"} # _id = specific request it
     result = collection.delete_one(query)
     
-    return jsonify({'msg':'hello'}), 200
+    return jsonify({'msg':'hello'}), 200 """
 
 
 @app.route('/equipments', methods=['GET'])
@@ -329,12 +335,108 @@ def apply_volunteer():
 
 # on progress ------------
 
+def admin_jwt_required(f): # custom-made @jwt_required specifically for verifying presence and validating session.
+    @wraps(f)
+    def get_header_token(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        
+        if not token or not token.startswith('Bearer '):
+            return make_response(jsonify({"msg": "No Session Found"}), 401) 
+        else:
+            token = token[7:]
+            
+        try:
+            # data = jwt.decode(token, app.config['SECRET_KEY'])
+            identity = get_jwt_identity()
+            
+            accounts = db['accounts']
+            
+            query = {'email':identity}
+            result = accounts.find(query)
+            
+            result = list(result)
+            
+            if len(result) > 1:
+                print('debug: multiple instance detected! [in admin_jwt_required]')
+            
+            acc_status = result[0]['status']
+            
+            if acc_status not in ["1","2"]: # if not admin or developer
+                return make_response(jsonify({"msg": "Unauthorized Account"}), 401)
+            
+        except jwt.ExpiredSignatureError:
+            return make_response(jsonify({"msg": "Session expired"}), 401)
+        
+        except jwt.InvalidTokenError:
+            return make_response(jsonify({"msg": "Invalid session"}), 401) # issue?
+
+        return f(*args, **kwargs)
+
+    return get_header_token
+
+
+def get_top_5_requesters(): # top 5 requesters with highest request quantity
+    accounts = db['accounts']
+    requests = db['requests']
+    query = {
+        {"$group":{
+            "name": "$requester_email", # email will be replaced with name in loop
+            "total_requests":{"$sum": 1}
+        }},
+        {"$sort":{"total_requests": -1}},
+        {"$limit":5}
+    }
+    count_requests = requests.aggregate(query)
+    count_requests = list(count_requests)
+    
+    for x in count_requests:
+        query = {'email': x['name']}
+        result = accounts.find(query)
+        acc = list(result)[0]
+        
+        name = f"{acc['fname']} {acc['mname']} {acc['lname']}"
+        x['name'] = name
+        
+    return count_requests
+
+def get_top_5_equipments(): # most borrowed equipment per month of current year --
+    equipment = db['equipment']
+    request = db['requests']
+    
+    query = {}
+    
+    results = request.aggregate()
+    
+    return
+    
+
 @app.route('/admin')
+@admin_jwt_required
 def admin_index():
     
-    collections = db.list_collection_names() # lists down all collection (this is for sidebar)
+    equipment = db['equipment']
+    services = db['services']
+    accounts = db['accounts']
+    #organization = db['organization']
+    info = {}
+    
+    acc_results = accounts.find() # list of accounts
+    acc_results = list(acc_results)
+    
+    info['top_5'] = get_top_5_requesters()
+    
+    info['frequent_equipments'] = get_top_5_equipments() # incomplete
+    
+    
+    
+    
+    
+    
+    
+    
+    return make_response(jsonify(info), 200)
 
-    return jsonify({'collections':collections}), 200
+    
 
 """ @app.route('/admin/requests/conclude', methods=['POST']) # this assumes that admins are the ones that declare requests as finished.
 def admin_request_conclude():
@@ -350,7 +452,10 @@ def admin_request_conclude():
     
     return jsonify({'msg':'Request instance conluded'}), 201 """
 
+
+    
 @app.route('/admin/report', methods=['GET'])
+@admin_jwt_required
 def admin_report():
     
     collection = db['requests']
