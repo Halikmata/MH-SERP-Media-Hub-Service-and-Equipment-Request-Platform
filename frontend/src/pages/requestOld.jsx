@@ -7,7 +7,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useCookies } from 'react-cookie';
 import NotLoggedIn from '../includes/notLoggedIn';
 
-
 const RequestPage = ({ url }) => {
   const [cookies] = useCookies(['presence']);
   const [requests, setRequest] = useState([]);
@@ -25,7 +24,6 @@ const RequestPage = ({ url }) => {
     end_date: null
   });
 
-
   useEffect(() => {
     axios.get(`${url}/equipment_type`)
       .then(response => {
@@ -38,7 +36,7 @@ const RequestPage = ({ url }) => {
           <NotLoggedIn>You need to log in</NotLoggedIn>
         )
       });
-  }, []);
+  }, [url]);
 
   useEffect(() => {
     axios.get(`${url}/equipment/available`)
@@ -51,24 +49,22 @@ const RequestPage = ({ url }) => {
           <NotLoggedIn>You need to log in</NotLoggedIn>
         )
       });
-
-  }, []);
+  }, [url]);
 
   const userDataString = sessionStorage.getItem('userData');
+  let requester_full_name = '';
 
   if (!userDataString) {
-    navigate('/login?from=request')
-  }
-  else{
+    navigate('/login?from=request');
+  } else {
     const userData = JSON.parse(userDataString);
     const { first_name, middle_name, last_name } = userData;
-    let requester_full_name = first_name;
+    requester_full_name = first_name;
     if (middle_name) {
       requester_full_name += ' ' + middle_name.charAt(0);
     }
     requester_full_name += ' ' + last_name;
   }
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,10 +91,12 @@ const RequestPage = ({ url }) => {
         prevSelectedTypes.filter((type) => type !== value)
       );
     }
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const userData = JSON.parse(userDataString);
 
     const requestData = {
       event_affiliation: formData.organization,
@@ -111,8 +109,8 @@ const RequestPage = ({ url }) => {
       requester_email: userData.email,
       requester_phone_number: userData.phone_number,
       requester_status: userData.status,
+      request_status: 0,
       equipment: selectedEquipment,
-
     };
 
     axios.post(`${url}/requests/add`, requestData)
@@ -124,8 +122,10 @@ const RequestPage = ({ url }) => {
       .catch(error => {
         console.error('Error creating request:', error);
       });
+
     navigate('/myrequests');
   };
+
 
   return (
     <div className="container mt-5">

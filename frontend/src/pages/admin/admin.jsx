@@ -40,8 +40,8 @@ const Admin = ({ url }) => {
         { field: 'event_name', label: 'Name' },
         { field: 'requester_full_name', label: 'Requester' },
         { field: 'event_affiliation', label: 'Organization' },
-        { field: 'request_start', label: 'Start' },
-        { field: 'request_end', label: 'End' },
+        { field: 'event_start', label: 'Start' },
+        { field: 'event_end', label: 'End' },
         { field: 'event_location', label: 'Location' },
         {
           field: 'request_status',
@@ -55,7 +55,7 @@ const Admin = ({ url }) => {
       columns: [
         { field: 'last_name', label: 'Lastname' },
         { field: 'first_name', label: 'Firstname' },
-        { field: 'gmail', label: 'email' }
+        { field: 'email', label: 'email' }
       ]
     },
     '/admin/organization': {
