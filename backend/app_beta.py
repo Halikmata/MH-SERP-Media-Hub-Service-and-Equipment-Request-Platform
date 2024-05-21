@@ -253,7 +253,7 @@ def user_add_requests(): # account only can make request twice a day only. check
         return make_response(jsonify(foreign_dict), 200) # returns services and equipment. dictionary in a dictionary.
 
 
-@app.route('/requests/delete', methods=['POST'])
+""" @app.route('/requests/delete', methods=['POST'])
 # @jwt_required() # needs login because its an approute specifically for a user.
 def user_delete_requests():
     
@@ -269,7 +269,7 @@ def user_delete_requests():
     query = {'_id': ObjectId(id), "{new attribute name}": "{new attribute name}"} # _id = specific request it
     result = collection.delete_one(query)
     
-    return jsonify({'msg':'hello'}), 200
+    return jsonify({'msg':'hello'}), 200 """
 
 
 @app.route('/equipments', methods=['GET'])
