@@ -147,8 +147,6 @@ def user_requests():
     if not verify:
         return make_response(jsonify({'msg':'Not Authorized'}), 401)
     
-    token = request.headers.get('Authorization')
-    
     collection = db['requests']
     
     page = int(request.args.get('page', default=1))
@@ -162,20 +160,16 @@ def user_requests():
     
     identity = get_jwt_identity()
     
-    accounts = db['accounts'].find({"gmail": identity})
-    
     if search != None and column != None:
-        query = {f"{column}": {"$regex":f"^{search}.*"}, "requester_gmail": identity}
+        query = {f"{column}": {"$regex":f"^{search}.*"}, "requester_email": identity}
         rows = collection.find(query).skip(offset).limit(limit_rows)
     else:
-        query = {f"requester_gmail": identity}
+        query = {f"requester_email": identity}
         rows = collection.find(query).skip(offset).limit(limit_rows)
     
     rows_list = list(rows)
     for x in rows_list:
         x['_id'] = str(x['_id'])
-    # rows_list = apply_foreign(rows_list, "requests")
-    print(f'\n\n{rows_list}\n\n')
 
     return make_response(jsonify(rows_list), 200)
 
