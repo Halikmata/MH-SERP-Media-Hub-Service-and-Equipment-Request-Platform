@@ -48,7 +48,7 @@ function Requests({ url }) {
             });
     }
 
-    async function get_requests_table_old() {
+    async function get_requests_table_beta() {
 		const url_link = `${url}/requests`;
 
 		const headers = {
