@@ -4,7 +4,6 @@ import { Table } from 'react-bootstrap';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useCookies } from 'react-cookie';
 import { useNavigate, Link } from 'react-router-dom';
-import NotLoggedIn from '../includes/notLoggedIn';
 
 function Requests({ url }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -13,6 +12,8 @@ function Requests({ url }) {
     const [requests, setRequests] = useState([]);
 
     const userDataString = sessionStorage.getItem('userData');
+
+    const status_array = ["pending", "approved", "declined"];
 
     // Check for userData and redirect if not found
     useEffect(() => {
@@ -23,9 +24,9 @@ function Requests({ url }) {
         }
     }, [userDataString, navigate]);
 
-    async function getRequestsTable() {
+    function getRequestsTable() {
         if (!userDataString) return;
-        
+
         const userData = JSON.parse(userDataString);
         const urlLink = `${url}/requests/${userData.email}`;
         const headers = {
@@ -38,12 +39,13 @@ function Requests({ url }) {
             withCredentials: true
         };
 
-        try {
-            const response = await axios.get(urlLink, options);
-            setRequests(response.data);
-        } catch (error) {
-            console.error("Error: ", error);
-        }
+        axios.get(urlLink, options)
+            .then(response => {
+                setRequests(response.data);
+            })
+            .catch(error => {
+                console.error("Error: ", error);
+            });
     }
 
     async function get_requests_table_old() {
@@ -84,29 +86,36 @@ function Requests({ url }) {
                 <Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
                     <thead>
                         <tr>
+                            <th>Name</th>{/* foreign value */}
                             <th>Status</th>{/* foreign value */}
-                            <th>Event Affiliation</th>
+                            <th>Timestamp</th>{/* foreign value */}
                             <th>Event Location</th>
                             <th>Event Details</th>
-                            <th>Request Start</th>
-                            <th>Request End</th>
+                            <th>Event Start</th>
+                            <th>Event End</th>
                             <th>Equipments</th>
                             <th>Service</th>
-                            <th>Organization</th>
-                            <th>Event</th>
                         </tr>
                     </thead>
                     <tbody>
                         {requests.map(item => (
-                            <tr key={item._id || "N/A"}>
-                                <td>{item.request_affiliation || "N/A"}</td>
-                                <td>{item.event_location || "N/A"}</td>
-                                <td>{item.event_details || "N/A"}</td>
-                                <td>{item.request_start || "N/A"}</td>
-                                <td>{item.request_end || "N/A"}</td>
-                                <td>{item.service || "N/A"}</td>
-                                <td>{item.organization || "N/A"}</td>
-                                <td>{item.event || "N/A"}</td>
+                            <tr key={item._id || ""}>
+                                <td>{item.event_name || ""}</td>
+                                <td>{status_array[item.request_status] || ""}</td>
+                                <td>{item.request_datetime || ""}</td>
+                                <td>{item.event_location || ""}</td>
+                                <td>{item.event_details || ""}</td>
+                                <td>{item.event_start || ""}</td>
+                                <td>{item.event_end || ""}</td>
+                                <td>
+                                    {item.equipment ? item.equipment.map((eq, index) => (
+                                        <React.Fragment key={index}>
+                                            {typeof eq === "object" ? JSON.stringify(eq) : eq}
+                                            <br />
+                                        </React.Fragment>
+                                    )) : ""}
+                                </td>
+                                <td>{item.services || ""}</td>
                             </tr>
                         ))}
                     </tbody>

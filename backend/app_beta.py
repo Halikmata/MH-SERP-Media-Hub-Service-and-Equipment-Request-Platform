@@ -140,7 +140,7 @@ def login():
 def landing_page():
     return jsonify({'msg':'hello'}), 200 # output: related to "View Updates feature"
 
-@app.route('/requests', methods=['GET']) # broad error catch fix --------------------------------------------------
+@app.route('/myrequests', methods=['GET']) # broad error catch fix --------------------------------------------------
 @jwt_required()
 def user_requests():
     verify = verify_cookie()

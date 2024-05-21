@@ -414,7 +414,56 @@ def admin_delete_row(collection, id):
     else:
         return jsonify({"message": "No row found with the given ID"}), 404
 
+@app.route('/requests/<email>', methods=['GET'])
+def my_requests(email):
+    try:
+        requests_collection = db['requests']
+        requests = requests_collection.find({'requester_email': email})
+        
+        requests_list = []
+        for request in requests:
+            request['_id'] = str(request['_id'])
+            requests_list.append(request)
+        
+        if not requests_list:
+            return jsonify({"message": "No requests found for the given email"}), 404
+        
+        return jsonify(requests_list), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 
+
+@app.route('/requests/add', methods=["GET", "POST"])
+# @jwt_required()
+def add_request(collection="requests"):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        collection = db[collection]
+    
+    if request.method == "POST":
+        json_input = request.get_json()
+        
+        try:
+            event_start = datetime.fromisoformat(json_input['event_start'].replace("Z", "+00:00"))
+            event_end = datetime.fromisoformat(json_input['event_end'].replace("Z", "+00:00"))
+        except KeyError as e:
+            return jsonify({"message": f"Missing key: {e.args[0]}"}), 400
+        except ValueError as e:
+            return jsonify({"message": "Invalid date format"}), 400
+        
+        json_input['event_start'] = event_start
+        json_input['event_end'] = event_end
+        json_input['request_datetime'] = datetime.now(timezone.utc)
+        
+        result = collection.insert_one(json_input)
+        return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
+    
+    else:
+        pass
+        
+        
     
 # add account profile to request GET and request ADD
 

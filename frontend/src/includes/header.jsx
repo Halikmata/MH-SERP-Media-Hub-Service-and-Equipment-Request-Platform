@@ -1,17 +1,27 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Navbar, Nav } from 'react-bootstrap';
 import logo from '../images/logo.png';
 import './header.css';
 
 function Header() {
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const userDataString = sessionStorage.getItem('userData');
+  useEffect(() => {
+    if (userDataString) {
+      setIsLoggedIn(true);
+    }
+  }, [userDataString, navigate]);
+
   function handleLogOut() {
     document.cookie.split(";").forEach(cookie => {
-        document.cookie = cookie.split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      document.cookie = cookie.split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
     });
     sessionStorage.clear();
-}
+    setIsLoggedIn(false);
+  }
 
 
   return (
@@ -29,9 +39,11 @@ function Header() {
             <Nav.Link as={NavLink} to="/services">Services</Nav.Link>
           </Nav>
           <Nav>
-            <Nav.Link as={Link} to="/signup">Sign Up</Nav.Link>
-            <Nav.Link as={Link} to="/login">Log in</Nav.Link> {/* should disappear if logged in, and log out must pop up, vice versa */}
-            <Nav.Link as={Link} onClick={handleLogOut} to="/logout">Log out</Nav.Link> {/* non-functional. please trigger /logout app route to remove cookie/session */}
+            {isLoggedIn ? (
+              <Nav.Link as={Link} onClick={handleLogOut} to="/logout">Log out</Nav.Link>
+            ) : (
+              <Nav.Link as={Link} to="/login">Log in</Nav.Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Navbar>

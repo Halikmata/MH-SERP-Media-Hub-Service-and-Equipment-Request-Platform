@@ -62,6 +62,26 @@ export const types = {
         }
     },
     "accounts": {
+        "gmail": {
+            "data_type": "text",
+            "label": "Email"
+        },
+        "first_name": {
+            "data_type": "text",
+            "label": "First name"
+        },
+        "middle_name": {
+            "data_type": "text",
+            "label": "Middle Name"
+        },
+        "last_name": {
+            "data_type": "text",
+            "label": "Last Name"
+        },
+        "phone_number": {
+            "data_type": "text",
+            "label": "Phone Number"
+        },
         "status": {
             "data_type": "text",
             "label": "Status"
