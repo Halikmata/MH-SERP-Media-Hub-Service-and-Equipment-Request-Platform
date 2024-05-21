@@ -174,7 +174,7 @@ def user_requests():
     return make_response(jsonify(rows_list), 200)
 
 
-@app.route('/request/limitcheck', methods=["GET"]) # users can only create two requests per day ---- used in /request/add
+@app.route('/request/activity', methods=["GET"]) # users can only create two requests per day ---- used in /request/add
 @jwt_required()
 def user_limit_requests():
     identity = get_jwt_identity()
