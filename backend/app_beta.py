@@ -433,14 +433,45 @@ def get_top_5_equipments(): # most borrowed equipment per month of current year 
         x['equipment'] = row['description']
     
     return results
+
+def get_top_5_services():
+    services = db['services']
+    request = db['requests']
     
+    query = {
+        {
+            "$group": {
+                "service": "$service",
+                "count":{"$sum": 1}
+            }
+        },
+        {
+            "$sort": {
+                "count": -1
+            }
+        },
+        {
+            "$limit": 5
+        }
+    }
+    
+    results = request.aggregate(query)
+    results = list(results)
+    
+    for x in results:
+        
+        row = services.find({"fk_idservice": x['service']})
+        row = list(row)[0]
+        x['service'] = row['name']
+    
+    return results
 
 @app.route('/admin')
 @admin_jwt_required
 def admin_index():
     
     equipment = db['equipment']
-    services = db['services']
+    
     accounts = db['accounts']
     #organization = db['organization']
     info = {}
@@ -448,11 +479,11 @@ def admin_index():
     acc_results = accounts.find() # list of accounts
     acc_results = list(acc_results)
     
-    info['top_5'] = get_top_5_requesters()
+    info['top_5_requesters'] = get_top_5_requesters()
     
-    info['frequent_equipments'] = get_top_5_equipments() # incomplete
+    info['top_5_equipments'] = get_top_5_equipments()
     
-    
+    info['top_5_services'] = get_top_5_services()
     
     
     
