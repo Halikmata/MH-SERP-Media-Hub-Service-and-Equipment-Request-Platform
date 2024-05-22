@@ -551,98 +551,6 @@ def admin_index():
     
     return make_response(jsonify(info), 200)
 
-    
-
-""" @app.route('/admin/requests/conclude', methods=['POST']) # this assumes that admins are the ones that declare requests as finished.
-def admin_request_conclude():
-    json_input = request.get_json()
-    id = int(request.args.get('id', default=None))
-
-    if id == None:
-        return jsonify({'msg':'Bad request, no ID found!'}), 400
-
-    collection = db['requests']
-    rows = collection.update_one({'_id':ObjectId(id)}, {'$set': '':json_input[]})
-    
-    
-    return jsonify({'msg':'Request instance conluded'}), 201 """
-
-
-    
-@app.route('/admin/report', methods=['GET'])
-@admin_jwt_required
-def admin_report():
-    
-    collection = db['requests']
-    
-    # get all available years in the collection
-    #years = collection.find({},{"request_start":1})
-    #years = collection.
-    #print(f"\n\n\n\n{list(years)}\n\n\n\n")
-    month = dict()
-    for y in range(0,12+1): # requests per month
-        rows = collection.aggregate(
-            [{
-                "$match":{
-                    "request_start":{
-                        "$regex":f"{y}.*", # incomplete
-                        "$options": "i"
-                    }
-                }
-            },
-            {
-                "$count": "request_per_month"
-            }]
-        )
-        #request_per_month = list(rows)[0]['request_per_month']
-        #month[f'{x}'] = request_per_month
-    #print(rows[0][''])
-    rows_list = list(rows)
-    
-    """ for x in rows_list:
-        x['_id'] = str(x['_id']) """
-    
-    #rows_list = apply_foreign(rows_list,"requests")
-    
-    return jsonify(rows_list), 200
-    
-
-# add account profile to request GET and request ADD
-
-# separate app route for login/register --
-
-# login for admin
-# admin dashboard
-# reports
-
-# sort --
-# by 
-
-# login app route include profile
-
-# admin declares request to finish (?)
-
-# Visualization
-# equipment request & service per month
-# most borrowed equipment
-# user with highest request quantities
-# organization, (refer to collection)
-
-# token must be from headers of request
-
-# vite
-
-# foreign key for request add
-
-# add privilege checker for each app routes.
-
-
-
-
-# new approutes
-
-# unit_cost is decimal128 need fix. in equipments
-
 @app.route('/admin/register', methods=['POST'])
 def admin_register(): # needs other admin accounts' approval.
     return jsonify({'msg':'hello'}), 200
@@ -652,7 +560,7 @@ def admin_login():
     return jsonify({'msg':'hello'}), 200
 
 
-@app.route('/<collection>', methods=['GET'])
+@app.route('/admin/<collection>', methods=['GET'])
 # @jwt_required()
 def admin_main_page(collection):
     if not verify_collection(collection):
