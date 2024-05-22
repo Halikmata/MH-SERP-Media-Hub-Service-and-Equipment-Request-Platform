@@ -6,130 +6,130 @@ import { useCookies } from 'react-cookie';
 import { useNavigate, Link } from 'react-router-dom';
 
 function Requests({ url }) {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const navigate = useNavigate();
-    const [cookies] = useCookies(['presence']);
-    const [requests, setRequests] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const [cookies] = useCookies(['presence']);
+  const [requests, setRequests] = useState([]);
 
-    const userDataString = sessionStorage.getItem('userData');
+  const userDataString = sessionStorage.getItem('userData');
 
-    const status_array = ["pending", "approved", "declined"];
+  const status_array = ["pending", "approved", "declined"];
 
-    // Check for userData and redirect if not found
-    useEffect(() => {
-        if (!userDataString) {
-            navigate('/login?from=request');
-        } else {
-            setIsLoggedIn(true);
-        }
-    }, [userDataString, navigate]);
-
-    function getRequestsTable() {
-        if (!userDataString) return;
-
-        const userData = JSON.parse(userDataString);
-        const urlLink = `${url}/requests/${userData.email}`;
-        const headers = {
-            "Content-type": "application/json",
-            "Authorization": "Bearer " + cookies.presence
-        };
-
-        const options = {
-            headers: headers,
-            withCredentials: true
-        };
-
-        axios.get(urlLink, options)
-            .then(response => {
-                setRequests(response.data);
-            })
-            .catch(error => {
-                console.error("Error: ", error);
-            });
+  // Check for userData and redirect if not found
+  useEffect(() => {
+    if (!userDataString) {
+      navigate('/login?from=request');
+    } else {
+      setIsLoggedIn(true);
     }
+  }, [userDataString, navigate]);
 
-    async function get_requests_table_beta() {
-        const url_link = `${url}/myrequests`;
+  function getRequestsTable() {
+    if (!userDataString) return;
 
-        const headers = {
-            "Content-type": "application/json",
-            "Authorization": "Bearer " + cookies.presence
-        };
+    const userData = JSON.parse(userDataString);
+    const urlLink = `${url}/requests/${userData.email}`;
+    const headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer " + cookies.presence
+    };
 
-        const options = {
-            headers: headers,
-            withCredentials: true
-        };
+    const options = {
+      headers: headers,
+      withCredentials: true
+    };
 
-        try {
-            const response = await axios.get(url_link, options);
-            //console.log(response.data);
-            setRequest(response.data);
+    axios.get(urlLink, options)
+      .then(response => {
+        setRequests(response.data);
+      })
+      .catch(error => {
+        console.error("Error: ", error);
+      });
+  }
 
-        } catch (error) {
-            console.error("Error: ", error);
-            navigate('/login') // if session is invalid.
-        }
+  async function get_requests_table_beta() {
+    const url_link = `${url}/myrequests`;
+
+    const headers = {
+      "Content-type": "application/json",
+      "Authorization": "Bearer " + cookies.presence
+    };
+
+    const options = {
+      headers: headers,
+      withCredentials: true
+    };
+
+    try {
+      const response = await axios.get(url_link, options);
+      //console.log(response.data);
+      setRequest(response.data);
+
+    } catch (error) {
+      console.error("Error: ", error);
+      navigate('/login') // if session is invalid.
     }
+  }
 
-    useEffect(() => {
-        if (isLoggedIn) {
-            getRequestsTable();
-        }
-    }, [isLoggedIn]);
+  useEffect(() => {
+    if (isLoggedIn) {
+      getRequestsTable();
+    }
+  }, [isLoggedIn]);
 
-    return (
-        <div className='container mt-5'>
-            <Link className='btn btn-primary' to="/request">Create Request</Link>
-            <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Your Requests</h2>
-            <div className='table-responsive'>
-                <Table striped bordered hover style={{ maxWidth: '1000px', margin: 'auto' }}>
-                    <thead>
-                        <tr>
-                            <th>Name</th>{/* foreign value */}
-                            <th>Status</th>{/* foreign value */}
-                            <th>Timestamp</th>{/* foreign value */}
-                            <th>Event Location</th>
-                            <th>Event Details</th>
-                            <th>Event Start</th>
-                            <th>Event End</th>
-                            <th>Equipment</th>
-                            <th>Service</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {requests.map(item => (
-                            <tr key={item._id || ""}>
-                                <td>{item.event_name || ""}</td>
-                                <td>{status_array[item.request_status] || ""}</td>
-                                <td>{item.request_datetime || ""}</td>
-                                <td>{item.event_location || ""}</td>
-                                <td>{item.event_details || ""}</td>
-                                <td>{item.event_start || ""}</td>
-                                <td>{item.event_end || ""}</td>
-                                <td>
-                                    {item.equipment ? item.equipment.map((eq, index) => (
-                                        <React.Fragment key={index}>
-                                            {typeof eq === "object" ? JSON.stringify(eq) : eq}
-                                            <br /><br />
-                                        </React.Fragment>
-                                    )) : ""}
-                                </td>
-                                <td>
-                                    {item.services ? item.services.map((ser, index) => (
-                                        <React.Fragment key={index}>
-                                            {typeof ser === "object" ? JSON.stringify(ser) : ser}
-                                            <br /><br />
-                                        </React.Fragment>
-                                    )) : ""}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            </div>
-        </div>
-    );
+  return (
+    <div className='container mt-5'>
+      <Link className='btn btn-primary' to="/request">Create Request</Link>
+      <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Your Requests</h2>
+      <div className='table-responsive'>
+        <Table striped bordered hover style={{ maxWidth: '1000px', margin: 'auto' }}>
+          <thead>
+            <tr>
+              <th>Name</th>{/* foreign value */}
+              <th>Status</th>{/* foreign value */}
+              <th>Timestamp</th>{/* foreign value */}
+              <th>Event Location</th>
+              <th>Event Details</th>
+              <th>Event Start</th>
+              <th>Event End</th>
+              <th>Equipment</th>
+              <th>Service</th>
+            </tr>
+          </thead>
+          <tbody>
+            {requests.map(item => (
+              <tr key={item._id || ""}>
+                <td>{item.event_name || ""}</td>
+                <td>{status_array[item.request_status] || ""}</td>
+                <td>{item.request_datetime || ""}</td>
+                <td>{item.event_location || ""}</td>
+                <td>{item.event_details || ""}</td>
+                <td>{item.event_start || ""}</td>
+                <td>{item.event_end || ""}</td>
+                <td>
+                  {item.equipment ? item.equipment.map((eq, index) => (
+                    <React.Fragment key={index}>
+                      {typeof eq === "object" ? JSON.stringify(eq) : eq}
+                      <br /><br />
+                    </React.Fragment>
+                  )) : ""}
+                </td>
+                <td>
+                  {item.services ? item.services.map((ser, index) => (
+                    <React.Fragment key={index}>
+                      {typeof ser === "object" ? JSON.stringify(ser) : ser}
+                      <br /><br />
+                    </React.Fragment>
+                  )) : ""}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+    </div>
+  );
 }
 
 export default Requests;
