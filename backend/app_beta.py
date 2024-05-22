@@ -403,11 +403,36 @@ def get_top_5_equipments(): # most borrowed equipment per month of current year 
     equipment = db['equipment']
     request = db['requests']
     
-    query = {}
+    query = {
+        {
+            "$unwind": "$equipment"
+        },
+        {
+            "$group": {
+            "equipment": "$equipment",
+            "count":{"$sum": 1}
+            }
+        },
+        {
+            "$sort": {
+                "count": -1
+            }
+        },
+        {
+            "$limit": 5
+        }
+    }
     
-    results = request.aggregate()
+    results = request.aggregate(query)
+    results = list(results)
     
-    return
+    for x in results:
+        
+        row = equipment.find({"idequipment":x['equipment']})
+        row = list(row)[0]
+        x['equipment'] = row['description']
+    
+    return results
     
 
 @app.route('/admin')
