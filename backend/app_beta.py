@@ -375,17 +375,35 @@ def admin_jwt_required(f): # custom-made @jwt_required specifically for verifyin
     return get_header_token
 
 
-def get_top_5_requesters(): # top 5 requesters with highest request quantity
+def get_month_requesters(): # top 5 requesters with highest request quantity
     accounts = db['accounts']
     requests = db['requests']
-    query = {
-        {"$group":{
+    
+    current_date = datetime.now().date().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$group":{
             "name": "$requester_email", # email will be replaced with name in loop
             "total_requests":{"$sum": 1}
-        }},
-        {"$sort":{"total_requests": -1}},
-        {"$limit":5}
-    }
+            }
+        },
+        {
+            "$sort":
+                {
+                    "total_requests": -1
+                }
+        },
+        {
+            "$limit":5
+        }
+    ]
     count_requests = requests.aggregate(query)
     count_requests = list(count_requests)
     
@@ -399,134 +417,139 @@ def get_top_5_requesters(): # top 5 requesters with highest request quantity
         
     return count_requests
 
-def get_top_5_equipments(): # most borrowed equipment per month of current year --
+def get_month_equipments(): # most borrowed equipment per month of current year --
     equipment = db['equipment']
     request = db['requests']
     
-    query = {}
+    current_date = datetime.now().date().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$unwind": "$equipment"
+        },
+        {
+            "$group": {
+            "equipment": "$equipment",
+            "count":{"$sum": 1}
+            }
+        },
+        {
+            "$sort": {
+                "count": -1
+            }
+        },
+        {
+            "$limit": 5
+        }
+    ]
     
-    results = request.aggregate()
+    results = request.aggregate(query)
+    results = list(results)
     
-    return
+    for x in results:
+        
+        row = equipment.find({"idequipment":x['equipment']})
+        row = list(row)[0]
+        x['equipment'] = row['description']
     
+    return results
+
+def get_month_services():
+    services = db['services']
+    request = db['requests']
+    
+    current_date = datetime.now().date().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$group": {
+                "service": "$service",
+                "count":{"$sum": 1}
+            }
+        },
+        {
+            "$sort": {
+                "count": -1
+            }
+        },
+        {
+            "$limit": 5
+        }
+    ]
+    
+    results = request.aggregate(query)
+    results = list(results)
+    
+    for x in results:
+        
+        row = services.find({"fk_idservice": x['service']})
+        row = list(row)[0]
+        x['service'] = row['name']
+    
+    return results
+
+def get_month_equipments(): # quantity of equipments used per month
+    requests = db['requests']
+    equipment = db['equipment']
+    
+    current_date = datetime.now().date().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$group": {
+            "equipment": "$equipment",
+            "count":{"$sum": 1}
+            }
+        },
+        {
+            "$sort": {
+                "count": -1
+            }
+        }
+    ]
+    
+    results = requests.aggregate(query)
+    results = list(results)
+    
+    for x in results:
+        
+        row = equipment.find({"idequipment":x['equipment']})
+        row = list(row)[0]
+        x['equipment'] = row['description']
+    
+    return results
 
 @app.route('/admin')
 @admin_jwt_required
 def admin_index():
     
-    equipment = db['equipment']
-    services = db['services']
-    accounts = db['accounts']
-    #organization = db['organization']
     info = {}
     
-    acc_results = accounts.find() # list of accounts
-    acc_results = list(acc_results)
+    info['top_5_requesters'] = get_month_requesters()
     
-    info['top_5'] = get_top_5_requesters()
+    info['top_5_services'] = get_month_services()
     
-    info['frequent_equipments'] = get_top_5_equipments() # incomplete
-    
-    
-    
-    
-    
-    
-    
+    info['equipments_month'] = get_month_equipments()
     
     return make_response(jsonify(info), 200)
-
-    
-
-""" @app.route('/admin/requests/conclude', methods=['POST']) # this assumes that admins are the ones that declare requests as finished.
-def admin_request_conclude():
-    json_input = request.get_json()
-    id = int(request.args.get('id', default=None))
-
-    if id == None:
-        return jsonify({'msg':'Bad request, no ID found!'}), 400
-
-    collection = db['requests']
-    rows = collection.update_one({'_id':ObjectId(id)}, {'$set': '':json_input[]})
-    
-    
-    return jsonify({'msg':'Request instance conluded'}), 201 """
-
-
-    
-@app.route('/admin/report', methods=['GET'])
-@admin_jwt_required
-def admin_report():
-    
-    collection = db['requests']
-    
-    # get all available years in the collection
-    #years = collection.find({},{"request_start":1})
-    #years = collection.
-    #print(f"\n\n\n\n{list(years)}\n\n\n\n")
-    month = dict()
-    for y in range(0,12+1): # requests per month
-        rows = collection.aggregate(
-            [{
-                "$match":{
-                    "request_start":{
-                        "$regex":f"{y}.*", # incomplete
-                        "$options": "i"
-                    }
-                }
-            },
-            {
-                "$count": "request_per_month"
-            }]
-        )
-        #request_per_month = list(rows)[0]['request_per_month']
-        #month[f'{x}'] = request_per_month
-    #print(rows[0][''])
-    rows_list = list(rows)
-    
-    """ for x in rows_list:
-        x['_id'] = str(x['_id']) """
-    
-    #rows_list = apply_foreign(rows_list,"requests")
-    
-    return jsonify(rows_list), 200
-    
-
-# add account profile to request GET and request ADD
-
-# separate app route for login/register --
-
-# login for admin
-# admin dashboard
-# reports
-
-# sort --
-# by 
-
-# login app route include profile
-
-# admin declares request to finish (?)
-
-# Visualization
-# equipment request & service per month
-# most borrowed equipment
-# user with highest request quantities
-# organization, (refer to collection)
-
-# token must be from headers of request
-
-# vite
-
-# foreign key for request add
-
-# add privilege checker for each app routes.
-
-
-
-
-# new approutes
-
-# unit_cost is decimal128 need fix. in equipments
 
 @app.route('/admin/register', methods=['POST'])
 def admin_register(): # needs other admin accounts' approval.
@@ -537,7 +560,7 @@ def admin_login():
     return jsonify({'msg':'hello'}), 200
 
 
-@app.route('/<collection>', methods=['GET'])
+@app.route('/admin/<collection>', methods=['GET'])
 # @jwt_required()
 def admin_main_page(collection):
     if not verify_collection(collection):
