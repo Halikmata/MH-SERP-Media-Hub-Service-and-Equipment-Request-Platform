@@ -38,7 +38,7 @@ const EditItem = ({ url, renderSelectCell }) => {
                 return <input className="form-control m-2" type={fieldType} name={field} value={formData[field] || ''} onChange={handleChange} />;
             case 'xor':
                 return (
-                    <select name={field} value={formData[field] || ''} onChange={handleChange}>
+                    <select className='form-select' name={field} value={formData[field] || ''} onChange={handleChange}>
                         <option value="">Select...</option>
                         {fieldValue.map((option, index) => (
                             <option key={option} value={index}>
