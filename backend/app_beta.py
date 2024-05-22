@@ -375,17 +375,35 @@ def admin_jwt_required(f): # custom-made @jwt_required specifically for verifyin
     return get_header_token
 
 
-def get_top_5_requesters(): # top 5 requesters with highest request quantity
+def get_month_requesters(): # top 5 requesters with highest request quantity
     accounts = db['accounts']
     requests = db['requests']
-    query = {
-        {"$group":{
+    
+    current_date = datetime.now().date().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$group":{
             "name": "$requester_email", # email will be replaced with name in loop
             "total_requests":{"$sum": 1}
-        }},
-        {"$sort":{"total_requests": -1}},
-        {"$limit":5}
-    }
+            }
+        },
+        {
+            "$sort":
+                {
+                    "total_requests": -1
+                }
+        },
+        {
+            "$limit":5
+        }
+    ]
     count_requests = requests.aggregate(query)
     count_requests = list(count_requests)
     
@@ -399,11 +417,19 @@ def get_top_5_requesters(): # top 5 requesters with highest request quantity
         
     return count_requests
 
-def get_top_5_equipments(): # most borrowed equipment per month of current year --
+def get_month_equipments(): # most borrowed equipment per month of current year --
     equipment = db['equipment']
     request = db['requests']
     
-    query = {
+    current_date = datetime.now().date().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
         {
             "$unwind": "$equipment"
         },
@@ -421,7 +447,7 @@ def get_top_5_equipments(): # most borrowed equipment per month of current year 
         {
             "$limit": 5
         }
-    }
+    ]
     
     results = request.aggregate(query)
     results = list(results)
@@ -434,11 +460,19 @@ def get_top_5_equipments(): # most borrowed equipment per month of current year 
     
     return results
 
-def get_top_5_services():
+def get_month_services():
     services = db['services']
     request = db['requests']
     
-    query = {
+    current_date = datetime.now().date().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
         {
             "$group": {
                 "service": "$service",
@@ -453,7 +487,7 @@ def get_top_5_services():
         {
             "$limit": 5
         }
-    }
+    ]
     
     results = request.aggregate(query)
     results = list(results)
@@ -466,29 +500,54 @@ def get_top_5_services():
     
     return results
 
+def get_month_equipments(): # quantity of equipments used per month
+    requests = db['requests']
+    equipment = db['equipment']
+    
+    current_date = datetime.now().date().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$group": {
+            "equipment": "$equipment",
+            "count":{"$sum": 1}
+            }
+        },
+        {
+            "$sort": {
+                "count": -1
+            }
+        }
+    ]
+    
+    results = requests.aggregate(query)
+    results = list(results)
+    
+    for x in results:
+        
+        row = equipment.find({"idequipment":x['equipment']})
+        row = list(row)[0]
+        x['equipment'] = row['description']
+    
+    return results
+
 @app.route('/admin')
 @admin_jwt_required
 def admin_index():
     
-    equipment = db['equipment']
-    
-    accounts = db['accounts']
-    #organization = db['organization']
     info = {}
     
-    acc_results = accounts.find() # list of accounts
-    acc_results = list(acc_results)
+    info['top_5_requesters'] = get_month_requesters()
     
-    info['top_5_requesters'] = get_top_5_requesters()
+    info['top_5_services'] = get_month_services()
     
-    info['top_5_equipments'] = get_top_5_equipments()
-    
-    info['top_5_services'] = get_top_5_services()
-    
-    
-    
-    
-    
+    info['equipments_month'] = get_month_equipments()
     
     return make_response(jsonify(info), 200)
 
