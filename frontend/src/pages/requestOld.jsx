@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Button, Table, Dropdown } from 'react-bootstrap';
+import { Form, Button, Accordion, Table, Dropdown } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -12,9 +12,12 @@ const RequestPage = ({ url }) => {
   const [requests, setRequest] = useState([]);
   const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
+  const [services, setServices] = useState([]);
   const [equipmentTypes, setEquipmentTypes] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedEquipment, setSelectedEquipment] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
+
   const [formData, setFormData] = useState({
     organization: '',
     event: '',
@@ -45,9 +48,16 @@ const RequestPage = ({ url }) => {
       })
       .catch(error => {
         console.error(error);
-        return (
-          <NotLoggedIn>You need to log in</NotLoggedIn>
-        )
+      });
+  }, [url]);
+
+  useEffect(() => {
+    axios.get(`${url}/services`)
+      .then(response => {
+        setServices(response.data);
+      })
+      .catch(error => {
+        console.error(error);
       });
   }, [url]);
 
@@ -82,6 +92,17 @@ const RequestPage = ({ url }) => {
     }
   };
 
+  const handleServiceChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setSelectedServices(prevSelected => [...prevSelected, value]);
+    } else {
+      setSelectedServices(prevSelected =>
+        prevSelected.filter(item => item !== value)
+      );
+    }
+  };
+
   const handleFilterChange = (event) => {
     const { value, checked } = event.target;
     if (checked) {
@@ -111,6 +132,7 @@ const RequestPage = ({ url }) => {
       requester_status: userData.status,
       request_status: 0,
       equipment: selectedEquipment,
+      services: selectedServices
     };
 
     axios.post(`${url}/requests/add`, requestData)
@@ -126,91 +148,100 @@ const RequestPage = ({ url }) => {
     navigate('/myrequests');
   };
 
+  const groupEquipmentByType = (equipment) => {
+    return equipment.reduce((acc, eq) => {
+      const type = eq.equipment_type;
+      if (!acc[type]) {
+        acc[type] = [];
+      }
+      acc[type].push(eq);
+      return acc;
+    }, {});
+  };
+
+  const groupedEquipment = groupEquipmentByType(equipment);
 
   return (
     <div className="container mt-5">
-      <Link className='btn btn-primary' to="/myrequests">View My Requests</Link>
-      <h2 className="mb-4" style={{ color: '#FF5733' }}>Request Details</h2>
-      <Form onSubmit={handleSubmit}>
-        <div className='w-50'>
-          <Form.Group className="mb-3" controlId="organization">
-            <Form.Label>Organizer/Contact Org</Form.Label>
-            <Form.Control type="text" name="organization" value={formData.organization} onChange={handleChange} required />
-          </Form.Group>
+    <Link className='btn btn-primary' to="/myrequests">View My Requests</Link>
+    <h2 className="mb-4" style={{ color: '#FF5733' }}>Request Details</h2>
+    <Form onSubmit={handleSubmit}>
+      <div className='w-50'>
+        <Form.Group className="mb-3" controlId="organization">
+          <Form.Label>Organizer/Contact Org</Form.Label>
+          <Form.Control type="text" name="organization" value={formData.organization} onChange={handleChange} required />
+        </Form.Group>
 
-          <Form.Group className="mb-3" controlId="event">
-            <Form.Label>Event</Form.Label>
-            <Form.Control type="text" name="event" value={formData.event} onChange={handleChange} required />
-          </Form.Group>
+        <Form.Group className="mb-3" controlId="event">
+          <Form.Label>Event</Form.Label>
+          <Form.Control type="text" name="event" value={formData.event} onChange={handleChange} required />
+        </Form.Group>
 
-          <Form.Group className="mb-3" controlId="location">
-            <Form.Label>Location</Form.Label>
-            <Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
-          </Form.Group>
+        <Form.Group className="mb-3" controlId="location">
+          <Form.Label>Location</Form.Label>
+          <Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
+        </Form.Group>
 
-          <Form.Group className="mb-3" controlId="details">
-            <Form.Label>Details</Form.Label>
-            <Form.Control type="text" name="details" value={formData.details} onChange={handleChange} placeholder='(optional)' />
-          </Form.Group>
+        <Form.Group className="mb-3" controlId="details">
+          <Form.Label>Details</Form.Label>
+          <Form.Control type="text" name="details" value={formData.details} onChange={handleChange} placeholder='(optional)' />
+        </Form.Group>
 
-          <Form.Group className="mb-3" controlId="start_date">
-            <Form.Label>Start Date</Form.Label>
-            <br />
-            <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
-          </Form.Group>
+        <Form.Group className="mb-3" controlId="start_date">
+          <Form.Label>Start Date</Form.Label>
+          <br />
+          <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
+        </Form.Group>
 
-          <Form.Group className="mb-3" controlId="end_date">
-            <Form.Label>End Date</Form.Label>
-            <br />
-            <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
-          </Form.Group>
-        </div>
+        <Form.Group className="mb-3" controlId="end_date">
+          <Form.Label>End Date</Form.Label>
+          <br />
+          <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
+        </Form.Group>
+      </div>
 
-        <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Equipment List</h2>
-        <br />
-        <Dropdown>
-          <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-            Select Equipment Types
-          </Dropdown.Toggle>
+      <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Equipment List</h2>
+      <br />
+      <Dropdown>
+        <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+          Filter by Equipment Type
+        </Dropdown.Toggle>
 
-          <Dropdown.Menu>
-            <Form>
-              {equipmentTypes.map((type) => (
-                <Form.Check
-                  key={type.fk_idequipment_type}
-                  type="checkbox"
-                  id={type.fk_idequipment_type}
-                  label={type.name}
-                  value={type.fk_idequipment_type}
-                  onChange={handleFilterChange}
-                  checked={selectedTypes.includes(type.fk_idequipment_type)}
-                />
-              ))}
-            </Form>
-          </Dropdown.Menu>
-        </Dropdown>
-        <br />
-        <div className="table-responsive">
-          <Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Type</th>
-                <th>Add</th>
-              </tr>
-            </thead>
-            <tbody>
-              {equipment.map(item => {
-                if (selectedTypes.includes(item.equipment_type)) {
-                  const typeName = equipmentTypes.find(type => type.fk_idequipment_type === item.equipment_type)?.name;
-                  return (
-                    <tr key={item._id}>
+        <Dropdown.Menu>
+          {equipmentTypes.map((type) => (
+            <Form.Check
+              key={type.fk_idequipment_type}
+              type="checkbox"
+              id={type.fk_idequipment_type}
+              label={type.name}
+              value={type.fk_idequipment_type}
+              onChange={handleFilterChange}
+              checked={selectedTypes.includes(type.fk_idequipment_type)}
+            />
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
+      <br />
+      <Accordion defaultActiveKey="0">
+        {equipmentTypes.map((type, idx) => (
+          <Accordion.Item eventKey={idx.toString()} key={type.fk_idequipment_type}>
+            <Accordion.Header>{type.name}</Accordion.Header>
+            <Accordion.Body>
+              <Table striped bordered hover responsive>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>Add</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {groupedEquipment[type.fk_idequipment_type]?.map(item => (
+                    <tr key={item.idequipment}>
                       <td>{item.idequipment}</td>
                       <td>{item.brand}</td>
                       <td>{item.model}</td>
-                      <td>{typeName}</td>
                       <td>
                         <Form.Check
                           type="checkbox"
@@ -222,22 +253,50 @@ const RequestPage = ({ url }) => {
                         />
                       </td>
                     </tr>
-                  );
-                } else {
-                  return null;
-                }
-              })}
-            </tbody>
-          </Table>
-        </div>
-        <br />
-        <div className="text-center">
-          <Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
-        </div>
-        <br /><br />
-      </Form>
-    </div>
-  );
+                  ))}
+                </tbody>
+              </Table>
+            </Accordion.Body>
+          </Accordion.Item>
+        ))}
+      </Accordion>
+      <br />
+      <div className="table-responsive">
+        <Table striped bordered hover style={{ maxWidth: '800px', margin: 'auto' }}>
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Add</th>
+            </tr>
+          </thead>
+          <tbody>
+            {services.map(item => (
+              <tr key={item._id}>
+                <td>{item.name}</td>
+                <td>
+                  <Form.Check
+                    type="checkbox"
+                    id={item.fk_idservice}
+                    value={item.fk_idservice}
+                    label=""
+                    onChange={handleServiceChange}
+                    checked={selectedServices.includes(item.fk_idservice)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+      <br />
+      <div className="text-center">
+        <Button variant="primary" type="submit" className="custom-submit-btn" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Submit</Button>
+      </div>
+      <br /><br />
+    </Form>
+  </div>
+);
 };
 
 export default RequestPage;
+

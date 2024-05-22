@@ -4,11 +4,9 @@ import AdminTable from './component/AdminTable';
 import AdminHeader from './component/AdminHeader';
 import AddItem from './add';
 import EditItem from './edit';
+import Item from './edit_beta';
 import Delete from './delete';
 import axios from 'axios';
-
-
-import renderSelectCell from './select';
 
 const Admin = ({ url }) => {
   const pathname = window.location.pathname;
@@ -46,7 +44,6 @@ const Admin = ({ url }) => {
         {
           field: 'request_status',
           label: 'Status',
-          cell: (option) => renderSelectCell(option, ['pending', 'approved', 'declined'], handleSelectChange)
         }
       ]
     },
@@ -63,6 +60,7 @@ const Admin = ({ url }) => {
       columns: [
         { field: 'acronym', label: 'Acronym' },
         { field: 'name', label: 'Name' },
+        { field: 'program', label: 'Program' },
       ]
     },
     '/admin/college_office': {
@@ -70,6 +68,7 @@ const Admin = ({ url }) => {
       columns: [
         { field: 'fk_idcollegeoffice', label: 'ID' },
         { field: 'name', label: 'Name' },
+        { field: 'type', label: 'Type' }
       ]
     },
   };
@@ -85,8 +84,9 @@ const Admin = ({ url }) => {
       )}
       <Routes>
         <Route path="/:collection/add" element={<AddItem url={url + "/admin/"} />} />
-        <Route path="/:collection/update/:id" element={<EditItem url={url + "/admin/"} renderSelectCell={renderSelectCell} />} />
+        <Route path="/:collection/update/:id" element={<EditItem url={url + "/admin/"} />} />
         <Route path="/:collection/delete/:id" element={<Delete url={url + "/admin/"} />} />
+        <Route path="/:collection/:id" element={<Item url={url + "/admin/"} collection={collection} columns={columns} />} />
       </Routes>
     </div>
   );
@@ -98,9 +98,4 @@ export default Admin;
 const formatAmount = (value) => {
   const formattedAmount = `${value} php`;
   return formattedAmount;
-};
-
-const handleSelectChange = (e) => {
-  const newValue = e.target.value;
-  handleChange(newValue);
 };
