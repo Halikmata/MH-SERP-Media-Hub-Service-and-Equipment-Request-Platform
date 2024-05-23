@@ -72,9 +72,9 @@ const AdminTable = ({ url, collection, columns }) => {
         </thead>
         <tbody>
           {sortedData.map(item => (
-            <tr key={item._id} className='tableRow' onClick={() => handleRowClick(item._id)}>
+            <tr key={item._id} className='tableRow'>
               {columns.map(({ field, cell }) => (
-                <td key={field}>
+                <td key={field} onClick={() => handleRowClick(item._id)}>
                   {cell ? cell(item[field]) : item[field]}
                 </td>
               ))}

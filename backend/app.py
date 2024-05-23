@@ -442,6 +442,58 @@ def admin_update_row(collection, id):
             return jsonify({"message": "No row found with the given ID"}), 404
 
 
+# Update Request
+
+@app.route('/admin/requests/update/<id>', methods=['GET', 'PUT'])
+def admin_update_request(id):
+    collection = "requests"
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        collection = db[collection]
+        
+    if request.method == "PUT":
+        json_input = request.get_json()
+        
+        # Remove '_id' if present in the input
+        json_input.pop('_id', None)
+        
+        try:
+            # Update the request in the collection
+            result = collection.update_one({'_id': ObjectId(id)}, {'$set': json_input})
+            
+            if result.modified_count > 0:
+                # If status is "1", update the equipment availability to "0"
+                if json_input.get('request_status') == "1":
+                    if 'equipment' in json_input:
+                        equipment_collection = db['equipment']
+                        equipment_ids = json_input['equipment']
+                        
+                        # Update the availability of each equipment item
+                        for eq_id in equipment_ids:
+                            equipment_result = equipment_collection.update_one(
+                                {'idequipment': eq_id},
+                                {'$set': {'availability': '0'}}
+                            )
+                            if equipment_result.matched_count == 0:
+                                return jsonify({"message": f"Equipment with ID {eq_id} not found"}), 404
+                
+                return jsonify({"message": "Updated successfully", "id": id}), 201
+            else:
+                return jsonify({"message": "No row found with the given ID"}), 404
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    else:
+        # Retrieve the request from the collection
+        result = collection.find_one({'_id': ObjectId(id)})
+        
+        if result:
+            result['_id'] = str(result['_id'])  # Convert ObjectId to string
+            return jsonify(result), 200
+        else:
+            return jsonify({"message": "No row found with the given ID"}), 404
+
+
 
 @app.route('/admin/<collection>/delete/<id>', methods=['DELETE'])
 # @jwt_required()
