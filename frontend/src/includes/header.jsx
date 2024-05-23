@@ -26,27 +26,29 @@ function Header() {
 
   return (
     <header style={headerStyle}>
-      <Navbar bg="body" variant="tertiary" expand="lg">
-        <Navbar.Brand as={Link} to="/">
-          <img src={logo} alt="Logo" style={{ width: '50px', marginRight: '20px' }} />
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="navbarSupportedContent" />
-        <Navbar.Collapse id="navbarSupportedContent">
-          <Nav className="mr-auto">
-            <Nav.Link as={NavLink} to="/" exact>Home</Nav.Link>
-            <Nav.Link as={NavLink} to="/myrequests">Requests</Nav.Link>
-            <Nav.Link as={NavLink} to="/equipment">Equipment</Nav.Link>
-            <Nav.Link as={NavLink} to="/services">Services</Nav.Link>
-          </Nav>
-          <Nav>
-            {isLoggedIn ? (
-              <Nav.Link as={Link} onClick={handleLogOut} to="/logout">Log out</Nav.Link>
-            ) : (
-              <Nav.Link as={Link} to="/login">Log in</Nav.Link>
-            )}
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
+      <div className="centered">
+        <Navbar bg="body" variant="tertiary" expand="lg">
+          <Navbar.Brand as={Link} to="/">
+            <img src={logo} alt="Logo" style={{ width: '50px', marginRight: '20px' }} />
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="navbarSupportedContent" />
+          <Navbar.Collapse id="navbarSupportedContent">
+            <Nav className="mr-auto">
+              <Nav.Link as={NavLink} to="/" exact activeClassName="active">Home</Nav.Link>
+              <Nav.Link as={NavLink} to="/myrequests" activeClassName="active">Requests</Nav.Link>
+              <Nav.Link as={NavLink} to="/equipment" activeClassName="active">Equipment</Nav.Link>
+              <Nav.Link as={NavLink} to="/services" activeClassName="active">Services</Nav.Link>
+            </Nav>
+            <Nav>
+              {isLoggedIn ? (
+                <Nav.Link as={Link} onClick={handleLogOut} to="/logout">Log out</Nav.Link>
+              ) : (
+                <Nav.Link as={Link} to="/login">Log in</Nav.Link>
+              )}
+            </Nav>
+          </Navbar.Collapse>
+        </Navbar>
+      </div>
     </header>
   );
 }
