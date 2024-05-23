@@ -63,11 +63,13 @@ const CreateRequest = ({ url }) => {
               </Form.Group>
             </Col>
           </Row>
-          <div className="text-center">
-            <Button variant="primary" onClick={handleNext} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>Next</Button>
-          </div>
         </Card.Body>
       </Card>
+      <Row className="justify-content-center">
+        <Col md={6} className="text-center">
+          <Button variant="primary" onClick={handleNext} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>Next</Button>
+        </Col>
+      </Row>
     </Container>
   );
 };
