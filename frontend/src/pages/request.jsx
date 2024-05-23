@@ -15,7 +15,7 @@ function Requests({ url }) {
 
   const userDataString = sessionStorage.getItem('userData');
 
-  const status_array = ["pending", "approved", "declined"];
+  const status_array = ["Pending", "Approved", "Declined"];
 
   // Check for userData and redirect if not found
   useEffect(() => {
@@ -62,7 +62,7 @@ function Requests({ url }) {
 
   return (
     <div className='container mt-5'>
-      <Link className='btn btn-primary' to="/request" style={{ backgroundColor: '#FF7F50', borderColor: '#FF7F50' }}>Create Request</Link>
+      <Link className='btn btn-primary' to="/request" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Create Request</Link>
       <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Your Requests</h2>
       <div className='row'>
         {requests.map(item => (
