@@ -16,3 +16,32 @@
       margin: 0; 
     }
   }
+  :root {
+    --primary-color: #FF7F50; /* Primary color for borders and other elements */
+  }
+  
+  .service-section {
+    border: 1px solid var(--primary-color); /* Use CSS variable for border color */
+    border-radius: 8px; /* Rounded corners */
+    padding: 16px; /* Padding inside the card */
+    margin: 16px 0; /* Margin between cards */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for a card effect */
+    background-color: #fff; /* White background */
+    transition: transform 0.2s; /* Smooth transition for hover effect */
+  }
+  
+  .service-section:hover {
+    transform: scale(1.02); /* Slightly enlarge card on hover */
+  }
+  
+  .service-image {
+    width: 100%; /* Make image responsive */
+    max-width: 300px; /* Set maximum width */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 16px; /* Space below image */
+  }
+  
+
+  h2{
+    color: #FF7F50;
+  }
