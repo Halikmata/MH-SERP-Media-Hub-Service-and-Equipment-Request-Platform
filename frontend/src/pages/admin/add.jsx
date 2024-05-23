@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { types } from './types.js';
+import { Button , Card, Col, Container, Row } from 'react-bootstrap';
 
 const AddItem = ({ url }) => {
     const { collection } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({});
+
+    function onCancel() {
+        navigate(`/admin/${collection}`);
+    }
 
     const renderInput = (field, fieldConfig) => {
         const fieldType = fieldConfig["data_type"];
@@ -14,11 +19,11 @@ const AddItem = ({ url }) => {
 
         switch (fieldType) {
             case 'text':
-                return <input type="text" name={field} onChange={handleChange} />;
+                return <input type="text" className="form-control m-2" name={field} onChange={handleChange} />;
             case 'date':
-                return <input type="date" name={field} onChange={handleChange} />;
+                return <input type="date" className="form-control m-2" name={field} onChange={handleChange} />;
             case 'number':
-                return <input type="number" name={field} onChange={handleChange} />;
+                return <input type="number" className="form-control m-2" name={field} onChange={handleChange} />;
             case 'xor':
                 return (
                     <select name={field} onChange={handleChange}>
@@ -35,7 +40,7 @@ const AddItem = ({ url }) => {
                     <>
                         {fieldValue.map((option) => (
                             <div key={option}>
-                                <input type="checkbox" name={field} value={option} onChange={handleCheckboxChange} />
+                                <input type="checkbox" className='form-select' name={field} value={option} onChange={handleCheckboxChange} />
                                 <label>{option}</label>
                             </div>
                         ))}
@@ -43,7 +48,7 @@ const AddItem = ({ url }) => {
                 );
             case 'foreign_xor':
                 return (
-                    <select name={field} onChange={handleChange}>
+                    <select name={field} onChange={handleChange} className='form-select'>
                         <option value="">Select...</option>
                         {fieldValue.map((option) => (
                             <option key={option._id.$oid} value={option.fk_id}>
@@ -81,15 +86,26 @@ const AddItem = ({ url }) => {
     const renderForm = () => {
         const collectionTypes = types[collection] || {};
         return (
-            <form onSubmit={handleSubmit}>
-                {Object.entries(collectionTypes).map(([field, config]) => (
-                    <div key={field}>
-                        <label>{config["label"]}: </label>
-                        {renderInput(field, config)}
-                    </div>
-                ))}
-                <button type="submit">Submit</button>
-            </form>
+            <Container className="mt-5">
+                <Row className="justify-content-center">
+                    <Col md={6}>
+                        <Card>
+                            <Card.Body>
+                                <form onSubmit={handleSubmit}>
+                                    {Object.entries(collectionTypes).map(([field, config]) => (
+                                        <div key={field} className="mb-3">
+                                            <label className="form-label">{config.label}: </label>
+                                            {renderInput(field, config)}
+                                        </div>
+                                    ))}
+                                    <Button className="m-2" type="submit">Submit</Button>
+                                    <Button className="m-2" variant="secondary" onClick={onCancel}>Cancel</Button>
+                                </form>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
         );
     };
 

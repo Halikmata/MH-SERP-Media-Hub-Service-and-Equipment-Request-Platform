@@ -56,6 +56,7 @@ const SelectServices = ({ url }) => {
     axios.post(`${url}/requests/add`, requestData)
       .then(response => {
         console.log('Request created successfully:', response.data);
+        alert("Request Submitted");
         navigate('/myrequests');
       })
       .catch(error => {

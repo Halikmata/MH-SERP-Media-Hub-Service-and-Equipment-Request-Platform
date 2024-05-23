@@ -15,7 +15,7 @@ const AdminTable = ({ url, collection, columns }) => {
   }, [collection]);
 
   const fetchData = () => {
-    fetch(`${url}/${collection}`)
+    fetch(`${url}/admin/${collection}`)
       .then(response => response.json())
       .then(data => setData(data))
       .catch(error => console.error('Error fetching data:', error));
@@ -47,7 +47,7 @@ const AdminTable = ({ url, collection, columns }) => {
 
 
   return (
-    <div className="container mt-4 w-75">
+    <div className="container mt-4 w-100">
       <h2>{collection}</h2>
       <Link to={`${location.pathname}/add`} className="btn btn-primary mb-2">Add</Link>
       <table className="table">

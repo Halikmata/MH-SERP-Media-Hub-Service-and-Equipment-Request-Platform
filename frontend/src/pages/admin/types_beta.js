@@ -42,7 +42,7 @@ export const types = {
     "requests": {
         "request_status": {
             "data_type": "xor",
-            "option": ["pending", "approved", "declined"],
+            "option": ["pending", "approved", "declined", "done"],
             "label": "Status"
         },
         "event_name": {

@@ -27,7 +27,7 @@ const Admin = ({ url }) => {
     '/admin/services': {
       collection: "services",
       columns: [
-        { field: 'idservice', label: 'ID' },
+        { field: 'fk_idservice', label: 'ID' },
         { field: 'name', label: 'Name' }
       ]
     },
@@ -42,8 +42,20 @@ const Admin = ({ url }) => {
         { field: 'event_end', label: 'End' },
         { field: 'event_location', label: 'Location' },
         {
+          field: 'equipment',
+          label: 'Equipment',
+          cell: (equipmentArray) => {
+            return equipmentArray.join('\n');
+          }
+        },
+        { field: 'services', label: 'Services' },
+        {
           field: 'request_status',
           label: 'Status',
+          cell: (status) => {
+            const statusArray = ["Pending", "Approved", "Declined", "Done"];
+            return statusArray[status];
+          }
         }
       ]
     },

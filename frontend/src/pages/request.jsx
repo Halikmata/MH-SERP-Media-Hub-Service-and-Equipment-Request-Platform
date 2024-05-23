@@ -15,7 +15,7 @@ function Requests({ url }) {
 
   const userDataString = sessionStorage.getItem('userData');
 
-  const status_array = ["Pending", "Approved", "Declined"];
+  const status_array = ["Pending", "Approved", "Declined", "Done"];
 
   // Check for userData and redirect if not found
   useEffect(() => {

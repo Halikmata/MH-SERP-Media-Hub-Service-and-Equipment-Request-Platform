@@ -60,7 +60,7 @@ const EditItem = ({ url, renderSelectCell }) => {
                 );
             case 'foreign_xor':
                 return (
-                    <select name={field} value={formData[field] || ''} onChange={handleChange}>
+                    <select name={field} className='form-select' value={formData[field] || ''} onChange={handleChange}>
                         <option value="">Select...</option>
                         {fieldValue.map((option) => (
                             <option key={option._id.$oid} value={option.fk_id}>
@@ -120,12 +120,16 @@ const EditItem = ({ url, renderSelectCell }) => {
                                 <form onSubmit={handleSubmit}>
                                     {Object.entries(collectionTypes).map(([field, config]) => (
                                         <div key={field}>
-                                            <label>{config["label"]}: </label>
-                                            {renderInput(field, config)}
+                                            <label>{config.label}: </label>
+                                            {config.editable === 1 ? (
+                                                renderInput(field, config)
+                                            ) : (
+                                                <span> <b>{formData[field]}</b></span>
+                                            )}
                                         </div>
                                     ))}
                                     <Button className="m-2" type="submit">Submit</Button>
-                                    <Button className="m-2"variant="secondary" onClick={onCancel}>Cancel</Button>
+                                    <Button className="m-2" variant="secondary" onClick={onCancel}>Cancel</Button>
                                 </form>
                             </div>
                         </div>

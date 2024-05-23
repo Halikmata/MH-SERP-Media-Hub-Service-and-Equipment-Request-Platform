@@ -78,5 +78,4 @@ const Equipment = ({ url }) => {
 };
 
 
-
 export default Equipment;

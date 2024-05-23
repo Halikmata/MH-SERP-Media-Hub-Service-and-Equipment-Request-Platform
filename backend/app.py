@@ -228,6 +228,65 @@ def index(collection):
     return jsonify(rows_list), 200
 
 
+
+@app.route('/admin/<collection>', methods=['GET'])
+# @jwt_required()
+def admin(collection):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        col_name = collection
+        collection = db[collection]
+    
+    # URL inputs.
+    page = int(request.args.get('page', default=1))
+    column = request.args.get('column',default=None)
+    search = request.args.get('search',default=None)
+    # sort = request.args.get('sort', default=None)
+    id = request.args.get('id',default=None) # ID specification
+    
+    if id != None and len(id) != 0: # the objectid
+        id = ObjectId(id)
+        row = collection.find({'_id':id})
+        row = list(row)
+        if len(row) == 1:
+            rows_list = list(row)
+    
+            for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
+                x['_id'] = str(x['_id'])
+            
+            rows_list = apply_foreign(rows_list,col_name)
+
+            return jsonify(rows_list), 200
+        else:
+            return jsonify({'message':'instance not found'}),400
+    
+    if(int(page) < 1): # avoids negatives.
+        page = 1
+    
+    limit_rows = 50 # change total rows in a page here.
+    offset = (page - 1) * limit_rows
+    rows = collection.find().skip(offset).limit(limit_rows) # ඞ
+    
+    if search != None and column != None:
+        rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows)
+        
+    elif search == None and column == None:
+        rows = collection.find().skip(offset).limit(limit_rows)
+        
+    else:
+        return jsonify({'message': 'May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
+    
+    rows_list = list(rows)
+    
+    for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
+        x['_id'] = str(x['_id'])
+        
+    # rows_list = apply_foreign(rows_list,col_name)
+
+    return jsonify(rows_list), 200
+
+
 @app.route('/admin/<collection>/<id>', methods=["GET"])
 def get_row(collection, id):
     if not verify_collection(collection):
@@ -551,6 +610,50 @@ def my_requests(email):
         return jsonify(requests_list), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    
+@app.route('/admin/requests/', methods=['GET'])
+def admin_requests():
+    try:
+        requests_collection = db['requests']
+        equipment_collection = db['equipment']
+        services_collection = db['services']
+        
+        requests = requests_collection.find({})
+        
+        requests_list = []
+        for request in requests:
+            request['_id'] = str(request['_id'])
+            
+            if 'equipment' in request:
+                equipment_names = []
+                for eq_id in request['equipment']:
+                    equipment = equipment_collection.find_one({'idequipment': eq_id})
+                    if equipment:
+                        equipment_names.append(f"{equipment['brand']} {equipment['model']}")
+                    else:
+                        equipment_names.append("Unknown Equipment")
+                request['equipment'] = equipment_names
+
+            if 'services' in request:
+                service_names = []
+                for service_id in request['services']:
+                    service = services_collection.find_one({'fk_idservice': service_id})
+                    if service:
+                        service_names.append(service['name'])
+                    else:
+                        service_names.append("Unknown Service")
+                request['services'] = service_names
+
+            requests_list.append(request)
+        
+        if not requests_list:
+            return jsonify({"message": "No requests found for the given email"}), 404
+        
+        return jsonify(requests_list), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
     
 
 
