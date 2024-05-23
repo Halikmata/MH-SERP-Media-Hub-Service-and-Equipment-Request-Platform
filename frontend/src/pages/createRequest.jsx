@@ -24,6 +24,9 @@ const CreateRequest = ({ url }) => {
     navigate('/select_equipment', { state: { formData } });
   };
 
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 5);
+
   return (
     <Container className="mt-5">
       <h2 className="mb-4" style={{ color: '#FF5733' }}>Request Details</h2>
@@ -54,20 +57,22 @@ const CreateRequest = ({ url }) => {
 
               <Form.Group className="mb-3" controlId="start_date">
                 <Form.Label>Start Date</Form.Label>
-                <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
+                <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control"  minDate={tomorrow} />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="end_date">
                 <Form.Label>End Date</Form.Label>
-                <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" />
+                <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control"  minDate={tomorrow}/>
               </Form.Group>
             </Col>
           </Row>
-          <div className="text-center">
-            <Button variant="primary" onClick={handleNext} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>Next</Button>
-          </div>
         </Card.Body>
       </Card>
+      <Row className="justify-content-center">
+        <Col md={6} className="text-center">
+          <Button variant="primary" onClick={handleNext} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>Next</Button>
+        </Col>
+      </Row>
     </Container>
   );
 };

@@ -10,6 +10,7 @@ const ImageDisplay = ({ imageName }) => {
   const imagePath = getImagePath(imageName);
   
   const imageStyle = {
+    margin:'20px',
     width: '100%',
     height: '100%',
     minWidth: '150px',
@@ -20,7 +21,7 @@ const ImageDisplay = ({ imageName }) => {
     aspectRatio: '1 / 1', // Square aspect ratio
     backgroundColor: '#FFFFFF',
     borderRadius: '7px',
-    boxShadow: '2px 2px 5px 1px rgba(51, 51, 51, 0.2)'
+    boxShadow: '-1px -1px 5px 3px rgba(51, 51, 51, 0.2)'
 };
 
   return (

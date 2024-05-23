@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Pagination } from 'react-bootstrap';
+import { Pagination, Card, Row, Col } from 'react-bootstrap';
 import ImageDisplay from '../includes/imagedisplay';
 
 const Equipment = ({ url }) => {
@@ -18,7 +18,6 @@ const Equipment = ({ url }) => {
         console.error(error);
       });
   }, []);
-
 
   useEffect(() => {
     axios.get(`${url}/equipment_type`)
@@ -47,23 +46,34 @@ const Equipment = ({ url }) => {
 
   return (
     <div className="container mt-5">
-      <h2 className="mb-4" style={{ color: '#FF5733' }}>Equipment List</h2>
-      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <h2 className="text-center mb-4" style={{ color: '#FF5733' }}>Equipment List</h2><br />
+      <Row xs={1} md={2} lg={3} className="g-4">
         {currentItems.map(item => (
-          <div key={item.id} className="col">
-            <div className="card h-100" style={{ backgroundColor: item.availability === "0" ? '#CCCCCC' : '#FFC893', boxShadow:"1px 1px 4px 2px #44444444" }}>              <div className="card-body">
-              <h5 className="card-title">{item.brand} {item.model}</h5>
-              <p className="card-text" style={{color:"#00000088", marginBottom: "0"}}>{item.idequipment}</p>
-              <p className="card-text" style={{marginBottom: "0"}}>{item.description}</p>
-              <p className="card-text" style={{marginBottom: "0"}}>Type: <b>{equipmentTypes[item.equipment_type]}</b></p>
-              <p className="card-text" style={{marginBottom: "0"}}>Location: <b>{item.equipment_location}</b></p>
-              {/* <p className="card-text">Unit Cost: {item.unit_cost}</p> */}
-              <ImageDisplay imageName={item.idequipment} />
-            </div>
-            </div>
-          </div>
+          <Col key={item.id}>
+            <Card style={{ border: 'none', position: 'relative', paddingTop: "20px", margin:'10px' }}>
+              <div style={{ textAlign: 'center', justifyItems: 'center' }}>
+                <ImageDisplay imageName={item.idequipment} />
+                <br />
+                <div style={{ width: '100%', display: "grid", justifyItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', allignSelf: 'center' }}>
+                    <div style={{ width: '15px', height: '15px', borderRadius: '50%', backgroundColor: item.availability === "1" ? 'green' : 'gray' }}></div>
+                    <span style={{ marginLeft: '10px', color: '#666' }}>{item.availability === "1" ? 'Available' : 'Unavailable'}</span>
+                  </div>
+                </div>
+              </div>
+              <Card.Body style={{ height: '12rem' }}>
+                <Card.Title style={{ color: '#333', fontSize: '1.2rem', fontWeight: 'bold' }}>{item.brand} {item.model}</Card.Title>
+                <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{item.description}</Card.Text>
+                <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Type: <b>{equipmentTypes[item.equipment_type]}</b></Card.Text>
+                <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Location: <b>{item.equipment_location}</b></Card.Text>
+              </Card.Body>
+              <div className="d-grid">
+                <button className="btn btn-primary" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', width: '100%' }}>Request Now</button>
+              </div>
+            </Card>
+          </Col>
         ))}
-      </div>
+      </Row>
       <Pagination className="justify-content-center mt-4" style={{ color: '#FF5733' }}>
         <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1} />
         {Array.from({ length: Math.ceil(equipment.length / itemsPerPage) }, (_, i) => (
@@ -76,6 +86,5 @@ const Equipment = ({ url }) => {
     </div>
   );
 };
-
 
 export default Equipment;

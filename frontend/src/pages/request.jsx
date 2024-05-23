@@ -65,6 +65,7 @@ function Requests({ url }) {
       <Link className='btn btn-primary' to="/request" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733' }}>Create Request</Link>
       <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Your Requests</h2>
       <div className='row'>
+        {requests.length === 0 && <div><br /><br /><p style={{textAlign:'center', margin:"15px"}}>No request found.</p></div>}
         {requests.map(item => (
           <div className='col-12 col-md-6 col-lg-4 mb-4' key={item._id || ""}>
             <Card>
