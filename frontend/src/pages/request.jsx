@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table } from 'react-bootstrap';
+import { Table, Button, Card, Collapse } from 'react-bootstrap';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useCookies } from 'react-cookie';
 import { useNavigate, Link } from 'react-router-dom';
+import './request.css'; 
 
 function Requests({ url }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
   const [cookies] = useCookies(['presence']);
   const [requests, setRequests] = useState([]);
+  const [open, setOpen] = useState({});
 
   const userDataString = sessionStorage.getItem('userData');
 
@@ -48,85 +50,99 @@ function Requests({ url }) {
       });
   }
 
-  async function get_requests_table_beta() {
-    const url_link = `${url}/myrequests`;
-
-    const headers = {
-      "Content-type": "application/json",
-      "Authorization": "Bearer " + cookies.presence
-    };
-
-    const options = {
-      headers: headers,
-      withCredentials: true
-    };
-
-    try {
-      const response = await axios.get(url_link, options);
-      //console.log(response.data);
-      setRequest(response.data);
-
-    } catch (error) {
-      console.error("Error: ", error);
-      navigate('/login') // if session is invalid.
-    }
-  }
-
   useEffect(() => {
     if (isLoggedIn) {
       getRequestsTable();
     }
   }, [isLoggedIn]);
 
+  const toggleCollapse = (id) => {
+    setOpen(prevOpen => ({ ...prevOpen, [id]: !prevOpen[id] }));
+  };
+
   return (
     <div className='container mt-5'>
-      <Link className='btn btn-primary' to="/request">Create Request</Link>
+      <Link className='btn btn-primary' to="/request" style={{ backgroundColor: '#FF7F50', borderColor: '#FF7F50' }}>Create Request</Link>
       <h2 className="mt-4 mb-3" style={{ color: '#FF5733' }}>Your Requests</h2>
-      <div className='table-responsive'>
-        <Table striped bordered hover style={{ maxWidth: '1000px', margin: 'auto' }}>
-          <thead>
-            <tr>
-              <th>Name</th>{/* foreign value */}
-              <th>Status</th>{/* foreign value */}
-              <th>Timestamp</th>{/* foreign value */}
-              <th>Event Location</th>
-              <th>Event Details</th>
-              <th>Event Start</th>
-              <th>Event End</th>
-              <th>Equipment</th>
-              <th>Service</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map(item => (
-              <tr key={item._id || ""}>
-                <td>{item.event_name || ""}</td>
-                <td>{status_array[item.request_status] || ""}</td>
-                <td>{item.request_datetime || ""}</td>
-                <td>{item.event_location || ""}</td>
-                <td>{item.event_details || ""}</td>
-                <td>{item.event_start || ""}</td>
-                <td>{item.event_end || ""}</td>
-                <td>
-                  {item.equipment ? item.equipment.map((eq, index) => (
-                    <React.Fragment key={index}>
-                      {typeof eq === "object" ? JSON.stringify(eq) : eq}
-                      <br /><br />
-                    </React.Fragment>
-                  )) : ""}
-                </td>
-                <td>
-                  {item.services ? item.services.map((ser, index) => (
-                    <React.Fragment key={index}>
-                      {typeof ser === "object" ? JSON.stringify(ser) : ser}
-                      <br /><br />
-                    </React.Fragment>
-                  )) : ""}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+      <div className='row'>
+        {requests.map(item => (
+          <div className='col-12 col-md-6 col-lg-4 mb-4' key={item._id || ""}>
+            <Card>
+              <Card.Header style={{ backgroundColor: '#FF7F50', color: 'white' }}>
+                {item.event_name || "Untitled Event"}
+                <Button
+                  variant="link"
+                  onClick={() => toggleCollapse(item._id)}
+                  aria-controls={`collapse-${item._id}`}
+                  aria-expanded={open[item._id]}
+                  className="float-end text-white"
+                >
+                  {open[item._id] ? "Hide Details" : "Show Details"}
+                </Button>
+              </Card.Header>
+              <Card.Body>
+                <Table responsive="sm" size="sm">
+                  <tbody>
+                    <tr>
+                      <td>Status:</td>
+                      <td>{status_array[item.request_status] || "Unknown"}</td>
+                    </tr>
+                    <tr>
+                      <td>Timestamp:</td>
+                      <td>{item.request_datetime || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td>Location:</td>
+                      <td>{item.event_location || "N/A"}</td>
+                    </tr>
+                  </tbody>
+                </Table>
+                <Collapse in={open[item._id]}>
+                  <div id={`collapse-${item._id}`}>
+                    <Table responsive="sm" size="sm">
+                      <tbody>
+                        <tr>
+                          <td>Details:</td>
+                          <td>{item.event_details || "N/A"}</td>
+                        </tr>
+                        <tr>
+                          <td>Start:</td>
+                          <td>{item.event_start || "N/A"}</td>
+                        </tr>
+                        <tr>
+                          <td>End:</td>
+                          <td>{item.event_end || "N/A"}</td>
+                        </tr>
+                        <tr>
+                          <td>Equipment:</td>
+                          <td>
+                            {item.equipment ? item.equipment.map((eq, index) => (
+                              <React.Fragment key={index}>
+                                {typeof eq === "object" ? JSON.stringify(eq) : eq}
+                                <br />
+                              </React.Fragment>
+                            )) : "N/A"}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Service:</td>
+                          <td>
+                            {item.services ? item.services.map((ser, index) => (
+                              <React.Fragment key={index}>
+                                {typeof ser === "object" ? JSON.stringify(ser) : ser}
+                                <br />
+                              </React.Fragment>
+                            )) : "N/A"}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </div>
+                </Collapse>
+              </Card.Body>
+            </Card>
+          </div>
+        ))}
       </div>
     </div>
   );

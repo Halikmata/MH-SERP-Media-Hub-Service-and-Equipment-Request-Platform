@@ -36,7 +36,7 @@ const Equipment = ({ url }) => {
                 <p className="card-text">{item.description}</p>
                 <p className="card-text">Type: {item.equipment_type}</p>
                 <p className="card-text">Location: {item.equipment_location}</p>
-                <p className="card-text">Unit Cost: {item.unit_cost}</p>
+                {/* <p className="card-text">Unit Cost: {item.unit_cost}</p> */}
               </div>
             </div>
           </div>

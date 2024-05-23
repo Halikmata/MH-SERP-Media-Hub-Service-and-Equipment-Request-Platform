@@ -1,9 +1,7 @@
-/* .custom-submit-btn {
-  background-color: #FF5733;
-  border-color: #FF5733;
+.card-header {
+  cursor: pointer;
 }
 
-.custom-submit-btn:hover {
-  background-color: #E54E29;
-  border-color: #E54E29;
-} */
+.card-header .btn-link {
+  text-decoration: none;
+}
