@@ -50,9 +50,14 @@ const Equipment = ({ url }) => {
       <Row xs={1} md={2} lg={3} className="g-4">
         {currentItems.map(item => (
           <Col key={item.id}>
-            <Card className="h-100" style={{ border: 'none' }}>
+            <Card className="h-100" style={{ border: 'none', position: 'relative' }}>
               <div style={{ textAlign: 'center' }}>
                 <ImageDisplay imageName={item.idequipment} />
+              </div>
+              {/* Availability Indicator */}
+              <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', alignItems: 'center' }}>
+                <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: item.availability ? 'green' : 'gray' }}></div>
+                <span style={{ marginLeft: '10px', color: '#666' }}>{item.availability ? 'Available' : 'Unavailable'}</span>
               </div>
               <Card.Body style={{ height: '18rem' }}>
                 <Card.Title style={{ color: '#333', fontSize: '1.2rem', fontWeight: 'bold' }}>{item.brand} {item.model}</Card.Title>
