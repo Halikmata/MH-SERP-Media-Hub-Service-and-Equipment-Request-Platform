@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const CreateRequest = ({ url }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { equipment } = location.state || {}; // Get the equipment data from the state
   const [formData, setFormData] = useState({
     organization: '',
     event: '',
@@ -57,12 +59,12 @@ const CreateRequest = ({ url }) => {
 
               <Form.Group className="mb-3" controlId="start_date">
                 <Form.Label>Start Date</Form.Label>
-                <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control"  minDate={tomorrow} />
+                <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control" minDate={tomorrow} />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="end_date">
                 <Form.Label>End Date</Form.Label>
-                <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control"  minDate={tomorrow}/>
+                <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" minDate={tomorrow} />
               </Form.Group>
             </Col>
           </Row>

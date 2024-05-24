@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Pagination, Card, Row, Col } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import ImageDisplay from '../includes/imagedisplay';
 
 const Equipment = ({ url }) => {
+  const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
   const [equipmentTypes, setEquipmentTypes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,7 +19,7 @@ const Equipment = ({ url }) => {
       .catch(error => {
         console.error(error);
       });
-  }, []);
+  }, [url]);
 
   useEffect(() => {
     axios.get(`${url}/equipment_type`)
@@ -44,6 +46,10 @@ const Equipment = ({ url }) => {
 
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
+  const handleRequestClick = (item) => {
+    navigate('/request', { state: { equipment: item } });
+  };
+
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4" style={{ color: '#FF5733' }}>Equipment List</h2><br />
@@ -55,7 +61,7 @@ const Equipment = ({ url }) => {
                 <ImageDisplay imageName={item.idequipment} />
                 <br />
                 <div style={{ width: '100%', display: "grid", justifyItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', allignSelf: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
                     <div style={{ width: '15px', height: '15px', borderRadius: '50%', backgroundColor: item.availability === "1" ? 'green' : 'gray' }}></div>
                     <span style={{ marginLeft: '10px', color: '#666' }}>{item.availability === "1" ? 'Available' : 'Unavailable'}</span>
                   </div>
@@ -68,7 +74,7 @@ const Equipment = ({ url }) => {
                 <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Location: <b>{item.equipment_location}</b></Card.Text>
               </Card.Body>
               <div className="d-grid">
-                <button className="btn btn-primary" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', width: '100%' }}>Request Now</button>
+                <button className="btn btn-primary" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', width: '100%' }} onClick={() => handleRequestClick(item)}>Request Now</button>
               </div>
             </Card>
           </Col>
