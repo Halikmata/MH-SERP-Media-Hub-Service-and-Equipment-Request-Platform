@@ -13,6 +13,8 @@ function Requests({ url }) {
   const [requests, setRequests] = useState([]);
   const [open, setOpen] = useState({});
 
+  const bgColorArray = ['#EB7F20','#4C7041','#EB4141','#878787']
+
   const userDataString = sessionStorage.getItem('userData');
 
   const status_array = ["Pending", "Approved", "Declined", "Done"];
@@ -69,8 +71,8 @@ function Requests({ url }) {
         {requests.map(item => (
           <div className='col-12 col-md-6 col-lg-4 mb-4' key={item._id || ""}>
             <Card>
-              <Card.Header style={{ backgroundColor: '#FF7F50', color: 'white' }}>
-                {item.event_name || "Untitled Event"}
+              <Card.Header style={{ backgroundColor: bgColorArray[item.request_status], color: 'white', fontSize:'110%' }}>
+                <b>{item.event_name || "Untitled Event"}</b>
                 <Button
                   variant="link"
                   onClick={() => toggleCollapse(item._id)}

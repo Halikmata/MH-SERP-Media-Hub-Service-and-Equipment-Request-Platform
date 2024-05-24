@@ -67,9 +67,9 @@ const Equipment = ({ url }) => {
                 <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Type: <b>{equipmentTypes[item.equipment_type]}</b></Card.Text>
                 <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Location: <b>{item.equipment_location}</b></Card.Text>
               </Card.Body>
-              <div className="d-grid">
+              {/* <div className="d-grid">
                 <button className="btn btn-primary" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', width: '100%' }}>Request Now</button>
-              </div>
+              </div> */}
             </Card>
           </Col>
         ))}
