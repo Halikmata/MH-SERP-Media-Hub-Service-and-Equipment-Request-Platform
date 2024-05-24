@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 const CreateRequest = ({ url }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { equipment } = location.state || {}; // Get the equipment data from the state
+  const { equipment, service } = location.state || {}; // Get the equipment or service data from the state
   const [formData, setFormData] = useState({
     organization: '',
     event: '',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import pc from '../images/Photo Coverage.png';
 import sde from '../images/SDE.png';
 import sr from '../images/Studio Recording.png';
@@ -61,6 +62,7 @@ const serviceData = [
 ];
 
 const Services = ({ url }) => {
+  const navigate = useNavigate();
   const [services, setServices] = useState([]);
 
   useEffect(() => {
@@ -73,6 +75,10 @@ const Services = ({ url }) => {
       });
   }, [url]);
 
+  const handleRequestClick = (service) => {
+    navigate('/request', { state: { service } });
+  };
+
   return (
     <div className="container">
       <div>
@@ -84,6 +90,13 @@ const Services = ({ url }) => {
             <p className="text-start fs-3">{service.name}</p>
             <img src={service.imgSrc} className="service-image rounded" alt={service.name}></img>
             <p>{service.description}</p>
+            <button 
+              className="btn btn-primary" 
+              style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', width: '100%' }}
+              onClick={() => handleRequestClick(service)}
+            >
+              Request Now
+            </button>
           </section>
         ))}
       </main>
