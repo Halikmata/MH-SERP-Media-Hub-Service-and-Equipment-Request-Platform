@@ -10,7 +10,7 @@ To-do list:
 Session feature = 
 
 Log-in feature = 
-Sign-up feature =
+Sign-up feature = ✖
 Encryption = 
 Calendar Thingy = ✖
 
