@@ -1,0 +1,8 @@
+Run backend:
+1. create venv/ install requirements_3_11.txt
+2. py run.py/run_beta.py
+
+Run frontend:
+1. cd frontend
+2. npm install (package.json is basically requirements_3_11.txt but for npm)
+3. npm run dev

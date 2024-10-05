@@ -1,0 +1,16 @@
+190th commit changelog
+
+✖ = Not yet implemented
+✔ = implemented and tested
+
+Unverified if blank
+
+To-do list:
+
+Session feature = 
+
+Log-in feature = 
+Sign-up feature =
+Encryption = 
+Calendar Thingy = ✖
+
