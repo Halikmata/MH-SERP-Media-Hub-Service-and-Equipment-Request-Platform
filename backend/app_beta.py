@@ -73,7 +73,7 @@ def sign_out(): # sign out redirect to main page.
     
     return response, 200
 
-@app.route("/register", methods=["POST"]) # beta version
+""" @app.route("/register", methods=["POST"]) # beta version
 def register():
     data = request.get_json() # register credentials
     
@@ -98,7 +98,7 @@ def register():
     else:
         return jsonify({'msg':'Account already exists!!'}), 401 # 400 as status code?
     
-    # hash the password. and dehash it, will implement soon.
+    # hash the password. and dehash it, will implement soon. """
 
 @app.route("/login",methods=["POST"])
 def login():
