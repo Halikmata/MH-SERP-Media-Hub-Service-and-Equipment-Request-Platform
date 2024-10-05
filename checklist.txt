@@ -11,7 +11,7 @@ Session feature =
 
 Log-in feature = ✖ (may not work due to Encryption/decryption feature versus passwords yet to be encrypted)
 Sign-up feature = ✖
-Encryption = 
+Encryption = ✖
 Calendar Thingy = ✖
 News Page = ✖
 
