@@ -8,8 +8,12 @@ import re
 import jwt
 from __init__ import app, db
 from utils import verify_collection
+import utils
 
 from foreign import apply_foreign
+
+# password encryption/decryption
+cipher = utils.load_encryption()
 
 # doesn't have restrictions yet but login is partially prepared.
 
@@ -28,7 +32,7 @@ def sign_out(): # sign out redirect to main page.
     
     return response
 
-@app.route("/register", methods=["POST"])
+""" @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json() # register credentials
     
@@ -51,7 +55,7 @@ def register():
     else:
         return jsonify({'message':'Account already exists!!'}), 400 # 400 as status code?
     
-    # hash the password. and dehash it, will implement soon.
+    # hash the password. and dehash it, will implement soon. """
     
     
 @app.route('/signup', methods=['POST'])
@@ -85,10 +89,10 @@ def signup():
         return jsonify({'message': 'Invalid phone number format'}), 400
 
     if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data['email']):
-         return jsonify({'message': 'Invalid email format'}), 400
+        return jsonify({'message': 'Invalid email format'}), 400
      
     if not re.match(r'.+@psu\.palawan\.edu\.ph$', data['email']):
-         return jsonify({'message': 'Corporate email is required in creating account'}), 400
+        return jsonify({'message': 'Corporate email is required in creating account'}), 400
 
     if not re.match(r'^[a-zA-Z0-9_]+$', data['username']):
         return jsonify({'message': 'Username must not contain special characters'}), 400
@@ -109,7 +113,15 @@ def signup():
             return jsonify({'message': f'Missing required field: {field}'}), 400
         
     del data['confirm_password']
-        
+    
+    # encrypt the passwords
+    # tag is used to verify if its tampered with. temporarily not included in database.
+    data['password'], tag = cipher.encrypt_and_digest(data['password'])
+
+    
+    
+    
+    
     # Set the date_created field with current date
     data['date_created'] = datetime.now(timezone.utc)
 
@@ -137,6 +149,10 @@ def login():
 
     username = data['username_email']
     password = data['password']
+    
+    # password decryption
+    password = cipher.decrypt(password)
+    
     session_const = data.get('session_const', False)
     
     accounts = list(db['accounts'].find({"$or": [{"username": username}, {"email": username}], "password": password}))    
