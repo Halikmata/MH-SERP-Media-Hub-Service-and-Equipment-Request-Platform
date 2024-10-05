@@ -45,9 +45,9 @@ def load_key():
         return None
 
 from Crypto.Cipher import AES
-
+import base64
 def load_encryption():
-    key = load_key()
+    key = base64.b64decode(load_key())
     cipher = AES.new(key, AES.MODE_EAX)
     
     return cipher
