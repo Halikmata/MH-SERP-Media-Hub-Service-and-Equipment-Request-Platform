@@ -12,8 +12,6 @@ import utils
 
 from foreign import apply_foreign
 
-# password encryption/decryption
-cipher = utils.load_encryption()
 
 # doesn't have restrictions yet but login is partially prepared.
 
@@ -114,13 +112,8 @@ def signup():
         
     del data['confirm_password']
     
-    # encrypt the passwords
-    # tag is used to verify if its tampered with. temporarily not included in database.
-    data['password'], tag = cipher.encrypt_and_digest(data['password'])
-
-    
-    
-    
+    # "encrypt" the password
+    data['password'] = utils.encrypt(data["password"])
     
     # Set the date_created field with current date
     data['date_created'] = datetime.now(timezone.utc)
@@ -145,24 +138,35 @@ def verify_presence():
     
 @app.route("/login", methods=["POST"])
 def login():
-    data = request.get_json()
+    data = request.get_json() # user inputs
 
     username = data['username_email']
-    password = data['password']
-    
-    # password decryption
-    password = cipher.decrypt(password)
+    password = data['password'] 
     
     session_const = data.get('session_const', False)
     
-    accounts = list(db['accounts'].find({"$or": [{"username": username}, {"email": username}], "password": password}))    
+    accounts = list(db['accounts'].find({"$or": [{"username": username}, {"email": username}]}))    
     if len(accounts) == 0:
         return jsonify({"msg": False}), 401
     
     if len(accounts) > 1:
         print("debug: more than 1 rows received, data redundancy detected.")
-    
+ 
     account = accounts[0]
+    
+    # this part assumes that there is an instance from the result, password checking is now to be executed.
+    if not utils.verify_password(account["password"], password):
+        
+        # compatibility with "un-encrypted instances"
+        if not account["password"] == password:
+            response_data = {
+                "msg": False,
+            }
+    
+            response = make_response(jsonify(response_data), 401)
+            return response
+
+    
     account['_id'] = str(account['_id'])
 
     # Create access token with additional claims
