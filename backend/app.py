@@ -12,8 +12,6 @@ import utils
 
 from foreign import apply_foreign
 
-# password encryption/decryption
-cipher = utils.load_encryption()
 
 # doesn't have restrictions yet but login is partially prepared.
 
@@ -22,41 +20,13 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
-
-
 @app.route('/signout',methods=['POST'])
 def sign_out(): # sign out redirect to main page.
     
     response = make_response(jsonify({"message":"Logged out"}))
     response.set_cookie('access_token', '', expires=datetime.now() - timedelta(days=1)) # cookie remover.
     
-    return response
-
-""" @app.route("/register", methods=["POST"])
-def register():
-    data = request.get_json() # register credentials
-    
-    # data['_id'] = str(data['_id']) # string id to object
-    
-    # credential conditions are tied in front end (e.g last name must have not have special characters) because back end will not check it. 
-    
-    # check if email exists already
-    
-    email = data['email']
-    
-    account = db['accounts'].find({"gmail":email})
-    account = list(account)
-    
-    if len(account) == 0: # means that there is no account existing for that email yet.
-        data = data.pop('_id', 'unknown_id') # doesn't include id, unknown if id not exist
-        
-        create_account = db['accounts'].insert_one(data)
-        return jsonify({'message':'Account created!'}), 201
-    else:
-        return jsonify({'message':'Account already exists!!'}), 400 # 400 as status code?
-    
-    # hash the password. and dehash it, will implement soon. """
-    
+    return response 
     
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -114,13 +84,8 @@ def signup():
         
     del data['confirm_password']
     
-    # encrypt the passwords
-    # tag is used to verify if its tampered with. temporarily not included in database.
-    data['password'], tag = cipher.encrypt_and_digest(data['password'])
-
-    
-    
-    
+    # "encrypt" the password
+    data['password'] = utils.encrypt(data["password"])
     
     # Set the date_created field with current date
     data['date_created'] = datetime.now(timezone.utc)
@@ -145,24 +110,35 @@ def verify_presence():
     
 @app.route("/login", methods=["POST"])
 def login():
-    data = request.get_json()
+    data = request.get_json() # user inputs
 
     username = data['username_email']
-    password = data['password']
-    
-    # password decryption
-    password = cipher.decrypt(password)
+    password = data['password'] 
     
     session_const = data.get('session_const', False)
     
-    accounts = list(db['accounts'].find({"$or": [{"username": username}, {"email": username}], "password": password}))    
+    accounts = list(db['accounts'].find({"$or": [{"username": username}, {"email": username}]}))    
     if len(accounts) == 0:
         return jsonify({"msg": False}), 401
     
     if len(accounts) > 1:
         print("debug: more than 1 rows received, data redundancy detected.")
-    
+ 
     account = accounts[0]
+    
+    # this part assumes that there is an instance from the result, password checking is now to be executed.
+    if not utils.verify_password(account["password"], password):
+        
+        # compatibility with "un-encrypted instances"
+        if not account["password"] == password:
+            response_data = {
+                "msg": False,
+            }
+    
+            response = make_response(jsonify(response_data), 401)
+            return response
+
+    
     account['_id'] = str(account['_id'])
 
     # Create access token with additional claims
@@ -258,7 +234,7 @@ def admin(collection):
     page = int(request.args.get('page', default=1))
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
-    # sort = request.args.get('sort', default=None)
+    sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
     
     if id != None and len(id) != 0: # the objectid
@@ -282,17 +258,19 @@ def admin(collection):
     
     limit_rows = 50 # change total rows in a page here.
     offset = (page - 1) * limit_rows
-    rows = collection.find().skip(offset).limit(limit_rows) # ඞ
-    
+    # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
+        
     if search != None and column != None:
         rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows)
         
     elif search == None and column == None:
         rows = collection.find().skip(offset).limit(limit_rows)
         
+    elif column != None and sort != None: # sorting
+        rows = collection.find().skip(offset).limit(limit_rows).sort([(column, int(sort))])
+
     else:
         return jsonify({'message': 'May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
-    
     rows_list = list(rows)
     
     for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
@@ -669,8 +647,6 @@ def admin_requests():
         return jsonify(requests_list), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
-    
 
 
 @app.route('/requests/add', methods=["GET", "POST"])

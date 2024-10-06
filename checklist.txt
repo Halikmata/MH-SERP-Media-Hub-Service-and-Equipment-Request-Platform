@@ -9,9 +9,11 @@ To-do list:
 
 Session feature = 
 
-Log-in feature = ✖ (may not work due to Encryption/decryption feature versus passwords yet to be encrypted)
+Log-in feature = ✖
 Sign-up feature = ✖
-Encryption = ✖
+"Encryption" = ✔
 Calendar Thingy = ✖
 News Page = ✖
-
+Admin page = ✖
+Volunteer system page = ✖
+error try/catchers = ✖

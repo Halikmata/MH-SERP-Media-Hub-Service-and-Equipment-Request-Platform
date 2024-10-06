@@ -1,5 +1,4 @@
 from __init__ import db
-import bcrypt # for encoding and decrypting passwords and other important credentials.
 from datetime import datetime
 import json
 
@@ -13,41 +12,18 @@ def verify_collection(x):
         return False
     return True
 
-def decrypt():
-    pass
-
-def encrypt():
-    pass
-
 def verify_date():
     pass
 
-def load_key():
-    try:
-        # Open the file and read its contents
-        with open("key.json", "r") as file:
-            # Parse the JSON content
-            data = json.load(file)
-        
-        # Access the 'key' value
-        return data.get('key')
-    
-    except FileNotFoundError:
-        print("Error: key.json file not found.")
-        return None
-    
-    except json.JSONDecodeError:
-        print("Error: Invalid JSON format in key.json.")
-        return None
-    
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return None
+# bcrypt functions | package for hashing / not encrypting/decrypting.
+import bcrypt
 
-from Crypto.Cipher import AES
-import base64
-def load_encryption():
-    key = base64.b64decode(load_key())
-    cipher = AES.new(key, AES.MODE_EAX)
-    
-    return cipher
+# this is to be stored in the password attribute in accounts.
+def encrypt(password):
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    return hashed_password
+
+# Assuming that the e-mail is used to track down a specific hashed password (one result query)
+# * hashed_password value is from the database.
+def verify_password(hashed_password, input_password):
+    return bcrypt.checkpw(hashed_password.encode('utf-8'), hashed_password) # returns true | false
