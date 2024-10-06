@@ -20,7 +20,7 @@ import SelectEquipment from './pages/selectEqmt.jsx';
 import SelectServices from './pages/selectService';
 
 function App(){
-    const [cookies, removeCookie] = useCookies(['presence']);
+    // const [cookies, removeCookie] = useCookies(['presence']);
     let navigate = useNavigate();
     const location = useLocation();
     const isAdminPage = location.pathname.startsWith('/admin');

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AdminTable from './component/AdminTable';
 import AdminHeader from './component/AdminHeader';
@@ -10,8 +10,50 @@ import axios from 'axios';
 
 const Admin = ({ url }) => {
   const pathname = window.location.pathname;
-
   const isAdminPage = pathname.startsWith('/admin');
+  const [equipmentTypes, setEquipmentTypes] = useState([]);
+
+
+  // Formatting
+  const formatAmount = (value) => {
+    if (typeof value !== 'number' || isNaN(value)) {
+      return 'Invalid amount';
+    }
+  
+    const formattedAmount = `₱${value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+    return formattedAmount;
+  };
+
+  useEffect(() => {
+    axios.get(`${url}/admin/equipment_type`)
+      .then((response) => {
+        setEquipmentTypes(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching equipment types:', error);
+      });
+  }, [url]);
+
+  const equipmentType = (fk_idequipment_type) => {
+    const equipmentType = equipmentTypes.find((type) => type.fk_idequipment_type === fk_idequipment_type);
+
+    return equipmentType ? equipmentType.name : "Unknown Type";
+  };
+
+  const availability = (value) => {
+    const isAvailable = value === 1;
+    const availabilityStyle = {
+      color: isAvailable ? 'green' : 'red',
+      fontWeight: 'bold'
+    };
+    return (
+      <div style={availabilityStyle}>
+        {isAvailable ? "Available" : "Not Available"}
+      </div>
+    );
+  }
+
+  // Collections and Columns
 
   const collectionMap = {
     '/admin/equipment': {
@@ -19,8 +61,8 @@ const Admin = ({ url }) => {
       columns: [
         { field: 'brand', label: 'Brand' },
         { field: 'model', label: 'Model' },
-        { field: 'equipment_type', label: 'Type' },
-        { field: 'availability', label: 'Availability' },
+        { field: 'equipment_type', label: 'Type', cell: equipmentType },
+        { field: 'availability', label: 'Availability', cell: availability },
         { field: 'unit_cost', label: 'Cost', cell: formatAmount }
       ]
     },
@@ -107,7 +149,7 @@ const Admin = ({ url }) => {
 export default Admin;
 
 
-const formatAmount = (value) => {
-  const formattedAmount = `${value} php`;
+const equipment_type = (value) => {
+  const formattedAmount = `${value}`;
   return formattedAmount;
 };
