@@ -20,41 +20,13 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
-
-
 @app.route('/signout',methods=['POST'])
 def sign_out(): # sign out redirect to main page.
     
     response = make_response(jsonify({"message":"Logged out"}))
     response.set_cookie('access_token', '', expires=datetime.now() - timedelta(days=1)) # cookie remover.
     
-    return response
-
-""" @app.route("/register", methods=["POST"])
-def register():
-    data = request.get_json() # register credentials
-    
-    # data['_id'] = str(data['_id']) # string id to object
-    
-    # credential conditions are tied in front end (e.g last name must have not have special characters) because back end will not check it. 
-    
-    # check if email exists already
-    
-    email = data['email']
-    
-    account = db['accounts'].find({"gmail":email})
-    account = list(account)
-    
-    if len(account) == 0: # means that there is no account existing for that email yet.
-        data = data.pop('_id', 'unknown_id') # doesn't include id, unknown if id not exist
-        
-        create_account = db['accounts'].insert_one(data)
-        return jsonify({'message':'Account created!'}), 201
-    else:
-        return jsonify({'message':'Account already exists!!'}), 400 # 400 as status code?
-    
-    # hash the password. and dehash it, will implement soon. """
-    
+    return response 
     
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -262,7 +234,7 @@ def admin(collection):
     page = int(request.args.get('page', default=1))
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
-    # sort = request.args.get('sort', default=None)
+    sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
     
     if id != None and len(id) != 0: # the objectid
@@ -286,17 +258,24 @@ def admin(collection):
     
     limit_rows = 50 # change total rows in a page here.
     offset = (page - 1) * limit_rows
-    rows = collection.find().skip(offset).limit(limit_rows) # ඞ
+    # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
     
+    print(column)
+    print(sort)
+        
     if search != None and column != None:
         rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows)
+        print('hit1')
         
     elif search == None and column == None:
         rows = collection.find().skip(offset).limit(limit_rows)
+        print('hit2')
         
+    elif column != None and sort != None: # sorting
+        rows = collection.find().skip(offset).limit(limit_rows).sort([(column, int(sort))])
+        print('hit sort')
     else:
         return jsonify({'message': 'May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
-    
     rows_list = list(rows)
     
     for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
@@ -673,8 +652,6 @@ def admin_requests():
         return jsonify(requests_list), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
-    
 
 
 @app.route('/requests/add', methods=["GET", "POST"])
