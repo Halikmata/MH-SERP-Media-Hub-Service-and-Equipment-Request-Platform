@@ -259,21 +259,16 @@ def admin(collection):
     limit_rows = 50 # change total rows in a page here.
     offset = (page - 1) * limit_rows
     # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
-    
-    print(column)
-    print(sort)
         
     if search != None and column != None:
         rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows)
-        print('hit1')
         
     elif search == None and column == None:
         rows = collection.find().skip(offset).limit(limit_rows)
-        print('hit2')
         
     elif column != None and sort != None: # sorting
         rows = collection.find().skip(offset).limit(limit_rows).sort([(column, int(sort))])
-        print('hit sort')
+
     else:
         return jsonify({'message': 'May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
     rows_list = list(rows)
