@@ -243,8 +243,8 @@ def admin(collection):
     search = request.args.get('search',default=None)
     sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
-    limit_rows = request.args.get('limit_rows',default=None)
-    
+    limit_rows = int(request.args.get('limit_rows',default=50))
+
     if id != None and len(id) != 0: # the objectid
         id = ObjectId(id)
         row = collection.find({'_id':id})
@@ -267,8 +267,13 @@ def admin(collection):
     #limit_rows = 50 # change total rows in a page here.
     offset = (page - 1) * limit_rows
     # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
+    
+    
+    # will shorten
+    if search != None and column != None and sort != None:
+        rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows).sort([(column, int(sort))])
         
-    if search != None and column != None:
+    elif search != None and column != None:
         rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows)
         
     elif search == None and column == None:
