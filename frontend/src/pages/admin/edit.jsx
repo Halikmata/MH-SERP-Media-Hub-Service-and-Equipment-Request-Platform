@@ -4,27 +4,48 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { types } from './types.js';
 
-const EditItem = ({ url, renderSelectCell }) => {
+const EditItem = ({ url }) => {
     const { collection, id } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({});
+    const [originalData, setOriginalData] = useState({});
     const [loading, setLoading] = useState(true);
+    const [foreignOptions, setForeignOptions] = useState({});
 
-
-    function onCancel() {
+    const onCancel = () => {
         navigate(`/admin/${collection}`);
-    }
+    };
 
     useEffect(() => {
         // Fetch existing item's data
         axios.get(`${url}${collection}/update/${id}`)
             .then((response) => {
-                setFormData(response.data); // Assuming the response contains item data
+                setFormData(response.data); // Set form data to the fetched item data
+                setOriginalData(response.data); // Store original data for comparison
                 setLoading(false);
             })
             .catch((error) => {
                 console.error('Error fetching item:', error);
             });
+
+        // Fetch foreign_xor options for each relevant field
+        const collectionTypes = types[collection] || {};
+        const foreignXorFields = Object.entries(collectionTypes)
+            .filter(([field, config]) => config.data_type === 'foreign_xor');
+
+        foreignXorFields.forEach(([field, config]) => {
+            const collectionOption = config.collection_option;
+            axios.get(`${url}${collectionOption}`)
+                .then((response) => {
+                    setForeignOptions(prevState => ({
+                        ...prevState,
+                        [field]: response.data
+                    }));
+                })
+                .catch((error) => {
+                    console.error(`Error fetching ${collectionOption} data:`, error);
+                });
+        });
     }, [id, collection, url]);
 
     const renderInput = (field, fieldConfig) => {
@@ -59,12 +80,20 @@ const EditItem = ({ url, renderSelectCell }) => {
                     </>
                 );
             case 'foreign_xor':
+                const options = foreignOptions[field] || [];
+                const identifier = fieldConfig.identifier;
+
                 return (
-                    <select name={field} className='form-select' value={formData[field] || ''} onChange={handleChange}>
+                    <select
+                        name={field}
+                        className='form-select m-2'
+                        onChange={handleChange}
+                        value={formData[field] || ''} // Ensure the selected option is the current value
+                    >
                         <option value="">Select...</option>
-                        {fieldValue.map((option) => (
-                            <option key={option._id.$oid} value={option.fk_id}>
-                                {`${option.name}`}
+                        {options.map((option) => (
+                            <option key={option._id.$oid} value={option[identifier]}>
+                                {option.name}
                             </option>
                         ))}
                     </select>
@@ -75,7 +104,30 @@ const EditItem = ({ url, renderSelectCell }) => {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        const fieldConfig = types[collection][name];
+        let updatedValue = value;
+
+        if (fieldConfig) {
+            switch (fieldConfig.data_type) {
+                case 'number':
+                    updatedValue = Number(value);
+                    break;
+
+                case 'foreign_xor':
+                    updatedValue = Number(value);
+                    break;
+
+                case 'boolean':
+                    updatedValue = e.target.checked; 
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        setFormData({ ...formData, [name]: updatedValue });
     };
 
     const handleCheckboxChange = (e) => {
@@ -95,14 +147,27 @@ const EditItem = ({ url, renderSelectCell }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.put(`${url}${collection}/update/${id}`, formData)
-            .then((response) => {
-                console.log('Item updated successfully:', response.data);
-                navigate(`/admin/${collection}`);
-            })
-            .catch((error) => {
-                console.error('Error updating item:', error);
-            });
+
+        const updatedData = Object.keys(formData).reduce((acc, key) => {
+            if (formData[key] !== originalData[key]) {
+                acc[key] = formData[key];
+            }
+            return acc;
+        }, {});
+
+        if (Object.keys(updatedData).length > 0) {
+            axios.put(`${url}${collection}/update/${id}`, updatedData)
+                .then((response) => {
+                    console.log('Item updated successfully:', response.data);
+                    navigate(`/admin/${collection}`);
+                })
+                .catch((error) => {
+                    console.error('Error updating item:', error);
+                });
+        } else {
+            console.log('No changes made to the item.');
+            navigate(`/admin/${collection}`);
+        }
     };
 
     const renderForm = () => {
@@ -139,19 +204,6 @@ const EditItem = ({ url, renderSelectCell }) => {
         );
     };
 
-    const handleSelectChange = (field, value) => {
-        setFormData({ ...formData, [field]: value });
-
-        axios.post(`${url}${collection}/update/${id}`, { [field]: value })
-            .then((response) => {
-                console.log('Item updated successfully:', response.data);
-                navigate(`/admin/${collection}`);
-            })
-            .catch((error) => {
-                console.error('Error updating item:', error);
-            });
-    };
-
     return (
         <div>
             <h2>Edit {collection}</h2>
@@ -160,4 +212,4 @@ const EditItem = ({ url, renderSelectCell }) => {
     );
 };
 
-export default EditItem;
+export default EditItem; 

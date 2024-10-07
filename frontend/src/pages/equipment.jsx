@@ -62,8 +62,8 @@ const Equipment = ({ url }) => {
                 <br />
                 <div style={{ width: '100%', display: "grid", justifyItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
-                    <div style={{ width: '15px', height: '15px', borderRadius: '50%', backgroundColor: item.availability === "1" ? 'green' : 'gray' }}></div>
-                    <span style={{ marginLeft: '10px', color: '#666' }}>{item.availability === "1" ? 'Available' : 'Unavailable'}</span>
+                    <div style={{ width: '15px', height: '15px', borderRadius: '50%', backgroundColor: item.availability === 1 ? 'green' : 'gray' }}></div>
+                    <span style={{ marginLeft: '10px', color: '#666' }}>{item.availability === 1 ? 'Available' : 'Unavailable'}</span>
                   </div>
                 </div>
               </div>

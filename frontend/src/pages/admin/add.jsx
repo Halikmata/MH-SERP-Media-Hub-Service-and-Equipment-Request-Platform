@@ -1,21 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { types } from './types.js';
-import { Button , Card, Col, Container, Row } from 'react-bootstrap';
+import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 const AddItem = ({ url }) => {
     const { collection } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({});
+    const [foreignOptions, setForeignOptions] = useState({});
 
-    function onCancel() {
+    const collectionTypes = types[collection] || {};
+
+    useEffect(() => {
+        const fetchForeignOptions = async () => {
+            const promises = Object.entries(collectionTypes)
+                .filter(([field, config]) => config.data_type === 'foreign_xor')
+                .map(async ([field, config]) => {
+                    try {
+                        const response = await axios.get(`${url}${config.collection_option}`);
+                        return { [field]: response.data };
+                    } catch (error) {
+                        console.error(`Error fetching ${config.collection_option} data:`, error);
+                        return { [field]: [] };
+                    }
+                });
+
+            const results = await Promise.all(promises);
+            setForeignOptions(Object.assign({}, ...results));
+        };
+
+        fetchForeignOptions();
+    }, [collection, url, collectionTypes]);
+
+    const onCancel = () => {
         navigate(`/admin/${collection}`);
-    }
+    };
 
     const renderInput = (field, fieldConfig) => {
         const fieldType = fieldConfig["data_type"];
-        const fieldValue = fieldConfig["option"];
+        const fieldValue = fieldConfig["option"] || [];
 
         switch (fieldType) {
             case 'text':
@@ -26,7 +50,7 @@ const AddItem = ({ url }) => {
                 return <input type="number" className="form-control m-2" name={field} onChange={handleChange} />;
             case 'xor':
                 return (
-                    <select name={field} onChange={handleChange}>
+                    <select name={field} onChange={handleChange} className="form-select m-2">
                         <option value="">Select...</option>
                         {fieldValue.map((option) => (
                             <option key={option} value={option}>
@@ -39,20 +63,26 @@ const AddItem = ({ url }) => {
                 return (
                     <>
                         {fieldValue.map((option) => (
-                            <div key={option}>
-                                <input type="checkbox" className='form-select' name={field} value={option} onChange={handleCheckboxChange} />
-                                <label>{option}</label>
+                            <div key={option} className="form-check form-check-inline">
+                                <input type="checkbox" className="form-check-input" name={field} value={option} onChange={handleCheckboxChange} />
+                                <label className="form-check-label">{option}</label>
                             </div>
                         ))}
                     </>
                 );
             case 'foreign_xor':
+                const options = foreignOptions[field] || [];
+                const identifier = fieldConfig.identifier;
                 return (
-                    <select name={field} onChange={handleChange} className='form-select'>
+                    <select
+                        name={field}
+                        className='form-select m-2'
+                        onChange={handleChange}
+                    >
                         <option value="">Select...</option>
-                        {fieldValue.map((option) => (
-                            <option key={option._id.$oid} value={option.fk_id}>
-                                {`${option.name}`}
+                        {options.map((option) => (
+                            <option key={option._id.$oid} value={option[identifier]}>
+                                {option.name}
                             </option>
                         ))}
                     </select>
@@ -63,12 +93,36 @@ const AddItem = ({ url }) => {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        const fieldConfig = collectionTypes[name];
+
+        let updatedValue = value;
+
+        if (fieldConfig) {
+            switch (fieldConfig.data_type) {
+                case 'number':
+                    updatedValue = Number(value);
+                    break;
+                case 'foreign_xor':
+                    updatedValue = Number(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        setFormData({ ...formData, [name]: updatedValue }); // Update the state with the new value
     };
 
-    // Placeholder function for handling checkbox changes
     const handleCheckboxChange = (e) => {
-        // Placeholder function
+        const { name, value, checked } = e.target;
+        const currentValues = formData[name] || [];
+
+        if (checked) {
+            setFormData({ ...formData, [name]: [...currentValues, value] });
+        } else {
+            setFormData({ ...formData, [name]: currentValues.filter(val => val !== value) });
+        }
     };
 
     const handleSubmit = (e) => {
