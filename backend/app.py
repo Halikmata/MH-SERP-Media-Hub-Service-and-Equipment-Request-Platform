@@ -140,6 +140,7 @@ def login():
 
     
     account['_id'] = str(account['_id'])
+    account['password'] = str(account['password'])
 
     # Create access token with additional claims
     additional_claims = {"account_detail": account}

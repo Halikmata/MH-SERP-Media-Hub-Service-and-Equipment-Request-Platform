@@ -28,4 +28,9 @@ def encrypt(password):
 # * hashed_password value is from the database.
 def verify_password(hashed_password, input_password):
     bytes_input = input_password.encode('utf-8')
-    return bcrypt.checkpw(bytes_input, hashed_password) # returns true | false
+    
+    try:
+        return bcrypt.checkpw(bytes_input, hashed_password) # returns true | false
+    except:
+        print("non-hashed password detected!")
+        return False
