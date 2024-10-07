@@ -162,7 +162,7 @@ def login():
     
     return response
 
-@app.route('/<collection>', methods=['GET'])
+@app.route('/<collection>', methods=['GET']) # temporary
 # @jwt_required()
 def index(collection):
     if not verify_collection(collection):
@@ -175,9 +175,10 @@ def index(collection):
     page = int(request.args.get('page', default=1))
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
-    # sort = request.args.get('sort', default=None)
+    sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
-    
+    limit_rows = int(request.args.get('limit_rows',default=50))
+
     if id != None and len(id) != 0: # the objectid
         id = ObjectId(id)
         row = collection.find({'_id':id})
@@ -197,26 +198,32 @@ def index(collection):
     if(int(page) < 1): # avoids negatives.
         page = 1
     
-    limit_rows = 50 # change total rows in a page here.
+    #limit_rows = 50 # change total rows in a page here.
     offset = (page - 1) * limit_rows
-    rows = collection.find().skip(offset).limit(limit_rows) # ඞ
+    # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
     
-    if search != None and column != None:
+    
+    # will shorten
+    if search != None and column != None and sort != None:
+        rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows).sort([(column, int(sort))])
+        
+    elif search != None and column != None:
         rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows)
         
     elif search == None and column == None:
         rows = collection.find().skip(offset).limit(limit_rows)
         
+    elif column != None and sort != None: # sorting
+        rows = collection.find().skip(offset).limit(limit_rows).sort([(column, int(sort))])
+
     else:
         return jsonify({'message': 'May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
-    
     rows_list = list(rows)
     
     for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
         x['_id'] = str(x['_id'])
         
     # rows_list = apply_foreign(rows_list,col_name)
-
     return jsonify(rows_list), 200
 
 
@@ -236,6 +243,7 @@ def admin(collection):
     search = request.args.get('search',default=None)
     sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
+    limit_rows = request.args.get('limit_rows',default=None)
     
     if id != None and len(id) != 0: # the objectid
         id = ObjectId(id)
@@ -256,7 +264,7 @@ def admin(collection):
     if(int(page) < 1): # avoids negatives.
         page = 1
     
-    limit_rows = 50 # change total rows in a page here.
+    #limit_rows = 50 # change total rows in a page here.
     offset = (page - 1) * limit_rows
     # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
         
