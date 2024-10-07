@@ -20,10 +20,12 @@ import bcrypt
 
 # this is to be stored in the password attribute in accounts.
 def encrypt(password):
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    byte_pass = password.encode('utf-8')
+    hashed_password = bcrypt.hashpw(byte_pass, bcrypt.gensalt())
     return hashed_password
 
 # Assuming that the e-mail is used to track down a specific hashed password (one result query)
 # * hashed_password value is from the database.
 def verify_password(hashed_password, input_password):
-    return bcrypt.checkpw(hashed_password.encode('utf-8'), hashed_password) # returns true | false
+    bytes_input = input_password.encode('utf-8')
+    return bcrypt.checkpw(bytes_input, hashed_password) # returns true | false
