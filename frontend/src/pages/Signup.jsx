@@ -147,9 +147,9 @@ function Signup({ url }) {
                 </div>
                 <div className="mb-3">
                   <select name="user_type" className="form-select" value={formData.user_type} onChange={handleInputChange} required>
-                    <option value="Student">Student</option>
-                    <option value="Faculty">Faculty</option>
-                    <option value="Staff">Staff</option>
+                    <option value="student">Student</option>
+                    <option value="faculty">Faculty</option>
+                    <option value="staff">Staff</option>
                   </select>
                 </div>
                 {formData.user_type === 'Student' && (
