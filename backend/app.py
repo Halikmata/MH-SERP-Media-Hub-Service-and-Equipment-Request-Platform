@@ -420,12 +420,12 @@ def get_available():
 
 # on progress ------------
 
-@app.route('/admin')
+""" @app.route('/admin')
 def admin_index():
     
     collections = db.list_collection_names()
 
-    return jsonify({'collections':collections}), 200
+    return jsonify({'collections':collections}), 200 """
 
 """ @app.route('/admin/requests/conclude', methods=['POST']) # this assumes that admins are the ones that declare requests as finished.
 def admin_request_conclude():
@@ -756,11 +756,10 @@ def get_org(college):
 
 # add privilege checker for each app routes.
 
-def get_month_requesters(): # top 5 requesters with highest request quantity
-    accounts = db['accounts']
+def get_month_requesters(): # top 5 requesters with highest request quantity per month
     requests = db['requests']
     
-    current_date = datetime.now().date().replace(day=1)
+    current_date = datetime.now().replace(day=1)
     query = [
         {
             "$match":{
@@ -771,7 +770,7 @@ def get_month_requesters(): # top 5 requesters with highest request quantity
         },
         {
             "$group":{
-            "name": "$requester_email", # email will be replaced with name in loop
+            "_id": "$requester_full_name",
             "total_requests":{"$sum": 1}
             }
         },
@@ -787,22 +786,58 @@ def get_month_requesters(): # top 5 requesters with highest request quantity
     ]
     count_requests = requests.aggregate(query)
     count_requests = list(count_requests)
-    
-    for x in count_requests:
-        query = {'email': x['name']}
-        result = accounts.find(query)
-        acc = list(result)[0]
-        
-        name = f"{acc['fname']} {acc['mname']} {acc['lname']}"
-        x['name'] = name
         
     return count_requests
 
-def get_month_equipments(): # most borrowed equipment per month of current year --
-    equipment = db['equipment']
+def get_month_services():
+    services = db['services']
     request = db['requests']
     
-    current_date = datetime.now().date().replace(day=1)
+    current_date = datetime.now().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$unwind": "$services"
+        },
+        {
+            "$group": {
+                "_id": "$services",
+                "count":{"$sum": 1}
+            }
+        },
+        {
+            "$sort":
+            {
+                "count": -1
+            }
+        },
+        {
+            "$limit": 5
+        }
+    ]
+    
+    results = request.aggregate(query)
+    results = list(results)
+    
+    for x in results:
+        
+        row = services.find({"fk_idservice": x['_id']})
+        row = list(row)[0]
+        x['_id'] = row['name']
+    
+    return results
+
+def get_month_equipments(): # quantity of equipments used per month
+    requests = db['requests']
+    equipment = db['equipment']
+    
+    current_date = datetime.now().replace(day=1)
     query = [
         {
             "$match":{
@@ -816,92 +851,13 @@ def get_month_equipments(): # most borrowed equipment per month of current year 
         },
         {
             "$group": {
-            "equipment": "$equipment",
+            "_id": "$equipment",
             "count":{"$sum": 1}
             }
         },
         {
-            "$sort": {
-                "count": -1
-            }
-        },
-        {
-            "$limit": 5
-        }
-    ]
-    
-    results = request.aggregate(query)
-    results = list(results)
-    
-    for x in results:
-        
-        row = equipment.find({"idequipment":x['equipment']})
-        row = list(row)[0]
-        x['equipment'] = row['description']
-    
-    return results
-
-def get_month_services():
-    services = db['services']
-    request = db['requests']
-    
-    current_date = datetime.now().date().replace(day=1)
-    query = [
-        {
-            "$match":{
-                "event_start": {
-                    "$gte": current_date
-                }
-            }
-        },
-        {
-            "$group": {
-                "service": "$service",
-                "count":{"$sum": 1}
-            }
-        },
-        {
-            "$sort": {
-                "count": -1
-            }
-        },
-        {
-            "$limit": 5
-        }
-    ]
-    
-    results = request.aggregate(query)
-    results = list(results)
-    
-    for x in results:
-        
-        row = services.find({"fk_idservice": x['service']})
-        row = list(row)[0]
-        x['service'] = row['name']
-    
-    return results
-
-def get_month_equipments(): # quantity of equipments used per month
-    requests = db['requests']
-    equipment = db['equipment']
-    
-    current_date = datetime.now().date().replace(day=1)
-    query = [
-        {
-            "$match":{
-                "event_start": {
-                    "$gte": current_date
-                }
-            }
-        },
-        {
-            "$group": {
-            "equipment": "$equipment",
-            "count":{"$sum": 1}
-            }
-        },
-        {
-            "$sort": {
+            "$sort":
+            {
                 "count": -1
             }
         }
@@ -912,9 +868,11 @@ def get_month_equipments(): # quantity of equipments used per month
     
     for x in results:
         
-        row = equipment.find({"idequipment":x['equipment']})
+        row = equipment.find({"idequipment":x['_id']})
+        
         row = list(row)[0]
-        x['equipment'] = row['description']
+        
+        x['_id'] = row['description']
     
     return results
 
