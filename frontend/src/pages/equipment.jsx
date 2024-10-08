@@ -11,13 +11,35 @@ const Equipment = ({ url }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6); // Number of items per page
 
+  const [columnList, setColumnList] = useState([]);
+  const [currentSort, setCurrentSort] = useState("equipment_type");
+
+  const [currentOrder, setCurrentOrder] = useState("1");
+
+  function updateOrder(order) { // 1 = Ascending, -1 = Descending
+    setCurrentOrder(order)
+  }
+
+  function updateSort(item) {
+    setCurrentSort(item)  
+  }
+
+  useEffect(() => { // List of attributes
+    axios.get(`${url}/equipment/attributes`)
+      .then(response => {
+        setColumnList(response.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, [url,currentSort,currentOrder]);
+
   useEffect(() => {
     axios.get(`${url}/equipment`, {
       params: {
-        column: "equipment_type",
-        limit_rows: 100,
-        sort: -1
-      }
+      column: currentSort,
+      sort: currentOrder,
+      },
     })
       .then(response => {
         setEquipment(response.data);
@@ -25,7 +47,7 @@ const Equipment = ({ url }) => {
       .catch(error => {
         console.error(error);
       });
-  }, [url]);
+  }, [url,currentSort,currentOrder]);
 
   useEffect(() => {
     axios.get(`${url}/equipment_type`)
@@ -43,7 +65,7 @@ const Equipment = ({ url }) => {
       .catch(error => {
         console.error(error);
       });
-  }, [url]);
+  }, [url,currentSort,currentOrder]);
 
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -58,6 +80,18 @@ const Equipment = ({ url }) => {
 
   return (
     <div className="container mt-5">
+
+      <select onChange={(e) => updateSort(e.target.value)}>  {/* new feature */}
+        {columnList.map(item => (
+          <option value={item} >{item}</option>
+        ))}       
+      </select>
+
+      <select onChange={(e) => updateOrder(e.target.value)}>  {/* new feature */}
+        <option value="1" >Ascending</option>
+        <option value="-1" >Descending</option>
+      </select>
+
       <h2 className="text-center mb-4" style={{ color: '#FF5733' }}>Equipment List</h2><br />
       <Row xs={1} md={2} lg={3} className="g-4">
         {currentItems.map(item => (

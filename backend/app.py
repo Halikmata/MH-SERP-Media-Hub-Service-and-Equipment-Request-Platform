@@ -19,6 +19,8 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
+# session approutes
+
 @app.route('/signout',methods=['POST'])
 def sign_out(): # sign out redirect to main page.
     
@@ -162,6 +164,39 @@ def login():
     
     return response
 
+
+# query approutes
+
+@app.route('/<collection>/attributes', methods=['GET']) # column, dynamic
+def get_table_attr(collection):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        col_name = collection
+        collection = db[collection]
+      
+    sample_row = collection.find_one()
+    
+    if "_id" in sample_row:
+        del sample_row["_id"]
+        
+    attributes = list(sample_row.keys())
+    
+    return jsonify(attributes), 200
+        
+    
+@app.route('/<collection>/length', methods=['GET']) # gets the total amount of documents
+def get_table_length(collection):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        col_name = collection
+        collection = db[collection]
+        
+    attributes = collection.estimated_document_count()
+    return jsonify(attributes), 200
+
+
 @app.route('/<collection>', methods=['GET'])
 # @jwt_required()
 def index(collection):
@@ -172,12 +207,12 @@ def index(collection):
         collection = db[collection]
     
     # URL inputs.
-    page = int(request.args.get('page', default=1)) # possibly deprecated
+    page = int(request.args.get('page', default=1))
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
     sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
-    limit_rows = int(request.args.get('limit_rows',default=50)) # possibly deprecated
+    limit_rows = int(request.args.get('limit_rows',default=50))
 
     if id != None and len(id) != 0: # the objectid
         id = ObjectId(id)
@@ -201,7 +236,6 @@ def index(collection):
     #limit_rows = 50 # change total rows in a page here.
     offset = (page - 1) * limit_rows
     # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
-    
     
     # will shorten
     if search != None and column != None and sort != None:
@@ -418,15 +452,68 @@ def get_available():
 
 # admin APIs
 
+@app.route('/admin/news', methods=['GET',"POST"]) # news management to show on end-user home page -- prototype version
+# @jwt_required()
+# check if account has privilege
+def news_management():
+    if request.method == "GET": # list of posts
+        collection = db["news"]
+        
+        page = int(request.args.get('page', default=1)) # possibly deprecated
+        column = request.args.get('column',default=None)
+        search = request.args.get('search',default=None)
+        sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
+        limit_rows = int(request.args.get('limit_rows',default=50)) # possibly deprecated
+        
+        # stuff here
+        
+        rows = collection.find()
+        
+        rows_list = list(rows)
+    
+        for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
+            x['_id'] = str(x['_id'])
+            
+        return jsonify(rows_list), 200
+    
+    elif request.method == "POST": # actions for posts, create, edit, delete
+        collection = db["news"]
+        action = request.args.get('action',default=None)
+        json_input = request.get_json()
+        match action:
+            case "add":
+                result = collection.insert_one(json_input)
+                
+                # management for pictures if exists
+                
+                return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
+            case "edit":
+                json_input = request.get_json()
+                
+                result = collection.update_one({'_id':ObjectId(json_input["id"])}, {'$set': json_input})
+                
+                if result.modified_count >  0:
+                    return jsonify({"message": "Updated successfully", "id": id}), 201
+                else:
+                    return jsonify({"message": "No row found with the given ID"}), 404
+                
+            case "delete":
+                result = collection.delete_one({'_id': ObjectId(json_input["id"])})
+    
+                if result.deleted_count > 0:
+                    return jsonify({"message": "Deleted successfully", "id": id}), 201
+                else:
+                    return jsonify({"message": "No row found with the given ID"}), 404
+            case _:
+                return jsonify({"message": "Unidentified Action!"}), 404
+
+
+
+
+
+
 
 # on progress ------------
-
-""" @app.route('/admin')
-def admin_index():
-    
-    collections = db.list_collection_names()
-
-    return jsonify({'collections':collections}), 200 """
 
 """ @app.route('/admin/requests/conclude', methods=['POST']) # this assumes that admins are the ones that declare requests as finished.
 def admin_request_conclude():
@@ -442,41 +529,6 @@ def admin_request_conclude():
     
     return jsonify({'message':'Request instance conluded'}), 201 """
 
-""" from datetime import datetime
-@app.route('/admin/report', methods=['GET'])
-def admin_report():
-    
-    collection = db['requests']
-    
-    # get all available years in the collection
-    #years = collection.find({},{"request_start":1})
-    #years = collection.
-    #print(f"\n\n\n\n{list(years)}\n\n\n\n")
-    month = dict()
-    for y in range(0,12+1): # requests per month
-        rows = collection.aggregate(
-            [{
-                "$match":{
-                    "request_start":{
-                        "$regex":f"{y}.*", # incomplete
-                        "$options": "i"
-                    }
-                }
-            },
-            {
-                "$count": "request_per_month"
-            }]
-        )
-        #request_per_month = list(rows)[0]['request_per_month']
-        #month[f'{x}'] = request_per_month
-    #print(rows[0][''])
-    rows_list = list(rows)
-    
-    x['_id'] = str(x['_id'])
-    
-    # rows_list = apply_foreign(rows_list,"requests")
-    
-    return jsonify(rows_list), 200 """
 
 
 @app.route('/admin/<collection>/update/<id>', methods=['GET', 'PUT'])
