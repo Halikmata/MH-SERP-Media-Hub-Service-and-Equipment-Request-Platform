@@ -167,6 +167,28 @@ def login():
 
 # query approutes
 
+@app.route('/<collection>/attributesType', methods=['GET']) # Get data type
+def get_table_attrType(collection):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        col_name = collection
+        collection = db[collection]
+    
+    sample_row = collection.find_one()
+    
+    if "_id" in sample_row:
+        del sample_row["_id"]
+        
+    attributes = list(sample_row.values())
+    
+    type_list = []
+    for x in attributes:
+        type_list.append(str(type(x)).split("'")[1])
+        
+    return jsonify(type_list), 200
+
+
 @app.route('/<collection>/attributes', methods=['GET']) # column, dynamic
 def get_table_attr(collection):
     if not verify_collection(collection):
@@ -176,8 +198,8 @@ def get_table_attr(collection):
         collection = db[collection]
       
     sample_row = collection.find_one()
-    
-    if "_id" in sample_row:
+        
+    if "_id" in sample_row.keys():
         del sample_row["_id"]
         
     attributes = list(sample_row.keys())
@@ -238,7 +260,7 @@ def index(collection):
     # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
     
     # will shorten
-    if search != None and column != None and sort != None:
+    if search != None and column != None and sort != None: # problem with search is that it is case sensitive, and data type sensitive.
         rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows).sort([(column, int(sort))])
         
     elif search != None and column != None:

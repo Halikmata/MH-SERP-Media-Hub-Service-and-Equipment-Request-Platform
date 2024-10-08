@@ -35,7 +35,7 @@ const Equipment = ({ url }) => {
   }, [url, currentSort, currentOrder]);
 
   useEffect(() => {
-    axios.get(`${url}/equipment`, {
+    axios.get(`${url}/equipment?`, {
       params: {
         column: currentSort,
         sort: currentOrder,
