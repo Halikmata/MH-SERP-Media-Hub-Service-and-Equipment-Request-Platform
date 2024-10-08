@@ -10,17 +10,9 @@ const Equipment = ({ url }) => {
   const [equipmentTypes, setEquipmentTypes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6); // Number of items per page
-
-  const [columnList, setColumnList] = useState({});
-  const [currentSort, setCurrentSort] = useState("idequipment"); //idequipment / all
-
+  const [columnList, setColumnList] = useState([]);
+  const [currentSort, setCurrentSort] = useState("equipment_type");
   const [currentOrder, setCurrentOrder] = useState("1");
-
-  const [currentSearch, setCurrentSearch] = useState("");
-
-  function updateSearch(searchInput) { // prototype
-    setCurrentSearch(searchInput)
-  }
 
   function updateOrder(order) { // 1 = Ascending, -1 = Descending
     setCurrentOrder(order);
@@ -33,25 +25,7 @@ const Equipment = ({ url }) => {
   useEffect(() => { // List of attributes
     axios.get(`${url}/equipment/attributes`)
       .then(response => {
-        let column_list = response.data;
-
-        let dict = {}
-
-        // exclude an attribute list
-        let exclude = ["equipment_location","unit_cost"]
-
-        column_list.filter((value) => !exclude.includes(value)).map(value => {
-          dict[value] = value
-        })
-
-        // modify a specific attribute name here
-        dict["idequipment"] = "All"
-
-
-
-
-
-        setColumnList(dict)
+        setColumnList(response.data);
       })
       .catch(error => {
         console.error(error);
@@ -59,11 +33,10 @@ const Equipment = ({ url }) => {
   }, [url, currentSort, currentOrder]);
 
   useEffect(() => {
-    axios.get(`${url}/equipment`, {
+    axios.get(`${url}/equipment?`, {
       params: {
-      column: currentSort,
-      sort: currentOrder,
-      /* search: currentSearch, */
+        column: currentSort,
+        sort: currentOrder,
       },
     })
       .then(response => {
@@ -72,7 +45,7 @@ const Equipment = ({ url }) => {
       .catch(error => {
         console.error(error);
       });
-  }, [url,currentSort,currentOrder, currentSearch]);
+  }, [url, currentSort, currentOrder]);
 
   useEffect(() => {
     axios.get(`${url}/equipment_type`)
@@ -90,7 +63,7 @@ const Equipment = ({ url }) => {
       .catch(error => {
         console.error(error);
       });
-  }, [url,currentSort,currentOrder, currentSearch]);
+  }, [url]);
 
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -105,20 +78,41 @@ const Equipment = ({ url }) => {
 
   return (
     <div className="container mt-5">
-      {/* <input type="text"placeholder="Search a specific selected category" onChange={(e) => updateSearch(e.target.value)}/>  */}{/* new feature */}
+      {/* Sorting Options - Aligned to the side */}
+      <div className="d-flex justify-content-start mb-4">
+        <div className="me-3">
+          <select
+            className="form-select"
+            style={{
+              backgroundColor: 'transparent', // Removing fill color
+              color: '#333', // Text color
+              borderColor: '#FF5733', // Border color matching theme
+              width: 'auto',
+            }}
+            onChange={(e) => updateSort(e.target.value)}
+          >
+            {columnList.map(item => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+        </div>
 
-      <select onChange={(e) => updateSort(e.target.value)}>  {/* new feature */}
-      {Object.entries(columnList).map(([key, value]) => (
-        <option value={key}>{value}</option>
-      ))}    
-      </select>
-
-      <select onChange={(e) => updateOrder(e.target.value)}>  {/* new feature */}
-        <option value="1" >Ascending</option>
-        <option value="-1" >Descending</option>
-      </select>
-
-      
+        <div className="me-3">
+          <select
+            className="form-select"
+            style={{
+              backgroundColor: 'transparent', // Removing fill color
+              color: '#333', // Text color
+              borderColor: '#FF5733', // Border color matching theme
+              width: 'auto',
+            }}
+            onChange={(e) => updateOrder(e.target.value)}
+          >
+            <option value="1">Ascending</option>
+            <option value="-1">Descending</option>
+          </select>
+        </div>
+      </div>
 
       <h2 className="text-center mb-4" style={{ color: '#FF5733' }}>Equipment List</h2><br />
       <Row xs={1} md={2} lg={3} className="g-4">
