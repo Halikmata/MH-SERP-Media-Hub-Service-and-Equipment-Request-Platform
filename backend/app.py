@@ -451,6 +451,66 @@ def get_available():
 
 # admin APIs
 
+@app.route('/admin/news', methods=['GET',"POST"]) # news management to show on end-user home page -- prototype version
+# @jwt_required()
+# check if account has privilege
+def news_management():
+    if request.method == "GET": # list of posts
+        collection = db["news"]
+        
+        page = int(request.args.get('page', default=1)) # possibly deprecated
+        column = request.args.get('column',default=None)
+        search = request.args.get('search',default=None)
+        sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
+        limit_rows = int(request.args.get('limit_rows',default=50)) # possibly deprecated
+        
+        # stuff here
+        
+        rows = collection.find()
+        
+        rows_list = list(rows)
+    
+        for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
+            x['_id'] = str(x['_id'])
+            
+        return jsonify(rows_list), 200
+    
+    elif request.method == "POST": # actions for posts, create, edit, delete
+        collection = db["news"]
+        action = request.args.get('action',default=None)
+        json_input = request.get_json()
+        match action:
+            case "add":
+                result = collection.insert_one(json_input)
+                
+                # management for pictures if exists
+                
+                return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
+            case "edit":
+                json_input = request.get_json()
+                
+                result = collection.update_one({'_id':ObjectId(json_input["id"])}, {'$set': json_input})
+                
+                if result.modified_count >  0:
+                    return jsonify({"message": "Updated successfully", "id": id}), 201
+                else:
+                    return jsonify({"message": "No row found with the given ID"}), 404
+                
+            case "delete":
+                result = collection.delete_one({'_id': ObjectId(json_input["id"])})
+    
+                if result.deleted_count > 0:
+                    return jsonify({"message": "Deleted successfully", "id": id}), 201
+                else:
+                    return jsonify({"message": "No row found with the given ID"}), 404
+            case _:
+                return jsonify({"message": "Unidentified Action!"}), 404
+
+
+
+
+
+
 
 # on progress ------------
 
