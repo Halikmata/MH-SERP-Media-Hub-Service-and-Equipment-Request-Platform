@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Pagination, Card, Row, Col, Dropdown } from 'react-bootstrap';
+import { Pagination, Card, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import ImageDisplay from '../includes/imagedisplay';
+import cart from '../images/cart.png';
 
 const Equipment = ({ url }) => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const Equipment = ({ url }) => {
   const [columnList, setColumnList] = useState([]);
   const [currentSort, setCurrentSort] = useState("equipment_type");
   const [currentOrder, setCurrentOrder] = useState("1");
+  const [selectedEquipmentIds, setSelectedEquipmentIds] = useState([]); // List of selected equipment IDs
 
   function updateOrder(order) { // 1 = Ascending, -1 = Descending
     setCurrentOrder(order);
@@ -65,6 +67,14 @@ const Equipment = ({ url }) => {
       });
   }, [url]);
 
+  useEffect(() => {
+    // Retrieve selected equipment IDs from session storage on component mount
+    const storedIds = sessionStorage.getItem('selectedEquipmentIds');
+    if (storedIds) {
+      setSelectedEquipmentIds(JSON.parse(storedIds));
+    }
+  }, []);
+
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -73,7 +83,29 @@ const Equipment = ({ url }) => {
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
   const handleRequestClick = (item) => {
-    navigate('/request', { state: { equipment: item } });
+    setSelectedEquipmentIds(prevIds => {
+      const updatedIds = prevIds.includes(item.idequipment)
+        ? prevIds.filter(id => id !== item.idequipment) // Remove the ID if already selected
+        : [...prevIds, item.idequipment]; // Add the ID if not selected
+
+      // Store the updated list in session storage
+      sessionStorage.setItem('selectedEquipmentIds', JSON.stringify(updatedIds));
+      return updatedIds;
+    });
+  };
+
+  const handleCartClick = () => {
+    // Retrieve the stored item IDs
+    const selectedIds = selectedEquipmentIds;
+    const selectedItems = equipment.filter(item => selectedIds.includes(item.idequipment));
+
+    if (selectedItems.length > 0) {
+      // Display the brand and model of the selected items
+      const itemDetails = selectedItems.map(item => `Brand: ${item.brand}, Model: ${item.model}`).join('\n');
+      alert(itemDetails);
+    } else {
+      alert('No equipment selected.');
+    }
   };
 
   return (
@@ -101,9 +133,9 @@ const Equipment = ({ url }) => {
           <select
             className="form-select"
             style={{
-              backgroundColor: 'transparent', // Removing fill color
-              color: '#333', // Text color
-              borderColor: '#FF5733', // Border color matching theme
+              backgroundColor: 'transparent',
+              color: '#333',
+              borderColor: '#FF5733',
               width: 'auto',
             }}
             onChange={(e) => updateOrder(e.target.value)}
@@ -116,44 +148,47 @@ const Equipment = ({ url }) => {
 
       <h2 className="text-center mb-4" style={{ color: '#FF5733' }}>Equipment List</h2><br />
       <Row xs={1} md={2} lg={3} className="g-4">
-        {currentItems.map(item => (
-          <Col key={item.id}>
-            <Card style={{ border: 'none', position: 'relative', paddingTop: "20px", margin: '10px' }}>
-              <div style={{ textAlign: 'center', justifyItems: 'center' }}>
-                <ImageDisplay imageName={item.idequipment} />
-                <br />
-                <div style={{ width: '100%', display: "grid", justifyItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
-                    <span className={`badge ${item.availability === "1" ? 'bg-success' : 'bg-secondary'}`}
-                      style={{ borderRadius: '50%', width: '15px', height: '15px' }}>
-                    </span>
-                    <span style={{ marginLeft: '10px', color: '#666' }}>
-                      {item.availability === "1" ? 'Available' : 'Unavailable'}
-                    </span>
+        {currentItems.map(item => {
+          const isSelected = selectedEquipmentIds.includes(item.idequipment);
+          return (
+            <Col key={item.id}>
+              <Card style={{ border: 'none', position: 'relative', paddingTop: "20px", margin: '10px', backgroundColor: isSelected ? '#CCCCCC' : 'white' }}>
+                <div style={{ textAlign: 'center', justifyItems: 'center' }}>
+                  <ImageDisplay imageName={item.idequipment} />
+                  <br />
+                  <div style={{ width: '100%', display: "grid", justifyItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
+                      <span className={`badge ${item.availability === 1 ? 'bg-success' : 'bg-secondary'}`}
+                        style={{ borderRadius: '50%', width: '15px', height: '15px' }}>
+                      </span>
+                      <span style={{ marginLeft: '10px', color: '#666' }}>
+                        {item.availability === 1 ? 'Available' : 'Unavailable'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <Card.Body style={{ height: '12rem' }}>
-                <Card.Title style={{ color: '#333', fontSize: '1.2rem', fontWeight: 'bold' }}>{item.brand} {item.model}</Card.Title>
-                <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{item.description}</Card.Text>
-                <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Type: <b>{equipmentTypes[item.equipment_type]}</b></Card.Text>
-                <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Location: <b>{item.equipment_location}</b></Card.Text>
-              </Card.Body>
-              <div className="d-grid">
-                <button className="btn btn-primary"
-                  style={{
-                    backgroundColor: '#FF5733',
-                    borderColor: '#FF5733',
-                    width: '100%',
-                  }}
-                  onClick={() => handleRequestClick(item)}
-                >
-                  Request Now
-                </button>
-              </div>
-            </Card>
-          </Col>
-        ))}
+                <Card.Body style={{ height: '12rem' }}>
+                  <Card.Title style={{ color: '#333', fontSize: '1.2rem', fontWeight: 'bold' }}>{item.brand} {item.model}</Card.Title>
+                  <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{item.description}</Card.Text>
+                  <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Type: <b>{equipmentTypes[item.equipment_type]}</b></Card.Text>
+                  <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Location: <b>{item.equipment_location}</b></Card.Text>
+                </Card.Body>
+                <div className="d-grid">
+                  <button className="btn"
+                    style={{
+                      backgroundColor: isSelected ? '#BBBBBB' : '#FF5733',
+                      borderColor: isSelected ? '#BBBBBB' : '#FF5733',
+                      width: '100%',
+                    }}
+                    onClick={() => handleRequestClick(item)}
+                  >
+                    {isSelected ? 'Cancel' : 'Request'}
+                  </button>
+                </div>
+              </Card>
+            </Col>
+          );
+        })}
       </Row>
 
       <Pagination className="justify-content-center mt-4" style={{ color: '#FF5733' }}>
@@ -165,8 +200,19 @@ const Equipment = ({ url }) => {
         ))}
         <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(equipment.length / itemsPerPage)} />
       </Pagination>
+      
+      <img src={cart} style={cartStyle} onClick={handleCartClick} alt="Cart" />
     </div>
   );
 };
 
 export default Equipment;
+
+const cartStyle = {
+  height: '60px',
+  width: '60px',
+  position: 'fixed',
+  right: '20px',
+  bottom: '20px',
+  zIndex: 1
+};
