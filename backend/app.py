@@ -19,6 +19,8 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
+# session approutes
+
 @app.route('/signout',methods=['POST'])
 def sign_out(): # sign out redirect to main page.
     
@@ -162,6 +164,35 @@ def login():
     
     return response
 
+
+# query approutes
+
+@app.route('/<collection>/attributes', methods=['GET']) # column, dynamic
+def get_table_attr(collection):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        col_name = collection
+        collection = db[collection]
+      
+    sample_row = collection.find_one()
+    
+    attributes = list(sample_row.keys())
+    return jsonify(attributes), 200
+        
+    
+@app.route('/<collection>/length', methods=['GET']) # gets the total amount of documents
+def get_table_length(collection):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        col_name = collection
+        collection = db[collection]
+        
+    attributes = collection.estimated_document_count()
+    return jsonify(attributes), 200
+
+
 @app.route('/<collection>', methods=['GET'])
 # @jwt_required()
 def index(collection):
@@ -172,12 +203,12 @@ def index(collection):
         collection = db[collection]
     
     # URL inputs.
-    page = int(request.args.get('page', default=1)) # possibly deprecated
+    page = int(request.args.get('page', default=1))
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
     sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
-    limit_rows = int(request.args.get('limit_rows',default=50)) # possibly deprecated
+    limit_rows = int(request.args.get('limit_rows',default=50))
 
     if id != None and len(id) != 0: # the objectid
         id = ObjectId(id)
@@ -201,7 +232,6 @@ def index(collection):
     #limit_rows = 50 # change total rows in a page here.
     offset = (page - 1) * limit_rows
     # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
-    
     
     # will shorten
     if search != None and column != None and sort != None:
