@@ -129,6 +129,11 @@ const Admin = ({ url }) => {
 
   const { collection, columns } = collectionMap[pathname] || {};
 
+
+
+
+
+  
   return (
     <div >
       {isAdminPage && <AdminHeader />}

@@ -12,7 +12,6 @@ import utils
 
 from foreign import apply_foreign
 
-
 # doesn't have restrictions yet but login is partially prepared.
 
 from flask_jwt_extended import (
@@ -396,12 +395,13 @@ def delete_row(collection, id):
 
 
 @app.route('/equipment/available', methods=['GET'])
+
 # @jwt_required()
 def get_available():
     try:
         equipment_collection = db['equipment']
         
-        available_items_cursor = equipment_collection.find({'availability': '1'})
+        available_items_cursor = equipment_collection.find({'availability': 1})
         
         available_items = []
         for item in available_items_cursor:

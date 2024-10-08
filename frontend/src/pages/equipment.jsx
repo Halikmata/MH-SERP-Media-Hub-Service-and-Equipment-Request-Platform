@@ -12,7 +12,13 @@ const Equipment = ({ url }) => {
   const [itemsPerPage] = useState(6); // Number of items per page
 
   useEffect(() => {
-    axios.get(`${url}/equipment`)
+    axios.get(`${url}/equipment`, {
+      params: {
+        column:"equipment_type",
+        limit_rows: 100,
+        sort: -1
+      }
+    })
       .then(response => {
         setEquipment(response.data);
       })
@@ -53,10 +59,18 @@ const Equipment = ({ url }) => {
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4" style={{ color: '#FF5733' }}>Equipment List</h2><br />
+      <label>Sort by:</label>
+      <select>
+        <option>Name</option>
+        <option>Type</option>
+        <option>Brand</option>
+        <option>ID</option>
+      </select>
+      <label>Show unavailable</label><input type='checkbox' checked />
       <Row xs={1} md={2} lg={3} className="g-4">
         {currentItems.map(item => (
           <Col key={item.id}>
-            <Card style={{ border: 'none', position: 'relative', paddingTop: "20px", margin:'10px' }}>
+            <Card style={{ border: 'none', position: 'relative', paddingTop: "20px", margin: '10px' }}>
               <div style={{ textAlign: 'center', justifyItems: 'center' }}>
                 <ImageDisplay imageName={item.idequipment} />
                 <br />
