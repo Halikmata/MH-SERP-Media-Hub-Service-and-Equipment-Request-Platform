@@ -182,10 +182,11 @@ def get_table_attrType(collection):
         
     attributes = list(sample_row.values())
     
+    type_list = []
     for x in attributes:
-        x = type(x)
+        type_list.append(str(type(x)).split("'")[1])
         
-    return jsonify(attributes), 200
+    return jsonify(type_list), 200
 
 
 @app.route('/<collection>/attributes', methods=['GET']) # column, dynamic
