@@ -14,7 +14,7 @@ const Equipment = ({ url }) => {
   useEffect(() => {
     axios.get(`${url}/equipment`, {
       params: {
-        column:"equipment_type",
+        column: "equipment_type",
         limit_rows: 100,
         sort: -1
       }
@@ -59,14 +59,6 @@ const Equipment = ({ url }) => {
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4" style={{ color: '#FF5733' }}>Equipment List</h2><br />
-      <label>Sort by:</label>
-      <select>
-        <option>Name</option>
-        <option>Type</option>
-        <option>Brand</option>
-        <option>ID</option>
-      </select>
-      <label>Show unavailable</label><input type='checkbox' checked />
       <Row xs={1} md={2} lg={3} className="g-4">
         {currentItems.map(item => (
           <Col key={item.id}>
@@ -76,8 +68,8 @@ const Equipment = ({ url }) => {
                 <br />
                 <div style={{ width: '100%', display: "grid", justifyItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
-                    <div style={{ width: '15px', height: '15px', borderRadius: '50%', backgroundColor: item.availability === 1 ? 'green' : 'gray' }}></div>
-                    <span style={{ marginLeft: '10px', color: '#666' }}>{item.availability === 1 ? 'Available' : 'Unavailable'}</span>
+                    <div style={{ width: '15px', height: '15px', borderRadius: '50%', backgroundColor: item.availability === "1" ? 'green' : 'gray' }}></div>
+                    <span style={{ marginLeft: '10px', color: '#666' }}>{item.availability === "1" ? 'Available' : 'Unavailable'}</span>
                   </div>
                 </div>
               </div>

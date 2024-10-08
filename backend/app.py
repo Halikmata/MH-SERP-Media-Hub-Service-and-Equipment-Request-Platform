@@ -162,7 +162,7 @@ def login():
     
     return response
 
-@app.route('/<collection>', methods=['GET']) # temporary
+@app.route('/<collection>', methods=['GET'])
 # @jwt_required()
 def index(collection):
     if not verify_collection(collection):
@@ -172,12 +172,12 @@ def index(collection):
         collection = db[collection]
     
     # URL inputs.
-    page = int(request.args.get('page', default=1))
+    page = int(request.args.get('page', default=1)) # possibly deprecated
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
     sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
-    limit_rows = int(request.args.get('limit_rows',default=50))
+    limit_rows = int(request.args.get('limit_rows',default=50)) # possibly deprecated
 
     if id != None and len(id) != 0: # the objectid
         id = ObjectId(id)
@@ -238,12 +238,12 @@ def admin(collection):
         collection = db[collection]
     
     # URL inputs.
-    page = int(request.args.get('page', default=1))
+    page = int(request.args.get('page', default=1)) # possibly deprecated
     column = request.args.get('column',default=None)
     search = request.args.get('search',default=None)
     sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
-    limit_rows = int(request.args.get('limit_rows',default=50))
+    limit_rows = int(request.args.get('limit_rows',default=50)) # possibly deprecated
 
     if id != None and len(id) != 0: # the objectid
         id = ObjectId(id)
@@ -421,12 +421,12 @@ def get_available():
 
 # on progress ------------
 
-@app.route('/admin')
+""" @app.route('/admin')
 def admin_index():
     
     collections = db.list_collection_names()
 
-    return jsonify({'collections':collections}), 200
+    return jsonify({'collections':collections}), 200 """
 
 """ @app.route('/admin/requests/conclude', methods=['POST']) # this assumes that admins are the ones that declare requests as finished.
 def admin_request_conclude():
@@ -442,7 +442,7 @@ def admin_request_conclude():
     
     return jsonify({'message':'Request instance conluded'}), 201 """
 
-from datetime import datetime
+""" from datetime import datetime
 @app.route('/admin/report', methods=['GET'])
 def admin_report():
     
@@ -472,12 +472,11 @@ def admin_report():
     #print(rows[0][''])
     rows_list = list(rows)
     
-    """ for x in rows_list:
-        x['_id'] = str(x['_id']) """
+    x['_id'] = str(x['_id'])
     
     # rows_list = apply_foreign(rows_list,"requests")
     
-    return jsonify(rows_list), 200
+    return jsonify(rows_list), 200 """
 
 
 @app.route('/admin/<collection>/update/<id>', methods=['GET', 'PUT'])
@@ -758,3 +757,136 @@ def get_org(college):
 
 # add privilege checker for each app routes.
 
+def get_month_requesters(): # top 5 requesters with highest request quantity per month
+    requests = db['requests']
+    
+    current_date = datetime.now().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$group":{
+            "_id": "$requester_full_name",
+            "total_requests":{"$sum": 1}
+            }
+        },
+        {
+            "$sort":
+                {
+                    "total_requests": -1
+                }
+        },
+        {
+            "$limit":5
+        }
+    ]
+    count_requests = requests.aggregate(query)
+    count_requests = list(count_requests)
+        
+    return count_requests
+
+def get_month_services():
+    services = db['services']
+    request = db['requests']
+    
+    current_date = datetime.now().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$unwind": "$services"
+        },
+        {
+            "$group": {
+                "_id": "$services",
+                "count":{"$sum": 1}
+            }
+        },
+        {
+            "$sort":
+            {
+                "count": -1
+            }
+        },
+        {
+            "$limit": 5
+        }
+    ]
+    
+    results = request.aggregate(query)
+    results = list(results)
+    
+    for x in results:
+        
+        row = services.find({"fk_idservice": x['_id']})
+        row = list(row)[0]
+        x['_id'] = row['name']
+    
+    return results
+
+def get_month_equipments(): # quantity of equipments used per month
+    requests = db['requests']
+    equipment = db['equipment']
+    
+    current_date = datetime.now().replace(day=1)
+    query = [
+        {
+            "$match":{
+                "event_start": {
+                    "$gte": current_date
+                }
+            }
+        },
+        {
+            "$unwind": "$equipment"
+        },
+        {
+            "$group": {
+            "_id": "$equipment",
+            "count":{"$sum": 1}
+            }
+        },
+        {
+            "$sort":
+            {
+                "count": -1
+            }
+        }
+    ]
+    
+    results = requests.aggregate(query)
+    results = list(results)
+    
+    for x in results:
+        
+        row = equipment.find({"idequipment":x['_id']})
+        
+        row = list(row)[0]
+        
+        x['_id'] = row['brand'] +" "+ row['model']
+    
+    return results
+
+@app.route('/admin')
+# jwt required
+def admin_index():
+    
+    info = {}
+    
+    info['top_5_requesters'] = get_month_requesters()
+    
+    info['top_5_services'] = get_month_services()
+    
+    info['equipments_month'] = get_month_equipments()
+    
+    return make_response(jsonify(info), 200)

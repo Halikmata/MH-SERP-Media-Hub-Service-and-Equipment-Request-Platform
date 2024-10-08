@@ -1,0 +1,24 @@
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px; /* Space between the grid items */
+  margin: 20px; /* Optional: outer margin */
+  grid-auto-flow: dense;
+}
+
+.chart {
+  background-color: #f9f9f9; /* Optional: background color for chart boxes */
+  border: 1px solid #ddd; /* Optional: border around chart boxes */
+  border-radius: 8px; /* Optional: rounded corners */
+  padding: 20px; /* Space inside chart boxes */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: shadow for depth */
+}
+
+.chart h2 {
+  text-align: center; /* Center align the chart titles */
+}
+
+.chart_wide {
+  grid-column: span 3;
+  grid-row: span 2;
+}
