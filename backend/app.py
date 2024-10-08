@@ -177,7 +177,11 @@ def get_table_attr(collection):
       
     sample_row = collection.find_one()
     
+    if "_id" in sample_row:
+        del sample_row["_id"]
+        
     attributes = list(sample_row.keys())
+    
     return jsonify(attributes), 200
         
     
@@ -450,13 +454,6 @@ def get_available():
 
 # on progress ------------
 
-""" @app.route('/admin')
-def admin_index():
-    
-    collections = db.list_collection_names()
-
-    return jsonify({'collections':collections}), 200 """
-
 """ @app.route('/admin/requests/conclude', methods=['POST']) # this assumes that admins are the ones that declare requests as finished.
 def admin_request_conclude():
     json_input = request.get_json()
@@ -471,41 +468,6 @@ def admin_request_conclude():
     
     return jsonify({'message':'Request instance conluded'}), 201 """
 
-""" from datetime import datetime
-@app.route('/admin/report', methods=['GET'])
-def admin_report():
-    
-    collection = db['requests']
-    
-    # get all available years in the collection
-    #years = collection.find({},{"request_start":1})
-    #years = collection.
-    #print(f"\n\n\n\n{list(years)}\n\n\n\n")
-    month = dict()
-    for y in range(0,12+1): # requests per month
-        rows = collection.aggregate(
-            [{
-                "$match":{
-                    "request_start":{
-                        "$regex":f"{y}.*", # incomplete
-                        "$options": "i"
-                    }
-                }
-            },
-            {
-                "$count": "request_per_month"
-            }]
-        )
-        #request_per_month = list(rows)[0]['request_per_month']
-        #month[f'{x}'] = request_per_month
-    #print(rows[0][''])
-    rows_list = list(rows)
-    
-    x['_id'] = str(x['_id'])
-    
-    # rows_list = apply_foreign(rows_list,"requests")
-    
-    return jsonify(rows_list), 200 """
 
 
 @app.route('/admin/<collection>/update/<id>', methods=['GET', 'PUT'])
