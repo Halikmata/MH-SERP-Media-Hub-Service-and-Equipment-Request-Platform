@@ -450,12 +450,13 @@ def delete_row(collection, id):
 
 
 @app.route('/equipment/available', methods=['GET'])
+
 # @jwt_required()
 def get_available():
     try:
         equipment_collection = db['equipment']
         
-        available_items_cursor = equipment_collection.find({'availability': '1'})
+        available_items_cursor = equipment_collection.find({'availability': 1})
         
         available_items = []
         for item in available_items_cursor:
@@ -945,7 +946,7 @@ def get_month_equipments(): # quantity of equipments used per month
         
         row = list(row)[0]
         
-        x['_id'] = row['description']
+        x['_id'] = row['brand'] +" "+ row['model']
     
     return results
 

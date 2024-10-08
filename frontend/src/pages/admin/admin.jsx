@@ -7,11 +7,13 @@ import EditItem from './edit';
 import Item from './edit_beta';
 import Delete from './delete';
 import axios from 'axios';
+import AnalyticsGraphs from './component/AnalyticsGraphs';
 
 const Admin = ({ url }) => {
   const pathname = window.location.pathname;
   const isAdminPage = pathname.startsWith('/admin');
   const [equipmentTypes, setEquipmentTypes] = useState([]);
+  const [analyticsData, setAnalyticsData] = useState(null);
 
 
   // Formatting
@@ -19,7 +21,7 @@ const Admin = ({ url }) => {
     if (typeof value !== 'number' || isNaN(value)) {
       return 'Invalid amount';
     }
-  
+
     const formattedAmount = `₱${value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
     return formattedAmount;
   };
@@ -32,6 +34,15 @@ const Admin = ({ url }) => {
       .catch((error) => {
         console.error('Error fetching equipment types:', error);
       });
+
+    axios.get(`${url}/admin`)
+      .then((response) => {
+        setAnalyticsData(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching analytics data:', error);
+      });
+
   }, [url]);
 
   const equipmentType = (fk_idequipment_type) => {
@@ -132,7 +143,16 @@ const Admin = ({ url }) => {
   return (
     <div >
       {isAdminPage && <AdminHeader />}
-      {pathname === '/admin' && <h1>Dashboard</h1>}
+      {pathname === '/admin' && (
+        <div style={mainStyle}>
+          <h1>Dashboard</h1>
+          {analyticsData ? (
+            <AnalyticsGraphs analyticsData={analyticsData} />
+          ) : (
+            <p>Loading analytics...</p>
+          )}
+        </div>
+      )}
       {collection && (
         <AdminTable url={url} collection={collection} columns={columns} />
       )}
@@ -153,3 +173,8 @@ const equipment_type = (value) => {
   const formattedAmount = `${value}`;
   return formattedAmount;
 };
+
+const mainStyle = {
+  width: '80vw',
+  marginLeft: '10vw'
+}

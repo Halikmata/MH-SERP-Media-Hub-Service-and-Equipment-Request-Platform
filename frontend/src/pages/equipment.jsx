@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Pagination, Card, Row, Col } from 'react-bootstrap';
+import { Pagination, Card, Row, Col, Dropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import ImageDisplay from '../includes/imagedisplay';
 
@@ -23,11 +23,11 @@ const Equipment = ({ url }) => {
   }
 
   function updateOrder(order) { // 1 = Ascending, -1 = Descending
-    setCurrentOrder(order)
+    setCurrentOrder(order);
   }
 
   function updateSort(item) {
-    setCurrentSort(item)  
+    setCurrentSort(item);
   }
 
   useEffect(() => { // List of attributes
@@ -56,10 +56,10 @@ const Equipment = ({ url }) => {
       .catch(error => {
         console.error(error);
       });
-  }, [url,currentSort,currentOrder]);
+  }, [url, currentSort, currentOrder]);
 
   useEffect(() => {
-    axios.get(`${url}/equipment?`, {
+    axios.get(`${url}/equipment`, {
       params: {
       column: currentSort,
       sort: currentOrder,
@@ -124,14 +124,18 @@ const Equipment = ({ url }) => {
       <Row xs={1} md={2} lg={3} className="g-4">
         {currentItems.map(item => (
           <Col key={item.id}>
-            <Card style={{ border: 'none', position: 'relative', paddingTop: "20px", margin:'10px' }}>
+            <Card style={{ border: 'none', position: 'relative', paddingTop: "20px", margin: '10px' }}>
               <div style={{ textAlign: 'center', justifyItems: 'center' }}>
                 <ImageDisplay imageName={item.idequipment} />
                 <br />
                 <div style={{ width: '100%', display: "grid", justifyItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
-                    <div style={{ width: '15px', height: '15px', borderRadius: '50%', backgroundColor: item.availability === "1" ? 'green' : 'gray' }}></div>
-                    <span style={{ marginLeft: '10px', color: '#666' }}>{item.availability === "1" ? 'Available' : 'Unavailable'}</span>
+                    <span className={`badge ${item.availability === "1" ? 'bg-success' : 'bg-secondary'}`}
+                      style={{ borderRadius: '50%', width: '15px', height: '15px' }}>
+                    </span>
+                    <span style={{ marginLeft: '10px', color: '#666' }}>
+                      {item.availability === "1" ? 'Available' : 'Unavailable'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -142,12 +146,22 @@ const Equipment = ({ url }) => {
                 <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Location: <b>{item.equipment_location}</b></Card.Text>
               </Card.Body>
               <div className="d-grid">
-                <button className="btn btn-primary" style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', width: '100%' }} onClick={() => handleRequestClick(item)}>Request Now</button>
+                <button className="btn btn-primary"
+                  style={{
+                    backgroundColor: '#FF5733',
+                    borderColor: '#FF5733',
+                    width: '100%',
+                  }}
+                  onClick={() => handleRequestClick(item)}
+                >
+                  Request Now
+                </button>
               </div>
             </Card>
           </Col>
         ))}
       </Row>
+
       <Pagination className="justify-content-center mt-4" style={{ color: '#FF5733' }}>
         <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1} />
         {Array.from({ length: Math.ceil(equipment.length / itemsPerPage) }, (_, i) => (
