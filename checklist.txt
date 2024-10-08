@@ -7,14 +7,36 @@ Unverified if blank
 
 To-do list:
 
-Session feature = 
+Session feature = ✔
+(functional, not complete)
 
-Log-in feature = ✖
-Sign-up feature = ✖
-"Encryption" = ✔
+Log-in feature = ✔
+(functional, not complete)
+
+Sign-up feature = ✔
+(functional, not complete)
+
+"Encryption" for password = ✔
+
 Calendar Thingy = ✖
+
 News Page = ✖
+
 Admin page = ✖
+
 Volunteer system page = ✖
+
 error try/catchers = ✖
-sorting = ✖
+
+sorting (for Equipment end-user page) = ✔
+
+login for admin = ✖
+
+Backend-Analytics = ✔
+
+Frontend-Analytics = ✖
+
+
+app route for instance quantity of a collection = ✔
+
+app route for list of columns/attributes of a collection = ✔
