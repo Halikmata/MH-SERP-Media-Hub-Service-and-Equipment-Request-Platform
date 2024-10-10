@@ -105,9 +105,10 @@ const Equipment = ({ url }) => {
             }}
             onChange={(e) => updateSort(e.target.value)}
           >
-            {columnList.map(item => (
-              <option key={item} value={item}>{item}</option>
-            ))}
+              <option value="idequipment">All</option>
+              <option value="equipment_type">Type</option>
+              <option value="brand">Brand</option>
+              <option value="model">Model</option>
           </select>
         </div>
 

@@ -9,13 +9,15 @@ const AddItem = ({ url }) => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({});
     const [foreignOptions, setForeignOptions] = useState({});
+    const [dropdownOptions, setDropdownOptions] = useState({});
+    const [showOtherInput, setShowOtherInput] = useState({});
 
     const collectionTypes = types[collection] || {};
 
     useEffect(() => {
         const fetchForeignOptions = async () => {
             const promises = Object.entries(collectionTypes)
-                .filter(([field, config]) => config.data_type === 'foreign_xor')
+                .filter(([_, config]) => config.data_type === 'foreign_xor')
                 .map(async ([field, config]) => {
                     try {
                         const response = await axios.get(`${url}${config.collection_option}`);
@@ -30,7 +32,25 @@ const AddItem = ({ url }) => {
             setForeignOptions(Object.assign({}, ...results));
         };
 
+        const fetchDropdownOptions = async () => {
+            const promises = Object.entries(collectionTypes)
+                .filter(([_, config]) => config.data_type === 'dropdown' || config.data_type === 'autocomplete')
+                .map(async ([field]) => {
+                    try {
+                        const response = await axios.get(`${url}/${collection}/${field}`);
+                        return { [field]: response.data };
+                    } catch (error) {
+                        console.error(`Error fetching distinct values for ${field}:`, error);
+                        return { [field]: [] };
+                    }
+                });
+
+            const results = await Promise.all(promises);
+            setDropdownOptions(Object.assign({}, ...results));
+        };
+
         fetchForeignOptions();
+        fetchDropdownOptions();
     }, [collection, url, collectionTypes]);
 
     const onCancel = () => {
@@ -87,6 +107,41 @@ const AddItem = ({ url }) => {
                         ))}
                     </select>
                 );
+
+            case 'dropdown':
+                const dropdownValues = dropdownOptions[field] || [];
+
+                return (
+                    <>
+                        <select
+                            name={field}
+                            className='form-select m-2'
+                            style={dropdownStyle}
+                            onChange={(e) => handleDropdownChange(e, field)}
+                            value={formData[field] || ''}
+                        >
+                            <option value="">Select...</option>
+                            <option value="DropdownOther">Add {fieldConfig.label}</option>
+                            {dropdownValues.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                        {showOtherInput[field] && (
+                            <input
+                                type="text"
+                                className="form-control m-2"
+                                name={field}
+                                placeholder="Type here"
+                                onChange={handleChange}
+                                value={formData[field] || ''}
+                            />
+                        )}
+                    </>
+                );
+
+
             default:
                 return null;
         }
@@ -101,8 +156,6 @@ const AddItem = ({ url }) => {
         if (fieldConfig) {
             switch (fieldConfig.data_type) {
                 case 'number':
-                    updatedValue = Number(value);
-                    break;
                 case 'foreign_xor':
                     updatedValue = Number(value);
                     break;
@@ -112,6 +165,18 @@ const AddItem = ({ url }) => {
         }
 
         setFormData({ ...formData, [name]: updatedValue }); // Update the state with the new value
+    };
+
+    const handleDropdownChange = (e, field) => {
+        const value = e.target.value;
+
+        if (value === "DropdownOther") {
+            setShowOtherInput({ ...showOtherInput, [field]: true });
+            setFormData({ ...formData, [field]: '' }); // Reset the field's value for custom input
+        } else {
+            setShowOtherInput({ ...showOtherInput, [field]: false });
+            setFormData({ ...formData, [field]: value });
+        }
     };
 
     const handleCheckboxChange = (e) => {
@@ -138,7 +203,6 @@ const AddItem = ({ url }) => {
     };
 
     const renderForm = () => {
-        const collectionTypes = types[collection] || {};
         return (
             <Container className="mt-5">
                 <Row className="justify-content-center">
@@ -172,3 +236,8 @@ const AddItem = ({ url }) => {
 };
 
 export default AddItem;
+
+const dropdownStyle = {
+    maxHeight: '100px',
+    overflowY: 'auto'
+};

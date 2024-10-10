@@ -11,6 +11,8 @@ const EditItem = ({ url }) => {
     const [originalData, setOriginalData] = useState({});
     const [loading, setLoading] = useState(true);
     const [foreignOptions, setForeignOptions] = useState({});
+    const [dropdownOptions, setDropdownOptions] = useState({});
+    const [showOtherInput, setShowOtherInput] = useState({});
 
     const onCancel = () => {
         navigate(`/admin/${collection}`);
@@ -46,6 +48,23 @@ const EditItem = ({ url }) => {
                     console.error(`Error fetching ${collectionOption} data:`, error);
                 });
         });
+
+        // Fetch distinct values for each 'dropdown' field
+        const dropdownFields = Object.entries(collectionTypes)
+            .filter(([field, config]) => config.data_type === 'dropdown');
+
+        dropdownFields.forEach(([field]) => {
+            axios.get(`http://127.0.0.1:5000/get_distinct/${collection}/${field}`)
+                .then((response) => {
+                    setDropdownOptions(prevState => ({
+                        ...prevState,
+                        [field]: response.data
+                    }));
+                })
+                .catch((error) => {
+                    console.error(`Error fetching distinct values for ${field}:`, error);
+                });
+        });
     }, [id, collection, url]);
 
     const renderInput = (field, fieldConfig) => {
@@ -60,7 +79,6 @@ const EditItem = ({ url }) => {
             case 'xor':
                 return (
                     <select className='form-select' name={field} value={formData[field] || ''} onChange={handleChange}>
-                        <option value="">Select...</option>
                         {fieldValue.map((option, index) => (
                             <option key={option} value={index}>
                                 {option}
@@ -98,6 +116,39 @@ const EditItem = ({ url }) => {
                         ))}
                     </select>
                 );
+            case 'dropdown':
+                const dropdownValues = dropdownOptions[field] || [];
+
+                return (
+                    <>
+                        <select
+                            name={field}
+                            className='form-select m-2'
+                            style={dropdownStyle}
+                            onChange={(e) => handleDropdownChange(e, field)}
+                            value={formData[field] || ''}
+                        >
+                            {dropdownValues.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                            <option value="Other">other (add)</option>
+                        </select>
+                        {showOtherInput[field] && (
+                            <input
+                                type="text"
+                                className="form-control m-2"
+                                name={field}
+                                placeholder="Specify other..."
+                                onChange={handleChange}
+                                value={formData[field] || ''}
+                            />
+                        )}
+                    </>
+                );
+
+
             default:
                 return null;
         }
@@ -105,56 +156,33 @@ const EditItem = ({ url }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        const fieldConfig = types[collection][name];
-        let updatedValue = value;
-
-        if (fieldConfig) {
-            switch (fieldConfig.data_type) {
-                case 'number':
-                    updatedValue = Number(value);
-                    break;
-
-                case 'foreign_xor':
-                    updatedValue = Number(value);
-                    break;
-
-                case 'boolean':
-                    updatedValue = e.target.checked; 
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        setFormData({ ...formData, [name]: updatedValue });
+        setFormData({ ...formData, [name]: value });
     };
 
-    const handleCheckboxChange = (e) => {
-        const { name, value } = e.target;
-        const isChecked = e.target.checked;
-        const currentValues = formData[name] || [];
-        let updatedValues;
+    const handleDropdownChange = (e, field) => {
+        const value = e.target.value;
 
-        if (isChecked) {
-            updatedValues = [...currentValues, value];
+        if (value === "Other") {
+            setShowOtherInput({ ...showOtherInput, [field]: true });
+            setFormData({ ...formData, [field]: '' }); // Reset the field's value for custom input
         } else {
-            updatedValues = currentValues.filter((val) => val !== value);
+            setShowOtherInput({ ...showOtherInput, [field]: false });
+            setFormData({ ...formData, [field]: value });
         }
-
-        setFormData({ ...formData, [name]: updatedValues });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // Create an object to hold only the changed values
         const updatedData = Object.keys(formData).reduce((acc, key) => {
             if (formData[key] !== originalData[key]) {
-                acc[key] = formData[key];
+                acc[key] = formData[key]; // Keep the original type
             }
             return acc;
         }, {});
 
+        // Proceed to update if there are any changed values
         if (Object.keys(updatedData).length > 0) {
             axios.put(`${url}${collection}/update/${id}`, updatedData)
                 .then((response) => {
@@ -166,7 +194,7 @@ const EditItem = ({ url }) => {
                 });
         } else {
             console.log('No changes made to the item.');
-            navigate(`/admin/${collection}`);
+            navigate(`/admin/${collection}`); // Navigate back if no changes
         }
     };
 
@@ -212,4 +240,9 @@ const EditItem = ({ url }) => {
     );
 };
 
-export default EditItem; 
+export default EditItem;
+
+const dropdownStyle = {
+    maxHeight: '100px',
+    overflowY: 'auto'
+};

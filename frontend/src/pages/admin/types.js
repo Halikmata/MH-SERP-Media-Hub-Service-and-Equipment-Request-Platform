@@ -8,7 +8,7 @@ export const types = {
         },
         "brand": {
             "editable" : 1,
-            "data_type": "text",
+            "data_type": "dropdown",
             "label": "Brand"
         },
         "model": {
@@ -28,15 +28,19 @@ export const types = {
         },
         "equipment_type": {
             "editable" : 1,
-            "data_type": "foreign_xor",
-            "label": "Type",
-            "collection_option": "equipment_type",
-            "identifier":"fk_idequipment_type"
+            "data_type": "dropdown",
+            "label": "Type"
         },
         "equipment_location": {
             "editable" : 1,
-            "data_type": "text",
+            "data_type": "dropdown",
             "label": "Location"
+        },
+        "availability": {
+            "editable" : 1,
+            "data_type": "xor",
+            "option": ["Unavailable", "Available"],
+            "label": "Availability"
         },
     },
     "services": {

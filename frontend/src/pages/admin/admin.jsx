@@ -27,13 +27,6 @@ const Admin = ({ url }) => {
   };
 
   useEffect(() => {
-    axios.get(`${url}/admin/equipment_type`)
-      .then((response) => {
-        setEquipmentTypes(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching equipment types:', error);
-      });
 
     axios.get(`${url}/admin`)
       .then((response) => {
@@ -45,11 +38,7 @@ const Admin = ({ url }) => {
 
   }, [url]);
 
-  const equipmentType = (fk_idequipment_type) => {
-    const equipmentType = equipmentTypes.find((type) => type.fk_idequipment_type === fk_idequipment_type);
 
-    return equipmentType ? equipmentType.name : "Unknown Type";
-  };
 
   const availability = (value) => {
     const isAvailable = value === 1;
@@ -72,7 +61,7 @@ const Admin = ({ url }) => {
       columns: [
         { field: 'brand', label: 'Brand' },
         { field: 'model', label: 'Model' },
-        { field: 'equipment_type', label: 'Type', cell: equipmentType },
+        { field: 'equipment_type', label: 'Type'},
         { field: 'availability', label: 'Availability', cell: availability },
         { field: 'unit_cost', label: 'Cost', cell: formatAmount }
       ]
