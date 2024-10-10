@@ -1,0 +1,20 @@
+/* Home.css */
+.news-card:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+  }
+  
+  .hero-section h1, .hero-section p {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn-primary {
+    background-color: #FF5733;
+    border-color: #FF5733;
+  }
+  
+  .btn-primary:hover {
+    background-color: #e04b2d;
+    border-color: #e04b2d;
+  }
+  
