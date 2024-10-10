@@ -802,6 +802,7 @@ def get_org(college):
 
 
 @app.route('/get_distinct/<collection_name>/<field_name>')
+@app.route('/admin/get_distinct/<collection_name>/<field_name>')
 def get_distinct(collection_name, field_name):
     collection = db[collection_name]
     distinct_values = collection.distinct(field_name)

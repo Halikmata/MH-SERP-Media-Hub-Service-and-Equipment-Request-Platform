@@ -124,23 +124,23 @@ const EditItem = ({ url }) => {
                         <select
                             name={field}
                             className='form-select m-2'
-                            style={dropdownStyle}
                             onChange={(e) => handleDropdownChange(e, field)}
                             value={formData[field] || ''}
                         >
+                            <option value="">Select...</option>
                             {dropdownValues.map((option) => (
                                 <option key={option} value={option}>
                                     {option}
                                 </option>
                             ))}
-                            <option value="Other">other (add)</option>
+                            <option value="NewOption">New {fieldConfig.label}</option>
                         </select>
                         {showOtherInput[field] && (
                             <input
                                 type="text"
                                 className="form-control m-2"
                                 name={field}
-                                placeholder="Specify other..."
+                                placeholder="Type here"
                                 onChange={handleChange}
                                 value={formData[field] || ''}
                             />
@@ -156,15 +156,37 @@ const EditItem = ({ url }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const fieldConfig = types[collection]?.[name];
+
+        let updatedValue = value;
+
+        // Determine the correct data type for the field
+        if (fieldConfig) {
+            switch (fieldConfig.data_type) {
+                case 'number':
+                case 'foreign_xor':
+                    updatedValue = Number(value);
+                    break;
+                case 'xor':
+                    updatedValue = Number(value);
+                    break;
+                case 'date':
+                    updatedValue = new Date(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        setFormData({ ...formData, [name]: updatedValue });
     };
 
     const handleDropdownChange = (e, field) => {
         const value = e.target.value;
 
-        if (value === "Other") {
+        if (value === "NewOption") {
             setShowOtherInput({ ...showOtherInput, [field]: true });
-            setFormData({ ...formData, [field]: '' }); // Reset the field's value for custom input
+            setFormData({ ...formData, [field]: '' });
         } else {
             setShowOtherInput({ ...showOtherInput, [field]: false });
             setFormData({ ...formData, [field]: value });

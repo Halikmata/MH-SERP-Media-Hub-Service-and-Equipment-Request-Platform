@@ -37,7 +37,7 @@ const AddItem = ({ url }) => {
                 .filter(([_, config]) => config.data_type === 'dropdown' || config.data_type === 'autocomplete')
                 .map(async ([field]) => {
                     try {
-                        const response = await axios.get(`${url}/${collection}/${field}`);
+                        const response = await axios.get(`${url}get_distinct/${collection}/${field}`);
                         return { [field]: response.data };
                     } catch (error) {
                         console.error(`Error fetching distinct values for ${field}:`, error);
@@ -72,8 +72,8 @@ const AddItem = ({ url }) => {
                 return (
                     <select name={field} onChange={handleChange} className="form-select m-2">
                         <option value="">Select...</option>
-                        {fieldValue.map((option) => (
-                            <option key={option} value={option}>
+                        {fieldValue.map((option, index) => (
+                            <option key={option} value={index}>
                                 {option}
                             </option>
                         ))}
@@ -157,6 +157,9 @@ const AddItem = ({ url }) => {
             switch (fieldConfig.data_type) {
                 case 'number':
                 case 'foreign_xor':
+                    updatedValue = Number(value);
+                    break;
+                case 'xor':
                     updatedValue = Number(value);
                     break;
                 default:
