@@ -43,9 +43,22 @@ const SelectEquipment = ({ url }) => {
       });
   }, [url]);
 
+  // Load selected items from sessionStorage on initial load
+  useEffect(() => {
+    const storedSelectedEquipment = sessionStorage.getItem('selectedEquipmentIds');
+    if (storedSelectedEquipment) {
+      setSelectedEquipment(JSON.parse(storedSelectedEquipment));
+    }
+  }, []);
+
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
-    setSelectedEquipment(prevSelected => checked ? [...prevSelected, value] : prevSelected.filter(item => item !== value));
+    setSelectedEquipment(prevSelected => {
+      const updatedSelected = checked ? [...prevSelected, value] : prevSelected.filter(item => item !== value);
+      // Update session storage
+      sessionStorage.setItem('selectedEquipmentIds', JSON.stringify(updatedSelected));
+      return updatedSelected;
+    });
   };
 
   const handleFilterChange = (e) => {

@@ -801,6 +801,11 @@ def get_org(college):
     return jsonify(data)
 
 
+@app.route('/get_distinct/<collection_name>/<field_name>')
+def get_distinct(collection_name, field_name):
+    collection = db[collection_name]
+    distinct_values = collection.distinct(field_name)
+    return jsonify(distinct_values)
     
 # add account profile to request GET and request ADD
 

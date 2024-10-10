@@ -129,8 +129,10 @@ export const types = {
         },
         "idcollegeoffice": {
             "editable" : 1,
-            "data_type": "number",
-            "label": "College ID"
+            "data_type": "foreign_xor",
+            "label": "Type",
+            "collection_option": "college_office",
+            "identifier":"fk_idcollegeoffice"
         },
         "name": {
             "editable" : 1,
