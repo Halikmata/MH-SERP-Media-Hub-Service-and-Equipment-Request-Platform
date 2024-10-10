@@ -7,57 +7,50 @@ import sr from '../images/Studio Recording.png';
 import ss from '../images/Studio Shoot.png';
 import vc from '../images/Video Coverage.png';
 import ls from '../images/Live Streaming.png';
-import "./services.css"
+import "./services.css";
 
 const serviceData = [
   {
     id: 1,
     name: 'Photo Coverage',
     imgSrc: pc,
-    description: 'Photo coverage- This service provides official photo coverage for your organization\'s event including the post-production process like editing and sorting of photos.',
-    bgColor:"#FFFFFF"
+    description: 'This service provides official photo coverage for your organization\'s event, including post-production editing and sorting of photos.',
   },
   {
     id: 2,
     name: 'Live Streaming',
     imgSrc: ls,
-    description: 'Live streaming- Live streaming of events on Facebook via Media Hub\'s official page, your organization\'s page, or cross-posting. This includes pre-production tasks creation of resources, setting up of equipment, and testing. Like the SDE, this is also rarely available as it requires a thorough discussion with the volunteers and heads of operation.',
-    bgColor:"#FFFFFF"
+    description: 'Live streaming of events on Facebook via Media Hub\'s official page, your organization\'s page, or cross-posting.',
   },
   {
     id: 3,
     name: 'Live Production',
     imgSrc: ls,
-    description: 'Live production- Similar to live streaming but focuses on live feeding for events that include the use of LED screens. This service does not include operating the lights and sound system.',
-    bgColor:"#FFFFFF"
+    description: 'Similar to live streaming, focusing on live feeds for events with LED screens. Excludes operating the lights and sound system.',
   },
   {
     id: 4,
     name: 'Studio Recording',
     imgSrc: sr,
-    description: 'Studio recording- This can be recording for a voice-over, song, or music production. This service requires the assistance of Media Hub\'s sound engineers and producers so expect a minimum of 7 days required notice for this.',
-    bgColor:"#FFFFFF"
+    description: 'Studio recording for voice-over, song, or music production, requiring Media Hub\'s sound engineers and producers.',
   },
   {
     id: 5,
     name: 'Studio Shooting',
     imgSrc: ss,
-    description: 'Studio shoot- Allows your organization to utilize the studio of Media Hub for your photo shoot. This also includes the post production process like sorting and editing of photos.',
-    bgColor:"#FFFFFF"
+    description: 'Utilize the Media Hub studio for photo shoots, including post-production sorting and editing of photos.',
   },
   {
     id: 6,
     name: 'SDE (Same Day Edit)',
     imgSrc: sde,
-    description: 'SDE- This service comes with the video coverage and requires a minimum of four Media Hub volunteers. This is a same-day-edit service and is considered as rarely available for small events. It is usually offered on events participated by large outside entities like government offices or big organizations as this service require a thorough discussion with the volunteers.',
-    bgColor:"#FFFFFF"
+    description: 'Same-day-edit service, often for larger events involving external entities. Requires extensive planning and volunteers.',
   },
   {
     id: 7,
     name: 'Video Coverage',
     imgSrc: vc,
-    description: 'Video coverage- This service provides video coverage for your event as well as a single video output for an overall edit. Should you require multiple outputs, kindly consult the manager of Media Hub, Ms. Yna Liao, for the details.',
-    bgColor:"#FFFFFF"
+    description: 'Provides video coverage and a single video output for an event. Consult with Media Hub management for multiple outputs.',
   }
 ];
 
@@ -66,13 +59,11 @@ const Services = ({ url }) => {
   const [services, setServices] = useState([]);
 
   useEffect(() => {
-    axios.get(url + '/services')
+    axios.get(`${url}/services`)
       .then(response => {
         setServices(response.data);
       })
-      .catch(error => {
-        console.error(error);
-      });
+      .catch(error => console.error(error));
   }, [url]);
 
   const handleRequestClick = (service) => {
@@ -80,27 +71,28 @@ const Services = ({ url }) => {
   };
 
   return (
-    <div className="container">
-      <div>
-        <h2>Service List</h2>
-      </div>
-      <main className="main">
+    <div className="container services-container mt-5">
+      <h2 className="text-center mb-4">Our Services</h2>
+      <div className="row">
         {serviceData.map(service => (
-          <section key={service.id} className="service-section" style={{backgroundColor:service.bgColor}}>
-            <p className="text-start fs-3">{service.name}</p>
-            <img src={service.imgSrc} className="service-image rounded" alt={service.name}></img>
-            <p>{service.description}</p>
-            <button 
-              className="btn btn-primary" 
-              style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', width: '100%' }}
-              onClick={() => handleRequestClick(service)}
-            >
-              Request Now
-            </button>
-          </section>
+          <div key={service.id} className="col-12 col-md-6 col-lg-4 mb-4">
+            <div className="service-card">
+              <img src={service.imgSrc} alt={service.name} className="service-image rounded-top" />
+              <div className="service-card-body">
+                <h5 className="service-title">{service.name}</h5>
+                <p className="service-description">{service.description}</p>
+                <button 
+                  className="btn btn-primary custom-btn w-100 mt-3"
+                  onClick={() => handleRequestClick(service)}
+                >
+                  Request Now
+                </button>
+              </div>
+            </div>
+          </div>
         ))}
-      </main>
-      <footer className="footer">
+      </div>
+      <footer className="text-center mt-4">
         <p>&copy; PSU Media Hub</p>
       </footer>
     </div>
