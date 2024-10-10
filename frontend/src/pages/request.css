@@ -1,7 +1,44 @@
-.card-header {
-  cursor: pointer;
+.custom-btn {
+  background-color: #FF5733;
+  border-color: #FF5733;
+  color: white;
 }
 
-.card-header .btn-link {
-  text-decoration: none;
+.custom-btn:hover {
+  background-color: #cc472a;
+  border-color: #cc472a;
+}
+
+.request-card {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  height: 100%;
+}
+
+.request-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.request-card .card-header {
+  font-size: 1.1rem;
+  padding: 1rem;
+}
+
+.request-card .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.table td {
+  padding: 0.4rem 0.75rem;
+}
+
+@media (max-width: 767.98px) {
+  .request-card {
+    margin-bottom: 1rem;
+  }
 }
