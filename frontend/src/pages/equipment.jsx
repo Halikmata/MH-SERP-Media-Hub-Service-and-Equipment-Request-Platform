@@ -8,7 +8,6 @@ import cart from '../images/cart.png';
 const Equipment = ({ url }) => {
   const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
-  const [equipmentTypes, setEquipmentTypes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6); // Number of items per page
   const [columnList, setColumnList] = useState([]);
@@ -49,23 +48,6 @@ const Equipment = ({ url }) => {
       });
   }, [url, currentSort, currentOrder]);
 
-  useEffect(() => {
-    axios.get(`${url}/equipment_type`)
-      .then(response => {
-        if (Array.isArray(response.data)) {
-          const typesObject = response.data.reduce((acc, curr) => {
-            acc[curr.fk_idequipment_type] = curr.name;
-            return acc;
-          }, {});
-          setEquipmentTypes(typesObject);
-        } else {
-          console.error('Expected array but got', response.data);
-        }
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  }, [url]);
 
   useEffect(() => {
     // Retrieve selected equipment IDs from session storage on component mount
@@ -170,7 +152,7 @@ const Equipment = ({ url }) => {
                 <Card.Body style={{ height: '12rem' }}>
                   <Card.Title style={{ color: '#333', fontSize: '1.2rem', fontWeight: 'bold' }}>{item.brand} {item.model}</Card.Title>
                   <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{item.description}</Card.Text>
-                  <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Type: <b>{equipmentTypes[item.equipment_type]}</b></Card.Text>
+                  <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Type: <b>{item.equipment_type}</b></Card.Text>
                   <Card.Text style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Location: <b>{item.equipment_location}</b></Card.Text>
                 </Card.Body>
                 <div className="d-grid">
@@ -182,7 +164,7 @@ const Equipment = ({ url }) => {
                     }}
                     onClick={() => handleRequestClick(item)}
                   >
-                    {isSelected ? 'Cancel' : 'Request'}
+                    {isSelected ? 'Remove' : 'Add'}
                   </button>
                 </div>
               </Card>
@@ -200,8 +182,10 @@ const Equipment = ({ url }) => {
         ))}
         <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(equipment.length / itemsPerPage)} />
       </Pagination>
-      
-      <img src={cart} style={cartStyle} onClick={handleCartClick} alt="Cart" />
+
+      <div style={cartStyle} onClick={handleCartClick}>
+        <img src={cart} style={cartImg} alt="Cart" />
+      </div>
     </div>
   );
 };
@@ -212,7 +196,13 @@ const cartStyle = {
   height: '60px',
   width: '60px',
   position: 'fixed',
-  right: '20px',
-  bottom: '20px',
-  zIndex: 1
+  right: '30px',
+  bottom: '30px',
+  zIndex: 1,
+  backgroundColor: 'red'
 };
+
+const cartImg = {
+  height: '60px',
+  width: '60px',
+}
