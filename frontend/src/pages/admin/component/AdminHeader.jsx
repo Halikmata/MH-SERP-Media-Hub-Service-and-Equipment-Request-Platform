@@ -1,6 +1,6 @@
 import React from 'react'
 import { Navbar, Nav } from 'react-bootstrap';
-import logo from '../../../images/logo.png';
+import logo from '../../../images/logo.webp';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 
 function AdminHeader() {

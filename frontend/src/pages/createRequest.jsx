@@ -26,6 +26,10 @@ const CreateRequest = ({ url }) => {
     navigate('/select_equipment', { state: { formData } });
   };
 
+  const handleBack = () => {
+    navigate('/myrequests'); // Navigate back to the Requests page
+  };
+
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 5);
 
@@ -72,6 +76,7 @@ const CreateRequest = ({ url }) => {
       </Card>
       <Row className="justify-content-center">
         <Col md={6} className="text-center">
+          <Button variant="secondary" onClick={handleBack} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', marginRight: '10px', borderRadius: '30px' }}>Back</Button>
           <Button variant="primary" onClick={handleNext} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>Next</Button>
         </Col>
       </Row>

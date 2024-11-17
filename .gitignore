@@ -6,3 +6,4 @@ backend/__pycache__
 project
 mh-serp-img
 .venv
+/myvenv

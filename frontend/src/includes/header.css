@@ -1,14 +1,137 @@
-/* Link{
-    color: black;
-    text-decoration: none;
-} */
-/* header.css */
-.active {
-    background-color: coral; /* Change the background color to whatever you prefer */
-    color: #fff; /* Change the text color to contrast with the background */
-    border-radius: 20px; /* Adjust the border radius to change the shape */
+/* General Styles */
+.header {
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Header Container */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Logo Styles */
+.logo-container {
+  flex: 1;
+}
+.logo {
+  height: 50px;
+  width: auto;
+}
+
+/* Navigation Links */
+.nav-links {
+  display: flex;
+  flex: 2;
+  justify-content: center;
+  gap: 30px; /* Increase spacing */
+  transition: all 0.3s ease;
+}
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  color: coral;
+}
+
+/* Auth Buttons */
+.auth-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+.auth-button {
+  border: none;
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  border-radius: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.auth-button.login {
+  background-color: coral;
+  color: #fff;
+}
+.auth-button.login:hover {
+  background-color: #e35d45;
+}
+.auth-button.logout {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+}
+.auth-button.logout:hover {
+  background-color: #ddd;
+}
+
+/* Hamburger Icon */
+.menu-toggle {
+  display: none;
+  cursor: pointer;
+}
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 25px;
+  height: 20px;
+}
+.hamburger span {
+  height: 3px;
+  background-color: #333;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+.hamburger.open span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    padding: 10px 0;
   }
-  .centered {
+
+  .nav-links.show {
     display: flex;
-    justify-content: center;
   }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .auth-container {
+    display: none;
+  }
+}

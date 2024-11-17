@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Button, Table, Container, Card } from 'react-bootstrap';
+import { Form, Button, Table, Container, Card, ButtonGroup } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const SelectServices = ({ url }) => {
@@ -97,7 +97,20 @@ const SelectServices = ({ url }) => {
           </Table>
 
           <div className="text-center">
-            <Button variant="primary" onClick={handleSubmit} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>Submit</Button>
+            <ButtonGroup>
+              <Button 
+                variant="secondary" 
+                onClick={() => navigate(-1)} 
+                style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px', marginRight: '10px' }}>
+                Back
+              </Button>
+              <Button 
+                variant="primary" 
+                onClick={handleSubmit} 
+                style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>
+                Submit
+              </Button>
+            </ButtonGroup>
           </div>
         </Card.Body>
       </Card>
