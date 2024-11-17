@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Navbar, Nav } from 'react-bootstrap';
 import logo from '../images/logo.webp';
 import './header.css';
 
 function Header() {
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const userDataString = sessionStorage.getItem('userData');
+
   useEffect(() => {
     if (userDataString) {
       setIsLoggedIn(true);
     }
-  }, [userDataString, navigate]);
+  }, [userDataString]);
 
   function handleLogOut() {
     document.cookie.split(";").forEach(cookie => {
@@ -21,41 +21,51 @@ function Header() {
     });
     sessionStorage.clear();
     setIsLoggedIn(false);
+    navigate('/login');
   }
 
-
   return (
-    <header style={headerStyle}>
-      <div className="centered">
-        <Navbar bg="body" variant="tertiary" expand="lg">
-          <Navbar.Brand as={Link} to="/">
-            <img src={logo} alt="Logo" style={{ width: '50px', marginRight: '20px' }} />
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbarSupportedContent" />
-          <Navbar.Collapse id="navbarSupportedContent">
-            <Nav className="mr-auto">
-              <Nav.Link as={NavLink} to="/" exact activeClassName="active">Home</Nav.Link>
-              <Nav.Link as={NavLink} to="/myrequests" activeClassName="active">Requests</Nav.Link>
-              <Nav.Link as={NavLink} to="/equipment" activeClassName="active">Equipment</Nav.Link>
-              <Nav.Link as={NavLink} to="/services" activeClassName="active">Services</Nav.Link>
-            </Nav>
-            <Nav>
-              {isLoggedIn ? (
-                <Nav.Link as={Link} onClick={handleLogOut} to="/logout">Log out</Nav.Link>
-              ) : (
-                <Nav.Link as={Link} to="/login">Log in</Nav.Link>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Navbar>
+    <header className="header">
+      <div className="header-container">
+        {/* Logo */}
+        <div className="logo-container">
+          <Link to="/">
+            <img src={logo} alt="Logo" className="logo" />
+          </Link>
+        </div>
+
+        {/* Hamburger Icon */}
+        <div className="menu-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <div className={`hamburger ${isMenuOpen ? 'open' : ''}`}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className={`nav-links ${isMenuOpen ? 'show' : ''}`}>
+          <NavLink to="/" exact activeClassName="active" onClick={() => setIsMenuOpen(false)}>Home</NavLink>
+          <NavLink to="/myrequests" activeClassName="active" onClick={() => setIsMenuOpen(false)}>Requests</NavLink>
+          <NavLink to="/equipment" activeClassName="active" onClick={() => setIsMenuOpen(false)}>Equipment</NavLink>
+          <NavLink to="/services" activeClassName="active" onClick={() => setIsMenuOpen(false)}>Services</NavLink>
+        </nav>
+
+        {/* Login/Logout Button */}
+        <div className="auth-container">
+          {isLoggedIn ? (
+            <button className="auth-button logout" onClick={handleLogOut}>
+              Log out
+            </button>
+          ) : (
+            <Link to="/login" className="auth-button login">
+              Log in
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );
 }
-
-const headerStyle = {
-  width: '100vw',
-  boxShadow: '0 3px 5px 5px #88888888'
-};
 
 export default Header;
