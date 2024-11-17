@@ -914,7 +914,7 @@ def get_month_services():
     
     return results
 
-def get_month_equipments(): # quantity of equipments used per month
+def get_month_equipments():
     requests = db['requests']
     equipment = db['equipment']
     

@@ -48,7 +48,7 @@ const AdminTable = ({ url, collection, columns }) => {
 
   return (
     <div className="container mt-4 w-100">
-      <h2>{collection}</h2>
+      <h2>{collection.charAt(0).toUpperCase() + collection.slice(1)}</h2>
       <Link to={`${location.pathname}/add`} className="btn btn-primary mb-2">Add</Link>
       <table className="table">
         <thead className="thead-dark">

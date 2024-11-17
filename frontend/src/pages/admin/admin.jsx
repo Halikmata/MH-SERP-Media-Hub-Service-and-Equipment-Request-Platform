@@ -99,7 +99,8 @@ const Admin = ({ url }) => {
             return statusArray[status];
           }
         }
-      ]
+      ],
+      default__sort:"request_status"
     },
     '/admin/accounts': {
       collection: "accounts",
