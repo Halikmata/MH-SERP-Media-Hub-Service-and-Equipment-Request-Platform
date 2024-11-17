@@ -79,6 +79,10 @@ const SelectEquipment = ({ url }) => {
     navigate('/select_services', { state: { formData, selectedEquipment } });
   };
 
+  const handleBack = () => {
+    navigate(-1); // Navigate back to the previous page
+  };
+
   const groupEquipmentByType = (equipment) => {
     if (!Array.isArray(equipment)) return {};
     return equipment.reduce((acc, eq) => {
@@ -144,18 +148,17 @@ const SelectEquipment = ({ url }) => {
                         </tr>
                       </thead>
                       <tbody>
-                        {groupedEquipment[type.fk_idequipment_type]?.map(item => (
-                          <tr key={item.idequipment}>
-                            <td>{item.idequipment}</td>
-                            <td>{item.brand}</td>
-                            <td>{item.model}</td>
+                        {groupedEquipment[type.name] && groupedEquipment[type.name].map(equipment => (
+                          <tr key={equipment.idequipment}>
+                            <td>{equipment.idequipment}</td>
+                            <td>{equipment.brand}</td>
+                            <td>{equipment.model}</td>
                             <td>
                               <Form.Check
                                 type="checkbox"
-                                id={item.idequipment}
-                                value={item.idequipment}
+                                value={equipment.idequipment}
+                                checked={selectedEquipment.includes(equipment.idequipment)}
                                 onChange={handleCheckboxChange}
-                                checked={selectedEquipment.includes(item.idequipment)}
                               />
                             </td>
                           </tr>
@@ -167,12 +170,14 @@ const SelectEquipment = ({ url }) => {
               )
             ))}
           </Accordion>
-
-          <div className="text-center">
-            <Button variant="primary" onClick={handleNext} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>Next</Button>
-          </div>
         </Card.Body>
       </Card>
+      <Row className="justify-content-center">
+        <Col md={6} className="text-center">
+          <Button variant="secondary" onClick={handleBack} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', marginRight: '10px', borderRadius: '30px' }}>Back</Button>
+          <Button variant="primary" onClick={handleNext} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>Next</Button>
+        </Col>
+      </Row>
     </Container>
   );
 };
