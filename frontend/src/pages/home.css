@@ -1,20 +1,100 @@
-/* Home.css */
+/* General Reset */
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scroll issues */
+}
+
+/* Hero Section */
+.hero-section {
+  background-image: url('/bg.jpg'); /* Ensure bg.jpg is in the public folder */
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-section .hero-content h1 {
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.hero-section .hero-content p {
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom Button Style */
+.btn-custom {
+  background-color: #FF5733; /* Orange theme color */
+  border-color: #FF5733;
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-custom:hover {
+  background-color: #e04b2d; /* Slightly darker orange on hover */
+  border-color: #e04b2d;
+  transform: scale(1.05);
+}
+
+/* News Section */
+.news-section h2 {
+  color: #333;
+  font-weight: bold;
+}
+
+.news-card {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
 .news-card:hover {
-    transform: scale(1.05);
-    transition: transform 0.3s ease;
+  transform: translateY(-10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Platform Info Section */
+.info-section {
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.info-section h2 {
+  color: #333;
+}
+
+.info-section p {
+  color: #555;
+}
+
+.info-section button {
+  background-color: #FF5733; /* Orange theme color */
+  border-color: #FF5733;
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.info-section button:hover {
+  background-color: #e04b2d; /* Slightly darker orange on hover */
+  border-color: #e04b2d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-section {
+    height: 70vh;
   }
-  
-  .hero-section h1, .hero-section p {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
+  .hero-section .hero-content h1 {
+    font-size: 2.5rem;
   }
-  
-  .btn-primary {
-    background-color: #FF5733;
-    border-color: #FF5733;
+
+  .hero-section .hero-content p {
+    font-size: 1.2rem;
   }
-  
-  .btn-primary:hover {
-    background-color: #e04b2d;
-    border-color: #e04b2d;
-  }
-  
+}
