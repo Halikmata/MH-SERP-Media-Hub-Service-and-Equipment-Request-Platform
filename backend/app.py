@@ -970,3 +970,162 @@ def admin_index():
     info['equipments_month'] = get_month_equipments()
     
     return make_response(jsonify(info), 200)
+
+# message user to admin feature
+
+# message route for user fetching latest 10 message on both user and admin
+# suggesting new collection - messages for storing of messages for user and admin and also admin(?) collection
+@app.route('/message_admin', methods=['GET', 'POST'])
+def message_admin():
+    if request.method == 'POST':
+        # User sends a message to the admin
+        data = request.json
+        username = data.get('username')
+        message = data.get('message')
+
+        if not username or not message:
+            return jsonify({"error": "Username and message are required."}), 400
+
+        # Ensure the user exists
+        user_account = db['accounts'].find_one({"username": username})
+        if not user_account:
+            return jsonify({"error": "User account not found."}), 404
+
+        # Ensure the admin exists
+        admin_account = db['admin'].find_one({"role": "admin"})
+        if not admin_account:
+            return jsonify({"error": "Admin account not found."}), 404
+
+        # Insert the user's message into the messages collection
+        db.messages.insert_one({
+            "from": username,
+            "to": "admin",
+            "message": message,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+        return jsonify({"success": "Message sent to admin."})
+
+    if request.method == 'GET':
+        # Fetch paginated messages between the user and admin
+        username = request.args.get('username')
+        skip = int(request.args.get('skip', 0))  # Number of messages to skip, default is 0
+        limit = 10  # Number of messages per page
+
+        if not username:
+            return jsonify({"error": "Username is required."}), 400
+
+        # Fetch the latest messages between the user and admin
+        messages = list(db.messages.find({
+            "$or": [
+                {"from": username, "to": "admin"},
+                {"from": "admin", "to": username}
+            ]
+        }).sort("timestamp", -1).skip(skip).limit(limit))  # Latest first
+
+        # Reverse messages to show chronological order on the client
+        messages.reverse()
+
+        formatted_messages = [
+            {
+                "from": msg["from"],
+                "to": msg["to"],
+                "message": msg["message"],
+                "timestamp": msg["timestamp"]
+            }
+            for msg in messages
+        ]
+
+        return jsonify({"messages": formatted_messages})
+
+# route for admin getting those latest messages on each user
+@app.route('/admin_user_messages', methods=['GET'])
+def admin_user_messages():
+    admin_account = db['admin'].find_one({"role": "admin"})
+    if not admin_account:
+        return jsonify({"error": "Admin account not found."}), 404
+
+    # Aggregate messages to get the latest message from each user
+    pipeline = [
+        {"$match": {"to": "admin"}},  # Filter messages sent to admin
+        {"$sort": {"timestamp": -1}},  # Sort messages by timestamp (latest first)
+        {"$group": {
+            "_id": "$from",  # Group by sender
+            "latest_message": {"$first": "$message"},  # Get the latest message
+            "latest_timestamp": {"$first": "$timestamp"}  # Get the timestamp of the latest message
+        }},
+        {"$sort": {"latest_timestamp": -1}}  # Sort groups by latest message timestamp
+    ]
+    user_messages = list(db.messages.aggregate(pipeline))
+
+    # Format the response
+    user_list = [
+        {
+            "username": entry["_id"],
+            "latest_message": entry["latest_message"],
+            "timestamp": entry["latest_timestamp"]
+        }
+        for entry in user_messages
+    ]
+    return jsonify({"users": user_list})
+
+# route for admin on specific user
+@app.route('/admin_user_messages/<username>', methods=['GET', 'POST'])
+def admin_user_conversation(username):
+    admin_account = db['admin'].find_one({"role": "admin"})
+    if not admin_account:
+        return jsonify({"error": "Admin account not found."}), 404
+
+    # Ensure the user exists
+    user_account = db['accounts'].find_one({"username": username})
+    if not user_account:
+        return jsonify({"error": "User account not found."}), 404
+
+    if request.method == 'GET':
+        # Fetch paginated messages between the admin and the specified user
+        skip = int(request.args.get('skip', 0))  # Number of messages to skip, default is 0
+        limit = 10  # Number of messages per page
+
+        # Fetch the latest messages
+        messages = list(db.messages.find({
+            "$or": [
+                {"from": username, "to": "admin"},
+                {"from": "admin", "to": username}
+            ]
+        }).sort("timestamp", -1).skip(skip).limit(limit))  # Latest first
+
+        # Reverse messages to show chronological order on the client
+        messages.reverse()
+
+        formatted_conversation = [
+            {
+                "from": msg["from"],
+                "to": msg["to"],
+                "message": msg["message"],
+                "timestamp": msg["timestamp"]
+            }
+            for msg in messages
+        ]
+
+        return jsonify({"conversation": formatted_conversation})
+
+    if request.method == 'POST':
+        # Admin sends a message to the specified user
+        data = request.json
+        message = data.get('message')
+
+        if not message:
+            return jsonify({"error": "Message content is required."}), 400
+
+        # Insert the admin's message into the messages collection
+        db.messages.insert_one({
+            "from": "admin",
+            "to": username,
+            "message": message,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+        return jsonify({"success": f"Message sent to user {username}."})
+
+
+
