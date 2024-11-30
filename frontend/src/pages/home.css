@@ -7,7 +7,8 @@ body {
 
 /* Hero Section */
 .hero-section {
-  background-image: url('/bg.jpg'); /* Ensure bg.jpg is in the public folder */
+  position: relative; /* Set position relative to allow overlay */
+  background-image: url('/bg.png'); /* Ensure bg.png is in the public folder */
   background-size: cover;
   background-position: center;
   height: 100vh;
@@ -15,14 +16,46 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
+  animation: zoomOutBg 10s infinite alternate;
 }
+
+/* Overlay to darken background image */
+.hero-section::before {
+  content: ""; /* Empty content to create the overlay */
+  position: absolute; /* Positioning it on top of the image */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Dark overlay with 50% opacity */
+  z-index: 1; /* Make sure it's above the background but below the text */
+}
+
+.hero-section .hero-content {
+  position: relative; /* Bring the content above the overlay */
+  z-index: 2; /* Ensure content stays above the dark overlay */
+}
+
+@keyframes zoomOutBg {
+  0% {
+    background-size: 100%;
+  }
+  100% {
+    background-size: 110%;
+  }
+}
+
 
 .hero-section .hero-content h1 {
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+  font-size: 4rem;
+  animation: fadeInUp 1.5s ease-in-out;
 }
 
 .hero-section .hero-content p {
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  font-size: 1.5rem;
+  animation: fadeInUp 2s ease-in-out;
 }
 
 /* Custom Button Style */
@@ -32,6 +65,7 @@ body {
   color: white;
   font-weight: bold;
   transition: background-color 0.3s ease, transform 0.3s ease;
+  animation: fadeInUp 2.5s ease-in-out;
 }
 
 .btn-custom:hover {
@@ -44,6 +78,7 @@ body {
 .news-section h2 {
   color: #333;
   font-weight: bold;
+  animation: fadeIn 1s ease-out;
 }
 
 .news-card {
@@ -57,44 +92,41 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Platform Info Section */
-.info-section {
+/* Features Section */
+.features-section {
   background-color: #f9f9f9;
-  text-align: center;
 }
 
-.info-section h2 {
-  color: #333;
+.feature-card {
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.info-section p {
-  color: #555;
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-.info-section button {
-  background-color: #FF5733; /* Orange theme color */
-  border-color: #FF5733;
-  color: white;
-  font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+.feature-card .feature-icon {
+  color: #FF5733;
+  margin-bottom: 1rem;
 }
 
-.info-section button:hover {
-  background-color: #e04b2d; /* Slightly darker orange on hover */
-  border-color: #e04b2d;
+.testimonial-card {
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .hero-section {
-    height: 70vh;
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
   }
-
-  .hero-section .hero-content h1 {
-    font-size: 2.5rem;
-  }
-
-  .hero-section .hero-content p {
-    font-size: 1.2rem;
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

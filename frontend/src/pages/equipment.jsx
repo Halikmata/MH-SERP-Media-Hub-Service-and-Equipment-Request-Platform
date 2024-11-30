@@ -4,6 +4,7 @@ import { Pagination, Card, Row, Col } from 'react-bootstrap';
 import ImageDisplay from '../includes/imagedisplay';
 import cart from '../images/cart.png';
 import './equipment.css';
+import Footer from '../includes/footer.jsx';
 
 const Equipment = ({ url }) => {
   const [equipment, setEquipment] = useState([]);
@@ -58,84 +59,86 @@ const Equipment = ({ url }) => {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="d-flex justify-content-start mb-4">
-        <div className="me-3">
-          <select
-            className="form-select short-select"
-            onChange={(e) => setCurrentSort(e.target.value)}
-          >
-            <option value="idequipment">All</option>
-            <option value="equipment_type">Type</option>
-            <option value="brand">Brand</option>
-            <option value="model">Model</option>
-          </select>
-        </div>
-        <div className="me-3">
-          <select
-            className="form-select short-select"
-            onChange={(e) => setCurrentOrder(e.target.value)}
-          >
-            <option value="1">Ascending</option>
-            <option value="-1">Descending</option>
-          </select>
-        </div>
-      </div>
 
-      <Row xs={1} md={2} lg={3} className="g-4">
-        {currentItems.map(item => (
-          <Col key={item.idequipment}>
-            <Card className={`equipment-card ${selectedEquipmentIds.includes(item.idequipment) ? 'selected' : ''}`}>
-              <ImageDisplay imageName={item.idequipment} />
-              <Card.Body>
-                <Card.Title>{item.brand} {item.model}</Card.Title>
-                <Card.Text>
-                  {showFullDescription[item.idequipment]
-                    ? item.description
-                    : `${item.description.substring(0, 50)}...`}
-                  {item.description.length > 50 && (
-                    <span
-                      className="description-toggle"
-                      onClick={() => toggleDescription(item.idequipment)}
-                    >
-                      {showFullDescription[item.idequipment] ? ' Show Less' : ' See More'}
+      <div className="container mt-5">
+        <div className="d-flex justify-content-start mb-4">
+          <div className="me-3">
+            <select
+              className="form-select short-select"
+              onChange={(e) => setCurrentSort(e.target.value)}
+            >
+              <option value="idequipment">All</option>
+              <option value="equipment_type">Type</option>
+              <option value="brand">Brand</option>
+              <option value="model">Model</option>
+            </select>
+          </div>
+          <div className="me-3">
+            <select
+              className="form-select short-select"
+              onChange={(e) => setCurrentOrder(e.target.value)}
+            >
+              <option value="1">Ascending</option>
+              <option value="-1">Descending</option>
+            </select>
+          </div>
+        </div>
+
+        <Row xs={1} md={2} lg={3} className="g-4">
+          {currentItems.map(item => (
+            <Col key={item.idequipment}>
+              <Card className={`equipment-card ${selectedEquipmentIds.includes(item.idequipment) ? 'selected' : ''}`}>
+                <ImageDisplay imageName={item.idequipment} />
+                <Card.Body>
+                  <Card.Title>{item.brand} {item.model}</Card.Title>
+                  <Card.Text>
+                    {showFullDescription[item.idequipment]
+                      ? item.description
+                      : `${item.description.substring(0, 50)}...`}
+                    {item.description.length > 50 && (
+                      <span
+                        className="description-toggle"
+                        onClick={() => toggleDescription(item.idequipment)}
+                      >
+                        {showFullDescription[item.idequipment] ? ' Show Less' : ' See More'}
+                      </span>
+                    )}
+                  </Card.Text>
+                  <div className="d-flex justify-content-between align-items-center mt-3">
+                    <span className={`badge ${item.availability === 1 ? 'bg-success' : 'bg-secondary'}`}>
+                      {item.availability === 1 ? 'Available' : 'Unavailable'}
                     </span>
-                  )}
-                </Card.Text>
-                <div className="d-flex justify-content-between align-items-center mt-3">
-                  <span className={`badge ${item.availability === 1 ? 'bg-success' : 'bg-secondary'}`}>
-                    {item.availability === 1 ? 'Available' : 'Unavailable'}
-                  </span>
-                  <button
-                    className={`btn ${selectedEquipmentIds.includes(item.idequipment) ? 'btn-secondary' : 'btn-primary'}`}
-                    onClick={() => handleRequestClick(item)}
-                  >
-                    {selectedEquipmentIds.includes(item.idequipment) ? 'Remove' : 'Request'}
-                  </button>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+                    <button
+                      className={`btn ${selectedEquipmentIds.includes(item.idequipment) ? 'btn-secondary' : 'btn-primary'}`}
+                      onClick={() => handleRequestClick(item)}
+                    >
+                      {selectedEquipmentIds.includes(item.idequipment) ? 'Remove' : 'Request'}
+                    </button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
 
-      <Pagination className="justify-content-center mt-4 pagination-container">
-        <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>&larr;</Pagination.Prev>
-        {Array.from({ length: Math.ceil(equipment.length / itemsPerPage) }, (_, i) => (
-          <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => paginate(i + 1)}>
-            {i + 1}
-          </Pagination.Item>
-        ))}
-        <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(equipment.length / itemsPerPage)}>&rarr;</Pagination.Next>
-      </Pagination>
+        <Pagination className="justify-content-center mt-4 pagination-container">
+          <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>&larr;</Pagination.Prev>
+          {Array.from({ length: Math.ceil(equipment.length / itemsPerPage) }, (_, i) => (
+            <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => paginate(i + 1)}>
+              {i + 1}
+            </Pagination.Item>
+          ))}
+          <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(equipment.length / itemsPerPage)}>&rarr;</Pagination.Next>
+        </Pagination>
 
-      <div className="cart-icon" onClick={handleCartClick}>
-        <img src={cart} alt="Cart" />
-        {selectedEquipmentIds.length > 0 && (
-          <span className="cart-badge">{selectedEquipmentIds.length}</span>
-        )}
+        <div className="cart-icon" onClick={handleCartClick}>
+          <img src={cart} alt="Cart" />
+          {selectedEquipmentIds.length > 0 && (
+            <span className="cart-badge">{selectedEquipmentIds.length}</span>
+          )}
+        </div>
       </div>
-    </div>
+
   );
 };
 
