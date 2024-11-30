@@ -33,8 +33,8 @@
   display: flex;
   flex: 2;
   justify-content: center;
-  gap: 30px; /* Increase spacing */
-  transition: all 0.3s ease;
+  gap: 30px;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 .nav-links a {
   text-decoration: none;
@@ -121,10 +121,14 @@
     right: 0;
     z-index: 999;
     padding: 10px 0;
+    opacity: 0;
+    transform: translateY(-10px);
   }
 
   .nav-links.show {
     display: flex;
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .menu-toggle {
