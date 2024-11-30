@@ -14,7 +14,6 @@ const Footer = () => {
               Palawan State University
             </a>
             <div className="social-icons mt-3">
-              {/* Facebook Redirect Icon */}
               <a href="https://www.facebook.com/mediahub2023" target="_blank" rel="noopener noreferrer" className="social-icon">
                 <FaFacebook size={30} color="#3b5998" />
               </a>

@@ -92,9 +92,6 @@ const Services = ({ url }) => {
           </div>
         ))}
       </div>
-      <footer className="text-center mt-4">
-        <p>&copy; PSU Media Hub</p>
-      </footer>
     </div>
   );
 }

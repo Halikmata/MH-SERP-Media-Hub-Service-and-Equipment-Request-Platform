@@ -1,0 +1,50 @@
+.agreement-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+.agreement-modal-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: justify; /* Justify text */
+  }
+  
+  p {
+    margin: 0;
+    text-align: justify;
+  }
+  
+  .indented {
+    display: inline-block;
+    text-indent: 0; /* Avoid additional indentation */
+    margin-left: 2em; /* Align description to start after label */
+  }
+  
+  strong {
+    display: inline-block;
+    /*min-width: 12em; /* Adjust this value to align labels uniformly */
+  }
+  
+  .email-link {
+    color: blue;
+    text-decoration: underline;
+  }
+  
+  .email-link:hover {
+    color: darkblue; /* Change color on hover */
+  }
+  

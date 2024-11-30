@@ -2,6 +2,7 @@ from flask import jsonify, request, make_response
 from bson.objectid import ObjectId
 from bson.decimal128 import Decimal128
 from datetime import datetime, timezone, timedelta
+from admin import admin_routes
 # from pymongo.errors import ConnectionFailure
 import re
 
@@ -283,91 +284,6 @@ def index(collection):
     return jsonify(rows_list), 200
 
 
-
-@app.route('/admin/<collection>', methods=['GET'])
-# @jwt_required()
-def admin(collection):
-    if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
-    else:
-        col_name = collection
-        collection = db[collection]
-    
-    # URL inputs.
-    page = int(request.args.get('page', default=1)) # possibly deprecated
-    column = request.args.get('column',default=None)
-    search = request.args.get('search',default=None)
-    sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
-    id = request.args.get('id',default=None) # ID specification
-    limit_rows = int(request.args.get('limit_rows',default=50)) # possibly deprecated
-
-    if id != None and len(id) != 0: # the objectid
-        id = ObjectId(id)
-        row = collection.find({'_id':id})
-        row = list(row)
-        if len(row) == 1:
-            rows_list = list(row)
-    
-            for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
-                x['_id'] = str(x['_id'])
-            
-            rows_list = apply_foreign(rows_list,col_name)
-
-            return jsonify(rows_list), 200
-        else:
-            return jsonify({'message':'instance not found'}),400
-    
-    if(int(page) < 1): # avoids negatives.
-        page = 1
-    
-    #limit_rows = 50 # change total rows in a page here.
-    offset = (page - 1) * limit_rows
-    # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
-    
-    
-    # will shorten
-    if search != None and column != None and sort != None:
-        rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows).sort([(column, int(sort))])
-        
-    elif search != None and column != None:
-        rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows)
-        
-    elif search == None and column == None:
-        rows = collection.find().skip(offset).limit(limit_rows)
-        
-    elif column != None and sort != None: # sorting
-        rows = collection.find().skip(offset).limit(limit_rows).sort([(column, int(sort))])
-
-    else:
-        return jsonify({'message': 'May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
-    rows_list = list(rows)
-    
-    for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
-        x['_id'] = str(x['_id'])
-        
-    # rows_list = apply_foreign(rows_list,col_name)
-
-    return jsonify(rows_list), 200
-
-
-@app.route('/admin/<collection>/<id>', methods=["GET"])
-def get_row(collection, id):
-    if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
-    else:
-        collection = db[collection]
-        try:
-            obj_id = ObjectId(id)
-            document = collection.find_one({"_id": obj_id})
-            if document:
-                document["_id"] = str(document["_id"])
-                return jsonify(document), 200
-            else:
-                return jsonify({"message": "No row found with the given ID"}), 404
-        except Exception as e:
-            return jsonify({"message": "Invalid ID format"}), 400
-        
-
 @app.route('/<collection>/add', methods=["GET","POST"])
 # @jwt_required()
 def add_row(collection):   
@@ -385,29 +301,10 @@ def add_row(collection):
         
         pass
         # will add GET request for acquiring choose-able options
-        
-@app.route('/admin/<collection>/add', methods=["GET","POST"])
-#@jwt_required()
-def admin_add_row(collection):   
-    if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
-    else:
-        collection = db[collection]
-    
-    if request.method == "POST":
-        json_input = request.get_json()
-        # json_input = json_input.pop('_id')
-        result = collection.insert_one(json_input)
-        return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
-    else:
-        
-        pass
-        # will add GET request for acquiring choose-able options
-
     
 
-@app.route('/<collection>/update/<id>', methods=['GET','POST']) # not yet tested -------------------------------------------------------------------- 
-#@jwt_required()
+@app.route('/<collection>/update/<id>', methods=['GET', 'POST'])
+# @jwt_required()
 def update_row(collection, id):
     
     if not verify_collection(collection):
@@ -415,23 +312,45 @@ def update_row(collection, id):
     else:
         collection = db[collection]
         
+    # Parse the exclude parameter
+    exclude = request.args.get('exclude', default=None)  # Fetch exclude parameter from query string
+    exclude_fields = []
+    if exclude:
+        exclude_fields = exclude.split(',')  # Comma-separated fields to exclude
+    
+    # Prepare the projection dict to exclude fields from the result
+    projection = {field: 0 for field in exclude_fields}  # 0 means exclude the field
+    
     if request.method == "POST":
         json_input = request.get_json()
         
-        result = collection.update_one({'_id':ObjectId(id)}, {'$set': json_input})
-          
-        if result.modified_count >  0:
+        # Handle potential bytes in json_input by decoding them
+        for key, value in json_input.items():
+            if isinstance(value, bytes):
+                json_input[key] = value.decode('utf-8')
+        
+        result = collection.update_one({'_id': ObjectId(id)}, {'$set': json_input})
+        
+        if result.modified_count > 0:
             return jsonify({"message": "Updated successfully", "id": id}), 201
         else:
             return jsonify({"message": "No row found with the given ID"}), 404
         
     else:
-
-        result = collection.find_one({'_id': ObjectId(id)})
+        result = collection.find_one({'_id': ObjectId(id)}, projection)  # Apply projection to exclude fields
         
-        for x in result:
-            x['_id'] = str(x['_id'])
-        return jsonify(result), 200
+        # Check and decode any bytes fields in the result
+        if result:
+            for key, value in result.items():
+                if isinstance(value, bytes):
+                    # Decode the bytes to base64 string or any appropriate representation
+                    result[key] = value.decode('utf-8')  # Or use base64.b64encode(value).decode('utf-8') if needed
+            result['_id'] = str(result['_id'])
+            return jsonify(result), 200
+        else:
+            return jsonify({"message": "Instance not found"}), 404
+        
+        
     
 @app.route('/<collection>/delete/<id>', methods=['POST'])
 @jwt_required()
@@ -472,68 +391,6 @@ def get_available():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# admin APIs
-
-@app.route('/admin/news', methods=['GET',"POST"]) # news management to show on end-user home page -- prototype version
-# @jwt_required()
-# check if account has privilege
-def news_management():
-    if request.method == "GET": # list of posts
-        collection = db["news"]
-        
-        page = int(request.args.get('page', default=1)) # possibly deprecated
-        column = request.args.get('column',default=None)
-        search = request.args.get('search',default=None)
-        sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
-        limit_rows = int(request.args.get('limit_rows',default=50)) # possibly deprecated
-        
-        # stuff here
-        
-        rows = collection.find()
-        
-        rows_list = list(rows)
-    
-        for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
-            x['_id'] = str(x['_id'])
-            
-        return jsonify(rows_list), 200
-    
-    elif request.method == "POST": # actions for posts, create, edit, delete
-        collection = db["news"]
-        action = request.args.get('action',default=None)
-        json_input = request.get_json()
-        match action:
-            case "add":
-                result = collection.insert_one(json_input)
-                
-                # management for pictures if exists
-                
-                return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
-            case "edit":
-                json_input = request.get_json()
-                
-                result = collection.update_one({'_id':ObjectId(json_input["id"])}, {'$set': json_input})
-                
-                if result.modified_count >  0:
-                    return jsonify({"message": "Updated successfully", "id": id}), 201
-                else:
-                    return jsonify({"message": "No row found with the given ID"}), 404
-                
-            case "delete":
-                result = collection.delete_one({'_id': ObjectId(json_input["id"])})
-    
-                if result.deleted_count > 0:
-                    return jsonify({"message": "Deleted successfully", "id": id}), 201
-                else:
-                    return jsonify({"message": "No row found with the given ID"}), 404
-            case _:
-                return jsonify({"message": "Unidentified Action!"}), 404
-
-
-
-
-
-
 
 # on progress ------------
 
@@ -551,104 +408,6 @@ def admin_request_conclude():
     
     return jsonify({'message':'Request instance conluded'}), 201 """
 
-
-
-@app.route('/admin/<collection>/update/<id>', methods=['GET', 'PUT'])
-def admin_update_row(collection, id):
-    if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
-    else:
-        collection = db[collection]
-        
-    if request.method == "PUT":
-            json_input = request.get_json()
-            
-            json_input.pop('_id', None)
-            
-            result = collection.update_one({'_id': ObjectId(id)}, {'$set': json_input})
-            
-            if result.modified_count > 0:
-                return jsonify({"message": "Updated successfully", "id": id}), 201
-            else:
-                return jsonify({"message": "No row found with the given ID"}), 404
-            
-    else:
-        result = collection.find_one({'_id': ObjectId(id)})
-        
-        if result:
-            result['_id'] = str(result['_id'])  # Convert ObjectId to string
-            return jsonify(result), 200
-        else:
-            return jsonify({"message": "No row found with the given ID"}), 404
-
-
-# Update Request
-
-@app.route('/admin/requests/update/<id>', methods=['GET', 'PUT'])
-def admin_update_request(id):
-    collection = "requests"
-    if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
-    else:
-        collection = db[collection]
-        
-    if request.method == "PUT":
-        json_input = request.get_json()
-        
-        # Remove '_id' if present in the input
-        json_input.pop('_id', None)
-        
-        try:
-            # Update the request in the collection
-            result = collection.update_one({'_id': ObjectId(id)}, {'$set': json_input})
-            
-            if result.modified_count > 0:
-                # If status is "1", update the equipment availability to "0"
-                if json_input.get('request_status') == "1":
-                    if 'equipment' in json_input:
-                        equipment_collection = db['equipment']
-                        equipment_ids = json_input['equipment']
-                        
-                        # Update the availability of each equipment item
-                        for eq_id in equipment_ids:
-                            equipment_result = equipment_collection.update_one(
-                                {'idequipment': eq_id},
-                                {'$set': {'availability': '0'}}
-                            )
-                            if equipment_result.matched_count == 0:
-                                return jsonify({"message": f"Equipment with ID {eq_id} not found"}), 404
-                
-                return jsonify({"message": "Updated successfully", "id": id}), 201
-            else:
-                return jsonify({"message": "No row found with the given ID"}), 404
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
-    else:
-        # Retrieve the request from the collection
-        result = collection.find_one({'_id': ObjectId(id)})
-        
-        if result:
-            result['_id'] = str(result['_id'])  # Convert ObjectId to string
-            return jsonify(result), 200
-        else:
-            return jsonify({"message": "No row found with the given ID"}), 404
-
-
-
-@app.route('/admin/<collection>/delete/<id>', methods=['DELETE'])
-# @jwt_required()
-def admin_delete_row(collection, id):
-    if not verify_collection(collection):
-        return jsonify({"message": "Unknown URL"}), 404
-    
-    collection = db[collection]
-    
-    result = collection.delete_one({'_id': ObjectId(id)})
-    
-    if result.deleted_count > 0:
-        return jsonify({"message": "Deleted successfully", "id": id}), 201
-    else:
-        return jsonify({"message": "No row found with the given ID"}), 404
 
 @app.route('/requests/<email>', methods=['GET'])
 def my_requests(email):
@@ -691,50 +450,6 @@ def my_requests(email):
         return jsonify(requests_list), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
-    
-@app.route('/admin/requests/', methods=['GET'])
-def admin_requests():
-    try:
-        requests_collection = db['requests']
-        equipment_collection = db['equipment']
-        services_collection = db['services']
-        
-        requests = requests_collection.find({})
-        
-        requests_list = []
-        for request in requests:
-            request['_id'] = str(request['_id'])
-            
-            if 'equipment' in request:
-                equipment_names = []
-                for eq_id in request['equipment']:
-                    equipment = equipment_collection.find_one({'idequipment': eq_id})
-                    if equipment:
-                        equipment_names.append(f"{equipment['brand']} {equipment['model']}")
-                    else:
-                        equipment_names.append("Unknown Equipment")
-                request['equipment'] = equipment_names
-
-            if 'services' in request:
-                service_names = []
-                for service_id in request['services']:
-                    service = services_collection.find_one({'fk_idservice': service_id})
-                    if service:
-                        service_names.append(service['name'])
-                    else:
-                        service_names.append("Unknown Service")
-                request['services'] = service_names
-
-            requests_list.append(request)
-        
-        if not requests_list:
-            return jsonify({"message": "No requests found for the given email"}), 404
-        
-        return jsonify(requests_list), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 
 @app.route('/requests/add', methods=["GET", "POST"])
 # @jwt_required()
@@ -770,6 +485,12 @@ def add_request(collection="requests"):
 def get_data(collection_name):
     conditions = request.args.to_dict()
 
+    for key, value in conditions.items():
+        if value.lower() == 'true':
+            conditions[key] = True
+        elif value.lower() == 'false':
+            conditions[key] = False
+
     collection = db[collection_name]
 
     documents = collection.find(conditions)
@@ -803,6 +524,8 @@ def get_org(college):
 
 @app.route('/get_distinct/<collection_name>/<field_name>')
 @app.route('/admin/get_distinct/<collection_name>/<field_name>')
+
+
 def get_distinct(collection_name, field_name):
     collection = db[collection_name]
     distinct_values = collection.distinct(field_name)
@@ -837,295 +560,6 @@ def get_distinct(collection_name, field_name):
 
 # add privilege checker for each app routes.
 
-def get_month_requesters(): # top 5 requesters with highest request quantity per month
-    requests = db['requests']
-    
-    current_date = datetime.now().replace(day=1)
-    query = [
-        {
-            "$match":{
-                "event_start": {
-                    "$gte": current_date
-                }
-            }
-        },
-        {
-            "$group":{
-            "_id": "$requester_full_name",
-            "total_requests":{"$sum": 1}
-            }
-        },
-        {
-            "$sort":
-                {
-                    "total_requests": -1
-                }
-        },
-        {
-            "$limit":5
-        }
-    ]
-    count_requests = requests.aggregate(query)
-    count_requests = list(count_requests)
-        
-    return count_requests
-
-def get_month_services():
-    services = db['services']
-    request = db['requests']
-    
-    current_date = datetime.now().replace(day=1)
-    query = [
-        {
-            "$match":{
-                "event_start": {
-                    "$gte": current_date
-                }
-            }
-        },
-        {
-            "$unwind": "$services"
-        },
-        {
-            "$group": {
-                "_id": "$services",
-                "count":{"$sum": 1}
-            }
-        },
-        {
-            "$sort":
-            {
-                "count": -1
-            }
-        },
-        {
-            "$limit": 5
-        }
-    ]
-    
-    results = request.aggregate(query)
-    results = list(results)
-    
-    for x in results:
-        
-        row = services.find({"fk_idservice": x['_id']})
-        row = list(row)[0]
-        x['_id'] = row['name']
-    
-    return results
-
-def get_month_equipments(): # quantity of equipments used per month
-    requests = db['requests']
-    equipment = db['equipment']
-    
-    current_date = datetime.now().replace(day=1)
-    query = [
-        {
-            "$match":{
-                "event_start": {
-                    "$gte": current_date
-                }
-            }
-        },
-        {
-            "$unwind": "$equipment"
-        },
-        {
-            "$group": {
-            "_id": "$equipment",
-            "count":{"$sum": 1}
-            }
-        },
-        {
-            "$sort":
-            {
-                "count": -1
-            }
-        }
-    ]
-    
-    results = requests.aggregate(query)
-    results = list(results)
-    
-    for x in results:
-        
-        row = equipment.find({"idequipment":x['_id']})
-        
-        row = list(row)[0]
-        
-        x['_id'] = row['brand'] +" "+ row['model']
-    
-    return results
-
-@app.route('/admin')
-# jwt required
-def admin_index():
-    
-    info = {}
-    
-    info['top_5_requesters'] = get_month_requesters()
-    
-    info['top_5_services'] = get_month_services()
-    
-    info['equipments_month'] = get_month_equipments()
-    
-    return make_response(jsonify(info), 200)
-
-# message user to admin feature
-
-# message route for user fetching latest 10 message on both user and admin
-# suggesting new collection - messages for storing of messages for user and admin and also admin(?) collection
-@app.route('/message_admin', methods=['GET', 'POST'])
-def message_admin():
-    if request.method == 'POST':
-        # User sends a message to the admin
-        data = request.json
-        username = data.get('username')
-        message = data.get('message')
-
-        if not username or not message:
-            return jsonify({"error": "Username and message are required."}), 400
-
-        # Ensure the user exists
-        user_account = db['accounts'].find_one({"username": username})
-        if not user_account:
-            return jsonify({"error": "User account not found."}), 404
-
-        # Ensure the admin exists
-        admin_account = db['admin'].find_one({"role": "admin"})
-        if not admin_account:
-            return jsonify({"error": "Admin account not found."}), 404
-
-        # Insert the user's message into the messages collection
-        db.messages.insert_one({
-            "from": username,
-            "to": "admin",
-            "message": message,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        })
-
-        return jsonify({"success": "Message sent to admin."})
-
-    if request.method == 'GET':
-        # Fetch paginated messages between the user and admin
-        username = request.args.get('username')
-        skip = int(request.args.get('skip', 0))  # Number of messages to skip, default is 0
-        limit = 10  # Number of messages per page
-
-        if not username:
-            return jsonify({"error": "Username is required."}), 400
-
-        # Fetch the latest messages between the user and admin
-        messages = list(db.messages.find({
-            "$or": [
-                {"from": username, "to": "admin"},
-                {"from": "admin", "to": username}
-            ]
-        }).sort("timestamp", -1).skip(skip).limit(limit))  # Latest first
-
-        # Reverse messages to show chronological order on the client
-        messages.reverse()
-
-        formatted_messages = [
-            {
-                "from": msg["from"],
-                "to": msg["to"],
-                "message": msg["message"],
-                "timestamp": msg["timestamp"]
-            }
-            for msg in messages
-        ]
-
-        return jsonify({"messages": formatted_messages})
-
-# route for admin getting those latest messages on each user
-@app.route('/admin_user_messages', methods=['GET'])
-def admin_user_messages():
-    admin_account = db['admin'].find_one({"role": "admin"})
-    if not admin_account:
-        return jsonify({"error": "Admin account not found."}), 404
-
-    # Aggregate messages to get the latest message from each user
-    pipeline = [
-        {"$match": {"to": "admin"}},  # Filter messages sent to admin
-        {"$sort": {"timestamp": -1}},  # Sort messages by timestamp (latest first)
-        {"$group": {
-            "_id": "$from",  # Group by sender
-            "latest_message": {"$first": "$message"},  # Get the latest message
-            "latest_timestamp": {"$first": "$timestamp"}  # Get the timestamp of the latest message
-        }},
-        {"$sort": {"latest_timestamp": -1}}  # Sort groups by latest message timestamp
-    ]
-    user_messages = list(db.messages.aggregate(pipeline))
-
-    # Format the response
-    user_list = [
-        {
-            "username": entry["_id"],
-            "latest_message": entry["latest_message"],
-            "timestamp": entry["latest_timestamp"]
-        }
-        for entry in user_messages
-    ]
-    return jsonify({"users": user_list})
-
-# route for admin on specific user
-@app.route('/admin_user_messages/<username>', methods=['GET', 'POST'])
-def admin_user_conversation(username):
-    admin_account = db['admin'].find_one({"role": "admin"})
-    if not admin_account:
-        return jsonify({"error": "Admin account not found."}), 404
-
-    # Ensure the user exists
-    user_account = db['accounts'].find_one({"username": username})
-    if not user_account:
-        return jsonify({"error": "User account not found."}), 404
-
-    if request.method == 'GET':
-        # Fetch paginated messages between the admin and the specified user
-        skip = int(request.args.get('skip', 0))  # Number of messages to skip, default is 0
-        limit = 10  # Number of messages per page
-
-        # Fetch the latest messages
-        messages = list(db.messages.find({
-            "$or": [
-                {"from": username, "to": "admin"},
-                {"from": "admin", "to": username}
-            ]
-        }).sort("timestamp", -1).skip(skip).limit(limit))  # Latest first
-
-        # Reverse messages to show chronological order on the client
-        messages.reverse()
-
-        formatted_conversation = [
-            {
-                "from": msg["from"],
-                "to": msg["to"],
-                "message": msg["message"],
-                "timestamp": msg["timestamp"]
-            }
-            for msg in messages
-        ]
-
-        return jsonify({"conversation": formatted_conversation})
-
-    if request.method == 'POST':
-        # Admin sends a message to the specified user
-        data = request.json
-        message = data.get('message')
-
-        if not message:
-            return jsonify({"error": "Message content is required."}), 400
-
-        # Insert the admin's message into the messages collection
-        db.messages.insert_one({
-            "from": "admin",
-            "to": username,
-            "message": message,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        })
-
-        return jsonify({"success": f"Message sent to user {username}."})
 
 
-
+app.register_blueprint(admin_routes)
