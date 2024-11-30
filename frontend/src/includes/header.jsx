@@ -49,20 +49,20 @@ function Header() {
           <NavLink to="/myrequests" activeClassName="active" onClick={() => setIsMenuOpen(false)}>Requests</NavLink>
           <NavLink to="/equipment" activeClassName="active" onClick={() => setIsMenuOpen(false)}>Equipment</NavLink>
           <NavLink to="/services" activeClassName="active" onClick={() => setIsMenuOpen(false)}>Services</NavLink>
+          
+          {/* Login/Logout Button inside hamburger */}
+          <div className="auth-container">
+            {isLoggedIn ? (
+              <button className="auth-button logout" onClick={handleLogOut}>
+                Log out
+              </button>
+            ) : (
+              <Link to="/login" className="auth-button login">
+                Log in
+              </Link>
+            )}
+          </div>
         </nav>
-
-        {/* Login/Logout Button */}
-        <div className="auth-container">
-          {isLoggedIn ? (
-            <button className="auth-button logout" onClick={handleLogOut}>
-              Log out
-            </button>
-          ) : (
-            <Link to="/login" className="auth-button login">
-              Log in
-            </Link>
-          )}
-        </div>
       </div>
     </header>
   );

@@ -1,6 +1,7 @@
 README.md
 backend/env
 backend/myvenv
+backend/venv
 backend/__pycache__
 .gitignore
 project

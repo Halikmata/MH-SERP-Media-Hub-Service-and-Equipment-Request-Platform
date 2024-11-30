@@ -132,6 +132,19 @@
   }
 
   .auth-container {
-    display: none;
+    display: flex;
+    flex-direction: column; /* Stack the login/logout buttons inside the menu */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 10px 0;
+    background-color: #fff;
+    position: relative;
+    z-index: 998;
+  }
+
+  .auth-button {
+    width: 80%;
+    margin: 10px 0; /* Space between buttons */
   }
 }
