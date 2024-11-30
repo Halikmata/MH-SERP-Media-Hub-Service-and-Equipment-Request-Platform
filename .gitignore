@@ -1,9 +1,10 @@
 README.md
 backend/env
 backend/myvenv
+backend/venv
 backend/__pycache__
 .gitignore
 project
 mh-serp-img
-.venv
+venv
 /myvenv

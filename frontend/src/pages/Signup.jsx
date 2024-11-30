@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Signup({ url }) {
   const [formData, setFormData] = useState({
-    first_name: '',
-    middle_name: '',
-    last_name: '',
-    phone_number: '',
-    email: '',
+    first_name: "",
+    middle_name: "",
+    last_name: "",
+    phone_number: "",
+    email: "",
     status: 3,
     incident_report: null,
-    username: '',
-    password: '',
-    confirm_password: '',
-    user_type: 'Student', // Default value
-    college: '', // Only for students
-    program: '', // Only for students
-    other_org: '', // Only for students
-    office: '', // Only for faculty/staff
-    position: '' // Only for faculty/staff
+    username: "",
+    password: "",
+    confirm_password: "",
+    user_type: "", // Default empty
+    college: "", // For students
+    program: "", // For students
+    other_org: "", // For students
+    office: "", // For staff/faculty
+    position: "", // For staff/faculty
   });
 
   const [colleges, setColleges] = useState([]);
@@ -28,39 +28,56 @@ function Signup({ url }) {
   const [otherOrgs, setOtherOrgs] = useState([]);
   const [isProgramDisabled, setIsProgramDisabled] = useState(true);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    axios.get(`${url}/get_data/college_office?is_college=true`)
-      .then((response) => {
-        setColleges(response.data); // Assuming the response contains item data
-      })
-      .catch((error) => {
-        console.error('Error fetching item:', error);
-      });
+    axios
+      .get(`${url}/get_data/college_office?type=college`)
+      .then((response) => setColleges(response.data))
+      .catch((error) => console.error("Error fetching colleges:", error));
   }, [url]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    // Reset fields based on user type
+    if (name === "user_type") {
+      setFormData((prevData) => ({
+        ...prevData,
+        college: "",
+        program: "",
+        other_org: "",
+        office: "",
+        position: "",
+      }));
+    }
+  };
 
   const handleCollegeChange = (e) => {
     const selectedCollege = e.target.value;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
       college: selectedCollege,
-      program: '', // Reset program when college changes
-      other_org: '' // Reset other_org when college changes
+      program: "",
+      other_org: "",
     }));
 
     if (selectedCollege) {
-      axios.get(`${url}/get_org/${selectedCollege}`)
+      axios
+        .get(`${url}/get_org/${selectedCollege}`)
         .then((response) => {
-          setOrganizations(response.data);
-          const programs = response.data.filter(org => org.program);
-          const otherOrgs = response.data.filter(org => !org.program);
+          const programs = response.data.filter((org) => org.program);
+          const otherOrgs = response.data.filter((org) => !org.program);
 
           setPrograms(programs);
           setOtherOrgs(otherOrgs);
           setIsProgramDisabled(programs.length === 0);
         })
-        .catch((error) => {
-          console.error('Error fetching item:', error);
-        });
+        .catch((error) => console.error("Error fetching organizations:", error));
     } else {
       setOrganizations([]);
       setPrograms([]);
@@ -69,25 +86,19 @@ function Signup({ url }) {
     }
   };
 
-  const navigate = useNavigate();
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const requiredFields = ['first_name', 'last_name', 'phone_number', 'email', 'username', 'password', 'confirm_password', 'user_type', 'college'];
-    if (!isProgramDisabled) {
-      requiredFields.push('program');
+    // Validation
+    const requiredFields = ["first_name", "last_name", "phone_number", "email", "username", "password", "confirm_password", "user_type"];
+    if (formData.user_type === "Student") {
+      requiredFields.push("college");
+      if (!isProgramDisabled) requiredFields.push("program");
+    } else {
+      requiredFields.push("office", "position");
     }
-    const emptyFields = requiredFields.filter(field => !formData[field]);
 
+    const emptyFields = requiredFields.filter((field) => !formData[field]);
     if (emptyFields.length > 0) {
       alert(`Please fill in all the required fields!`);
       return;
@@ -98,18 +109,18 @@ function Signup({ url }) {
       return;
     }
 
-    axios.post(`${url}/signup`, formData)
-      .then((response) => {
-        console.log('User added successfully:', response.data);
-        navigate('/login');
+    // API Call
+    axios
+      .post(`${url}/signup`, formData)
+      .then(() => {
+        alert("Signup successful!");
+        navigate("/login");
       })
       .catch((error) => {
-    console.error('Error adding item:', error);
-    if (error.response && error.response.data && error.response.data.message) {
-      alert('Error creating account: \n' + error.response.data.message);
-    } else {
-      alert('Error creating account. Please try again later.');
-    }
+        console.error("Error during signup:", error);
+        alert(
+          error.response?.data?.message || "Error creating account. Please try again later."
+        );
       });
   };
 
@@ -119,101 +130,175 @@ function Signup({ url }) {
         <div className="col-md-6">
           <div className="card mt-5">
             <div className="card-body">
-              <h2 className="text-center">Sign Up</h2><br />
+              <h2 className="text-center">Sign Up</h2>
+              <br />
               <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <input type="text" name="first_name" className="form-control" placeholder="First Name" value={formData.first_name} onChange={handleInputChange} required />
-                </div>
-                <div className="mb-3">
-                  <input type="text" name="middle_name" className="form-control" placeholder="Middle Name (optional)" value={formData.middle_name} onChange={handleInputChange} />
-                </div>
-                <div className="mb-3">
-                  <input type="text" name="last_name" className="form-control" placeholder="Last Name" value={formData.last_name} onChange={handleInputChange} required />
-                </div>
-                <div className="mb-3">
-                  <input type="text" name="phone_number" className="form-control" placeholder="Phone Number" value={formData.phone_number} onChange={handleInputChange} required />
-                </div>
-                <div className="mb-3">
-                  <input type="email" name="email" className="form-control" placeholder="Email" value={formData.email} onChange={handleInputChange} required />
-                </div>
-                <div className="mb-3">
-                  <input type="text" name="username" className="form-control" placeholder="Username" value={formData.username} onChange={handleInputChange} required />
-                </div>
-                <div className="mb-3">
-                  <input type="password" name="password" className="form-control" placeholder="Password" value={formData.password} onChange={handleInputChange} required />
-                </div>
-                <div className="mb-3">
-                  <input type="password" name="confirm_password" className="form-control" placeholder="Confirm Password" value={formData.confirm_password} onChange={handleInputChange} required />
-                </div>
-                <div className="mb-3">
-                  <select name="user_type" className="form-select" value={formData.user_type} onChange={handleInputChange} required>
-                    <option value="student">Student</option>
-                    <option value="faculty">Faculty</option>
-                    <option value="staff">Staff</option>
-                  </select>
-                </div>
-                {formData.user_type === 'Student' && (
+                {/* Basic Information */}
+                <input
+                  type="text"
+                  name="first_name"
+                  className="form-control mb-3"
+                  placeholder="First Name"
+                  value={formData.first_name}
+                  onChange={handleInputChange}
+                  required
+                />
+                <input
+                  type="text"
+                  name="middle_name"
+                  className="form-control mb-3"
+                  placeholder="Middle Name (optional)"
+                  value={formData.middle_name}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  name="last_name"
+                  className="form-control mb-3"
+                  placeholder="Last Name"
+                  value={formData.last_name}
+                  onChange={handleInputChange}
+                  required
+                />
+                <input
+                  type="text"
+                  name="phone_number"
+                  className="form-control mb-3"
+                  placeholder="Phone Number"
+                  value={formData.phone_number}
+                  onChange={handleInputChange}
+                  required
+                />
+                <input
+                  type="email"
+                  name="email"
+                  className="form-control mb-3"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+                <input
+                  type="text"
+                  name="username"
+                  className="form-control mb-3"
+                  placeholder="Username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  required
+                />
+                <input
+                  type="password"
+                  name="password"
+                  className="form-control mb-3"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
+                <input
+                  type="password"
+                  name="confirm_password"
+                  className="form-control mb-3"
+                  placeholder="Confirm Password"
+                  value={formData.confirm_password}
+                  onChange={handleInputChange}
+                  required
+                />
+                <select
+                  name="user_type"
+                  className="form-select mb-3"
+                  value={formData.user_type}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="" disabled>Select User Type</option>
+                  <option value="Student">Student</option>
+                  <option value="Faculty">Faculty</option>
+                  <option value="Staff">Staff</option>
+                </select>
+
+                {/* Student Fields */}
+                {formData.user_type === "Student" && (
                   <>
-                    <div className="mb-3">
-                      <select name="college" className="form-select" value={formData.college} onChange={handleCollegeChange} required>
-                        <option value="" disabled>Select College</option>
-                        {colleges.map(college => (
-                          <option key={college._id.$oid} value={college.fk_idcollegeoffice}>
-                            {college.acronym || college.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-3">
-                      <select
-                        name="program"
-                        className="form-select"
-                        value={formData.program}
-                        onChange={handleInputChange}
-                        disabled={isProgramDisabled || programs.length === 0}
-                        required={!isProgramDisabled}
-                      >
-                        <option value="" disabled>Select Program</option>
-                        {programs.map(program => (
-                          <option key={program._id.$oid} value={program.fk_org_id}>
-                            {program.program}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-3">
-                      <select
-                        name="other_org"
-                        className="form-select"
-                        value={formData.other_org}
-                        onChange={handleInputChange}
-                        disabled={isProgramDisabled}
-                      >
-                        <option value="" disabled>Organization (optional)</option>
-                        {otherOrgs.map(org => (
-                          <option key={org._id.$oid} value={org.fk_org_id}>
-                            {org.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <select
+                      name="college"
+                      className="form-select mb-3"
+                      value={formData.college}
+                      onChange={handleCollegeChange}
+                      required
+                    >
+                      <option value="" disabled>Select College</option>
+                      {colleges.map((college) => (
+                        <option key={college._id.$oid} value={college.fk_idcollegeoffice}>
+                          {college.acronym || college.name}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      name="program"
+                      className="form-select mb-3"
+                      value={formData.program}
+                      onChange={handleInputChange}
+                      disabled={isProgramDisabled || programs.length === 0}
+                      required={!isProgramDisabled}
+                    >
+                      <option value="" disabled>Select Program</option>
+                      {programs.map((program) => (
+                        <option key={program._id.$oid} value={program.fk_org_id}>
+                          {program.program}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      name="other_org"
+                      className="form-select mb-3"
+                      value={formData.other_org}
+                      onChange={handleInputChange}
+                      disabled={isProgramDisabled}
+                    >
+                      <option value="" disabled>Organization (optional)</option>
+                      {otherOrgs.map((org) => (
+                        <option key={org._id.$oid} value={org.fk_org_id}>
+                          {org.name}
+                        </option>
+                      ))}
+                    </select>
                   </>
                 )}
-                {formData.user_type !== 'Student' && (
+
+                {/* Faculty/Staff Fields */}
+                {formData.user_type !== "Student" && (
                   <>
-                    <div className="mb-3">
-                      <input type="text" name="office" className="form-control" placeholder="Office" value={formData.office} onChange={handleInputChange} required />
-                    </div>
-                    <div className="mb-3">
-                      <input type="text" name="position" className="form-control" placeholder="Position" value={formData.position} onChange={handleInputChange} required />
-                    </div>
+                    <input
+                      type="text"
+                      name="office"
+                      className="form-control mb-3"
+                      placeholder="Office"
+                      value={formData.office}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <input
+                      type="text"
+                      name="position"
+                      className="form-control mb-3"
+                      placeholder="Position"
+                      value={formData.position}
+                      onChange={handleInputChange}
+                      required
+                    />
                   </>
                 )}
-                <div className="mb-3 d-grid">
-                  <button type="submit" className="btn btn-primary" style={{ backgroundColor: 'orange' }} onClick={handleSubmit}>Sign Up</button>
-                </div>
+
+                {/* Submit Button */}
+                <button type="submit" className="btn btn-primary w-100" style={{ backgroundColor: "orange" }}>
+                  Sign Up
+                </button>
               </form>
-              <p className="text-center">Already have an account? <Link to="/login">Log in</Link></p>
+              <p className="text-center mt-3">
+                Already have an account? <Link to="/login">Log in</Link>
+              </p>
             </div>
           </div>
         </div>

@@ -1,42 +1,164 @@
-.short-select {
-  width: 150px; /* Fixed width for dropdowns */
+/* Custom Add Button Color */
+.btn-primary {
+  background-color: #FF5733; /* Custom orange color */
+  border-color: #FF5733; /* Matching border color */
 }
 
+.btn-primary:hover {
+  background-color: #D94A27; /* Slightly darker orange for hover effect */
+  border-color: #D94A27;
+}
+
+/* Pagination Customization */
+.pagination .page-link {
+  color: #FF5733; /* Custom orange for pagination links */
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #FF5733; /* Active page background */
+  border-color: #FF5733;
+  color: #fff; /* White text on active page */
+}
+
+.pagination .page-item .page-link {
+  color: black; /* Black color for pagination numbers */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Pagination Hover State */
+.pagination .page-link:hover {
+  background-color: lightgray; /* Light gray background on hover */
+}
+
+/* Center pagination at the bottom */
+.pagination-container {
+  display: flex;
+  justify-content: center; /* Center pagination horizontally */
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 50px; /* Ensure it's not stuck to the bottom */
+}
+
+/* Equipment Card Styles */
+
+/* Equal Height for Cards */
 .equipment-card {
-  border: none;
-  border-radius: 8px;
-  transition: transform 0.3s, box-shadow 0.3s;
-  height: 100%; /* Ensure cards take full column height */
-}
-
-.equipment-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* Equal card height */
+  max-width: 250px; /* Set a max-width for the equipment card */
+  margin: 0 auto; /* Center the card */
+  transition: transform 0.3s ease; /* Adding transition for zoom effect */
 }
 
 .equipment-card .card-body {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 220px; /* Fixed height for uniformity */
+  justify-content: space-between; /* Ensure consistent spacing */
+  height: 100%; /* Fill the available space */
+  padding: 10px; /* Reduce padding for smaller cards */
 }
 
-.selected {
-  background-color: #f0f0f0;
+.equipment-card .card-title {
+  font-size: 1.2rem; /* Adjust title size */
+  margin-bottom: 10px;
 }
 
-.cart-icon {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background-color: #FF5733;
-  border-radius: 50%;
-  padding: 10px;
+.equipment-card .card-text {
+  flex-grow: 1; /* Allow the description to expand, keeping cards aligned */
+  font-size: 0.95rem; /* Adjust text size */
+  line-height: 1.4;
+}
+
+.equipment-card .card-text span.description-toggle {
+  color: #FF5733;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.equipment-card .card-footer {
+  margin-top: auto; /* Push footer (availability and buttons) to the bottom */
+}
+
+.equipment-card:hover {
+  transform: scale(1.05); /* Slight zoom effect on hover */
+}
+
+/* Add Bootstrap fade-in effect to the equipment cards */
+.fade-in {
+  animation: fadeIn 1s ease-in-out; /* Apply fade-in animation */
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design for Smaller Screens */
+
+/* Card adjustments for smaller screens */
+@media (max-width: 576px) {
+  .equipment-card {
+    height: auto; /* Allow cards to adjust height */
+  }
+
+  .equipment-card .card-body {
+    height: auto; /* Allow content to grow */
+  }
+
+  .short-select {
+    width: 100%; /* Full width dropdowns on small screens */
+  }
+
+  .cart-icon img {
+    width: 40px;
+    height: 40px; /* Adjust cart icon size */
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px; /* Reduce padding for smaller screens */
+  }
+
+  .pagination {
+    font-size: 0.9rem; /* Smaller font for pagination */
+  }
+}
+
+/* Cart Icon Button */
+.cart-icon {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed; /* Make it fixed at the bottom right */
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000; /* Ensure it's on top of other content */
 }
 
 .cart-icon img {
-  width: 50px;
-  height: 50px;
+  width: 50px; /* Set width for the cart icon */
+  height: 50px; /* Set height for the cart icon */
+}
+
+.cart-icon:hover {
+  transform: scale(1.1); /* Optional: Button enlarges slightly on hover */
+}
+
+/* Cart Badge Notification */
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 10px;
+  font-size: 12px;
 }

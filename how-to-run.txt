@@ -1,8 +1,27 @@
-Run backend:
-1. create venv/ install requirements_3_11.txt
-2. py run.py/run_beta.py
+How to Run MH-SERP
 
-Run frontend:
-1. cd frontend
-2. npm install (package.json is basically requirements_3_11.txt but for npm)
-3. npm run dev
+After cloning from github. Check the branch(git branch) your in.
+If branch shows "main", then proceed to "test" branch (git checkout test)
+
+Proceed to Backend's directory (cd backend)
+
+Run Backend:
+
+1. Create a Virtual environment (python -m venv "venv")
+2. Activate virtual environment (venv/scripts/activate)
+3. Install all required dependencies & modules to your Venv (pip install -r req.txt)
+4. Run Backend (python.exe run.py / python.exe run_beta.py)
+
+After the Running the Backend of the webapp, open another terminal then follow the instructions below.
+
+Run Frontend:
+
+1. Proceed to the frontend directory (cd frontend)
+2. Make sure you have Node.js installed on your machine. 
+    (To check, run a terminal then type "node -v" and "npm -v" 
+    this will show you what version you have on your machine indicating you have one installed)
+    
+3. Install all dependencies & modules for frontend (npm install requirements_3_11 or
+    package.json, it's basically requirements_3_11.txt but for npm)
+
+4. After installing, run the frontend(npm run dev) and click the webapp's address.

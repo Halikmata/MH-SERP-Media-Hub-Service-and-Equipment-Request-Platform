@@ -16,11 +16,13 @@ function Header() {
   }, [userDataString]);
 
   function handleLogOut() {
-    document.cookie.split(";").forEach(cookie => {
-      document.cookie = cookie.split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    document.cookie.split(";").forEach((cookie) => {
+      document.cookie =
+        cookie.split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
     });
     sessionStorage.clear();
     setIsLoggedIn(false);
+    setIsMenuOpen(false); // Close menu on logout
     navigate('/login');
   }
 
@@ -45,24 +47,53 @@ function Header() {
 
         {/* Navigation Links */}
         <nav className={`nav-links ${isMenuOpen ? 'show' : ''}`}>
-          <NavLink to="/" exact activeClassName="active" onClick={() => setIsMenuOpen(false)}>Home</NavLink>
-          <NavLink to="/myrequests" activeClassName="active" onClick={() => setIsMenuOpen(false)}>Requests</NavLink>
-          <NavLink to="/equipment" activeClassName="active" onClick={() => setIsMenuOpen(false)}>Equipment</NavLink>
-          <NavLink to="/services" activeClassName="active" onClick={() => setIsMenuOpen(false)}>Services</NavLink>
-        </nav>
+          <NavLink
+            to="/"
+            exact="true"
+            className={({ isActive }) => (isActive ? 'active' : '')}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/myrequests"
+            className={({ isActive }) => (isActive ? 'active' : '')}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Requests
+          </NavLink>
+          <NavLink
+            to="/equipment"
+            className={({ isActive }) => (isActive ? 'active' : '')}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Equipment
+          </NavLink>
+          <NavLink
+            to="/services"
+            className={({ isActive }) => (isActive ? 'active' : '')}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Services
+          </NavLink>
 
-        {/* Login/Logout Button */}
-        <div className="auth-container">
-          {isLoggedIn ? (
-            <button className="auth-button logout" onClick={handleLogOut}>
-              Log out
-            </button>
-          ) : (
-            <Link to="/login" className="auth-button login">
-              Log in
-            </Link>
-          )}
-        </div>
+          {/* Login/Logout Button */}
+          <div className="auth-container">
+            {isLoggedIn ? (
+              <button className="auth-button logout" onClick={handleLogOut}>
+                Log out
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="auth-button login"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Log in
+              </Link>
+            )}
+          </div>
+        </nav>
       </div>
     </header>
   );
