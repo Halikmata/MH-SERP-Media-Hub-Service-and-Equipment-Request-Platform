@@ -6,5 +6,5 @@ backend/__pycache__
 .gitignore
 project
 mh-serp-img
-.venv
+venv
 /myvenv
