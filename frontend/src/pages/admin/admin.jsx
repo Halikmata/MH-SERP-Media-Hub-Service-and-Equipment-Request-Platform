@@ -12,9 +12,7 @@ import AnalyticsGraphs from './component/AnalyticsGraphs';
 const Admin = ({ url }) => {
   const pathname = window.location.pathname;
   const isAdminPage = pathname.startsWith('/admin');
-  const [equipmentTypes, setEquipmentTypes] = useState([]);
   const [analyticsData, setAnalyticsData] = useState(null);
-
 
   // Formatting
   const formatAmount = (value) => {
@@ -27,7 +25,6 @@ const Admin = ({ url }) => {
   };
 
   useEffect(() => {
-
     axios.get(`${url}/admin`)
       .then((response) => {
         setAnalyticsData(response.data);
@@ -35,10 +32,7 @@ const Admin = ({ url }) => {
       .catch((error) => {
         console.error('Error fetching analytics data:', error);
       });
-
   }, [url]);
-
-
 
   const availability = (value) => {
     const isAvailable = value === 1;
@@ -53,44 +47,70 @@ const Admin = ({ url }) => {
     );
   }
 
-  // Collections and Columns
+  const formatDate = (value) => {
+    if (!value) return 'N/A';
+    const date = new Date(value);
+    return (new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date));
+  };
 
+  const formatDateTime = (value) => {
+    if (!value) return 'N/A';
+    const date = new Date(value);
+    const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+    const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    return (
+      <>
+        {formattedTime}
+        <br />
+        {formattedDate}
+
+      </>
+    );
+  };
+
+  // Collections and Columns
   const collectionMap = {
     '/admin/equipment': {
       collection: "equipment",
       columns: [
+        { field: 'idequipment', label: 'ID' },
         { field: 'brand', label: 'Brand' },
         { field: 'model', label: 'Model' },
-        { field: 'equipment_type', label: 'Type'},
+        { field: 'equipment_type', label: 'Type' },
         { field: 'availability', label: 'Availability', cell: availability },
         { field: 'unit_cost', label: 'Cost', cell: formatAmount }
-      ]
+      ],
+      parameters: { sort: ["equipment_type"], order: ["asc"] },
+      controls: {
+        sort: [
+          { field: 'equipment_type', label: 'Type' },
+          { field: 'brand', label: 'Brand' },
+          { field: 'idequipment', label: 'ID' },
+        ],
+        filter: {
+          field: 'availability', options: [{ 0: 'Not available' }, { 1: 'available' }]
+        }
+      }
     },
     '/admin/services': {
       collection: "services",
       columns: [
         { field: 'fk_idservice', label: 'ID' },
         { field: 'name', label: 'Name' }
-      ]
+      ],
+      parameters: { sort: ["name"], order: ["asc"] }
     },
     '/admin/requests': {
       collection: "requests",
       columns: [
-        { field: 'idrequests', label: 'ID' },
+        { field: 'request_datetime', label: 'Timestamp', cell: formatDateTime },
         { field: 'event_name', label: 'Name' },
         { field: 'requester_full_name', label: 'Requester' },
         { field: 'event_affiliation', label: 'Organization' },
-        { field: 'event_start', label: 'Start' },
-        { field: 'event_end', label: 'End' },
+        { field: 'event_start', label: 'Start', cell: formatDate },
+        { field: 'event_end', label: 'End', cell: formatDate },
         { field: 'event_location', label: 'Location' },
-        {
-          field: 'equipment',
-          label: 'Equipment',
-          cell: (equipmentArray) => {
-            return equipmentArray.join('\n');
-          }
-        },
-        { field: 'services', label: 'Services' },
         {
           field: 'request_status',
           label: 'Status',
@@ -100,15 +120,37 @@ const Admin = ({ url }) => {
           }
         }
       ],
-      default__sort:"request_status"
+      parameters: { sort: ["request_datetime"], order: ["desc"] },
+      controls: {
+        filter: { field: 'request_status', options: [{ 0: "Pending" }, { 1: "Approved" }, { 2: "Declined" }, { 3: "Done" }] },
+        sort: [
+          { field: 'request_datetime', label: 'timestamp' },
+          { field: 'request_status', label: 'status' },
+          { field: 'event_start', label: 'start' },
+          { field: 'event_end', label: 'end' },
+        ]
+      }
     },
     '/admin/accounts': {
       collection: "accounts",
       columns: [
+        { field: 'date_created', label: 'Date created', cell: formatDate },
         { field: 'last_name', label: 'Lastname' },
         { field: 'first_name', label: 'Firstname' },
-        { field: 'email', label: 'email' }
-      ]
+        { field: 'email', label: 'Email' },
+        { field: 'user_type', label: 'Type' },
+      ],
+      parameters: { sort: ["date_created"], order: ["desc"], exclude: "password" },
+      controls: {
+        sort: [
+          { field: 'date_created', label: 'Date created' },
+          { field: 'last_name', label: 'Lastname' },
+          { field: 'first_name', label: 'Firstname' },
+        ],
+        filter: {
+          field: 'user_type', options: [{ 'Student': 'Student' }, { 'Faculty': 'Faculty' }, {'Staff': 'Staff'}]
+        }
+      }
     },
     '/admin/organization': {
       collection: "organization",
@@ -116,19 +158,25 @@ const Admin = ({ url }) => {
         { field: 'acronym', label: 'Acronym' },
         { field: 'name', label: 'Name' },
         { field: 'program', label: 'Program' },
-      ]
+      ],
+      parameters: { sort: ["acronym"], order: ["asc"] }
     },
     '/admin/college_office': {
       collection: "college_office",
       columns: [
-        { field: 'fk_idcollegeoffice', label: 'ID' },
+        { field: 'acronym', label: 'Acronym' },
         { field: 'name', label: 'Name' },
-        { field: 'type', label: 'Type' }
-      ]
-    },
+        {
+          field: 'is_college', label: 'Type', cell: (is_college) => {
+            return is_college ? "College" : "Office";
+          }
+        }
+      ],
+      parameters: { sort: ["name"], order: ["asc"] }
+    }
   };
 
-  const { collection, columns } = collectionMap[pathname] || {};
+  const { collection, columns, parameters, controls } = collectionMap[pathname] || {};
 
   return (
     <div >
@@ -144,7 +192,7 @@ const Admin = ({ url }) => {
         </div>
       )}
       {collection && (
-        <AdminTable url={url} collection={collection} columns={columns} />
+        <AdminTable url={url} collection={collection} columns={columns} parameters={parameters} properties={controls} />
       )}
       <Routes>
         <Route path="/:collection/add" element={<AddItem url={url + "/admin/"} />} />
@@ -158,13 +206,7 @@ const Admin = ({ url }) => {
 
 export default Admin;
 
-
-const equipment_type = (value) => {
-  const formattedAmount = `${value}`;
-  return formattedAmount;
-};
-
 const mainStyle = {
   width: '80vw',
   marginLeft: '10vw'
-}
+};

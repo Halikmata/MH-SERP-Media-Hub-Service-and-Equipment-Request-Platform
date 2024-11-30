@@ -29,7 +29,7 @@ function Signup({ url }) {
   const [isProgramDisabled, setIsProgramDisabled] = useState(true);
 
   useEffect(() => {
-    axios.get(`${url}/get_data/college_office?type=college`)
+    axios.get(`${url}/get_data/college_office?is_college=true`)
       .then((response) => {
         setColleges(response.data); // Assuming the response contains item data
       })

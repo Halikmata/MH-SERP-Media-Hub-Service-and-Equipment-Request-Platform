@@ -1,4 +1,3 @@
-// AnalyticsGraphs.js
 import './AnalyticsGraphs.css';
 import React from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
@@ -7,7 +6,13 @@ import { Chart, CategoryScale, LinearScale, ArcElement, BarElement, Tooltip, Leg
 Chart.register(CategoryScale, LinearScale, ArcElement, BarElement, Tooltip, Legend);
 
 const AnalyticsGraphs = ({ analyticsData }) => {
-  const { equipments_month, top_5_requesters, top_5_services } = analyticsData;
+  // Check if analyticsData is undefined or null
+  if (!analyticsData) {
+    return <div>Loading analytics...</div>;
+  }
+
+  // Destructure only if analyticsData exists
+  const { equipments_month = [], top_5_requesters = [], top_5_services = [] } = analyticsData;
 
   const equipmentData = {
     labels: equipments_month.map(item => item._id),
