@@ -1,30 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Pagination, Card, Row, Col } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 import ImageDisplay from '../includes/imagedisplay';
 import cart from '../images/cart.png';
-import './equipment.css'; //
+import './equipment.css';
 
 const Equipment = ({ url }) => {
-  const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6);
-  const [columnList, setColumnList] = useState([]);
   const [currentSort, setCurrentSort] = useState("equipment_type");
   const [currentOrder, setCurrentOrder] = useState("1");
   const [selectedEquipmentIds, setSelectedEquipmentIds] = useState([]);
   const [showFullDescription, setShowFullDescription] = useState({});
-
-  const updateOrder = (order) => setCurrentOrder(order);
-  const updateSort = (item) => setCurrentSort(item);
-
-  useEffect(() => {
-    axios.get(`${url}/equipment/attributes`)
-      .then(response => setColumnList(response.data))
-      .catch(error => console.error(error));
-  }, [url]);
 
   useEffect(() => {
     axios.get(`${url}/equipment`, { params: { column: currentSort, sort: currentOrder } })
@@ -59,7 +47,7 @@ const Equipment = ({ url }) => {
     const selectedItems = equipment.filter(item => selectedEquipmentIds.includes(item.idequipment));
     if (selectedItems.length > 0) {
       const itemDetails = selectedItems.map(item => `Brand: ${item.brand}, Model: ${item.model}`).join('\n');
-      alert(itemDetails);
+      alert(`Selected Equipment:\n${itemDetails}`);
     } else {
       alert('No equipment selected.');
     }
@@ -74,32 +62,19 @@ const Equipment = ({ url }) => {
       <div className="d-flex justify-content-start mb-4">
         <div className="me-3">
           <select
-            className="form-select"
-            style={{
-              backgroundColor: 'transparent', // Removing fill color
-              color: '#333', // Text color
-              borderColor: '#FF5733', // Border color matching theme
-              width: 'auto',
-            }}
-            onChange={(e) => updateSort(e.target.value)}
+            className="form-select short-select"
+            onChange={(e) => setCurrentSort(e.target.value)}
           >
-              <option value="idequipment">All</option>
-              <option value="equipment_type">Type</option>
-              <option value="brand">Brand</option>
-              <option value="model">Model</option>
+            <option value="idequipment">All</option>
+            <option value="equipment_type">Type</option>
+            <option value="brand">Brand</option>
+            <option value="model">Model</option>
           </select>
         </div>
-
         <div className="me-3">
           <select
-            className="form-select"
-            style={{
-              backgroundColor: 'transparent',
-              color: '#333',
-              borderColor: '#FF5733',
-              width: 'auto',
-            }}
-            onChange={(e) => updateOrder(e.target.value)}
+            className="form-select short-select"
+            onChange={(e) => setCurrentOrder(e.target.value)}
           >
             <option value="1">Ascending</option>
             <option value="-1">Descending</option>
@@ -109,10 +84,10 @@ const Equipment = ({ url }) => {
 
       <Row xs={1} md={2} lg={3} className="g-4">
         {currentItems.map(item => (
-          <Col key={item.id}>
+          <Col key={item.idequipment}>
             <Card className={`equipment-card ${selectedEquipmentIds.includes(item.idequipment) ? 'selected' : ''}`}>
               <ImageDisplay imageName={item.idequipment} />
-              <Card.Body className="d-flex flex-column justify-content-between">
+              <Card.Body>
                 <Card.Title>{item.brand} {item.model}</Card.Title>
                 <Card.Text>
                   {showFullDescription[item.idequipment]
@@ -120,7 +95,7 @@ const Equipment = ({ url }) => {
                     : `${item.description.substring(0, 50)}...`}
                   {item.description.length > 50 && (
                     <span
-                      style={{ color: '#FF5733', cursor: 'pointer' }}
+                      className="description-toggle"
                       onClick={() => toggleDescription(item.idequipment)}
                     >
                       {showFullDescription[item.idequipment] ? ' Show Less' : ' See More'}
@@ -135,7 +110,7 @@ const Equipment = ({ url }) => {
                     className={`btn ${selectedEquipmentIds.includes(item.idequipment) ? 'btn-secondary' : 'btn-primary'}`}
                     onClick={() => handleRequestClick(item)}
                   >
-                    {selectedEquipmentIds.includes(item.idequipment) ? 'Remove' : 'Add'}
+                    {selectedEquipmentIds.includes(item.idequipment) ? 'Remove' : 'Request'}
                   </button>
                 </div>
               </Card.Body>
@@ -144,18 +119,21 @@ const Equipment = ({ url }) => {
         ))}
       </Row>
 
-      <Pagination className="justify-content-center mt-4">
-        <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1} />
+      <Pagination className="justify-content-center mt-4 pagination-container">
+        <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>&larr;</Pagination.Prev>
         {Array.from({ length: Math.ceil(equipment.length / itemsPerPage) }, (_, i) => (
           <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => paginate(i + 1)}>
             {i + 1}
           </Pagination.Item>
         ))}
-        <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(equipment.length / itemsPerPage)} />
+        <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(equipment.length / itemsPerPage)}>&rarr;</Pagination.Next>
       </Pagination>
 
       <div className="cart-icon" onClick={handleCartClick}>
         <img src={cart} alt="Cart" />
+        {selectedEquipmentIds.length > 0 && (
+          <span className="cart-badge">{selectedEquipmentIds.length}</span>
+        )}
       </div>
     </div>
   );

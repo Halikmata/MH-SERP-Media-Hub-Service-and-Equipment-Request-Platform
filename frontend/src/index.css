@@ -37,12 +37,14 @@ body {
   width: 100vw; /* Full width of the viewport */
   min-height: 100vh;
   flex-direction: column; /* Stack body content vertically */
+  padding-top: 70px; /* Adjust this value to match the height of your fixed header */
 }
 
 /* Allow content to overflow if necessary, but keep everything inside */
 .page-container {
   width: 100%;
   overflow-x: hidden; /* Hide any horizontal overflow */
+  padding-top: 70px; /* This matches the header height, ensuring no overlap */
 }
 
 /* Max-width for elements to avoid overflowing */
