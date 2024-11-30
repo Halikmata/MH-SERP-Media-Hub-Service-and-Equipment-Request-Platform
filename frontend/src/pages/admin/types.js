@@ -71,6 +71,11 @@ export const types = {
             "data_type": "text",
             "label": "Location"
         },
+        "equipment":{
+            "include":1,
+            "data_type":"test",
+            "label":"Equipment"
+        },
         "request_status": {
             "editable" : 1,
             "data_type": "xor",

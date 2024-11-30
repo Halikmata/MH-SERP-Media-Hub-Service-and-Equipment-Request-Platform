@@ -272,7 +272,8 @@ def admin_update_request(id):
         
     if request.method == "PUT":
         json_input = request.get_json()
-        
+        print(json_input)
+
         # Remove '_id' if present in the input
         json_input.pop('_id', None)
         
@@ -282,16 +283,33 @@ def admin_update_request(id):
             
             if result.modified_count > 0:
                 # If status is "1", update the equipment availability to "0"
-                if json_input.get('request_status') == "1":
+                if json_input.get('request_status') == 1:
+                    print("Update Request: Setting equipment availability to 0")
                     if 'equipment' in json_input:
                         equipment_collection = db['equipment']
                         equipment_ids = json_input['equipment']
-                        
+
                         # Update the availability of each equipment item
                         for eq_id in equipment_ids:
                             equipment_result = equipment_collection.update_one(
                                 {'idequipment': eq_id},
-                                {'$set': {'availability': '0'}}
+                                {'$set': {'availability': 0}}
+                            )
+                            if equipment_result.matched_count == 0:
+                                return jsonify({"message": f"Equipment with ID {eq_id} not found"}), 404
+
+                # If status is "3", update the equipment availability to "1"
+                elif json_input.get('request_status') == 3:
+                    print("Update Request: Setting equipment availability to 1")
+                    if 'equipment' in json_input:
+                        equipment_collection = db['equipment']
+                        equipment_ids = json_input['equipment']
+
+                        # Update the availability of each equipment item
+                        for eq_id in equipment_ids:
+                            equipment_result = equipment_collection.update_one(
+                                {'idequipment': eq_id},
+                                {'$set': {'availability': 1}}
                             )
                             if equipment_result.matched_count == 0:
                                 return jsonify({"message": f"Equipment with ID {eq_id} not found"}), 404
@@ -309,8 +327,7 @@ def admin_update_request(id):
             return jsonify(result), 200
         else:
             return jsonify({"message": "No row found with the given ID"}), 404
-        
-        
+
         
 
 @app.route('/admin/foreign/<collection>', methods=['GET'])

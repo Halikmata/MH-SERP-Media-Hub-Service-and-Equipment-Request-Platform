@@ -147,20 +147,19 @@ const EditItem = ({ url }) => {
                         )}
                     </>
                 );
-                case 'bool':
-                    return (
-                        <div className="form-check m-2">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                name={field}
-                                checked={formData[field] || false} // Default to `false` if the value is undefined
-                                onChange={(e) => handleCheckboxChange(e, field)}
-                            />
-                            <label className="form-check-label">{fieldConfig.label}</label>
-                        </div>
-                    );
-
+            case 'bool':
+                return (
+                    <div className="form-check m-2">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            name={field}
+                            checked={formData[field] || false} // Default to `false` if the value is undefined
+                            onChange={(e) => handleCheckboxChange(e, field)}
+                        />
+                        <label className="form-check-label">{fieldConfig.label}</label>
+                    </div>
+                );
 
             default:
                 return null;
@@ -214,15 +213,16 @@ const EditItem = ({ url }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Create an object to hold only the changed values
+        // Create an object to hold only the changed values or included fields
+        const collectionTypes = types[collection] || {};
         const updatedData = Object.keys(formData).reduce((acc, key) => {
-            if (formData[key] !== originalData[key]) {
-                acc[key] = formData[key]; // Keep the original type
+            if (formData[key] !== originalData[key] || collectionTypes[key]?.include === 1) {
+                acc[key] = formData[key];
             }
             return acc;
         }, {});
 
-        // Proceed to update if there are any changed values
+        // Proceed to update if there are any changed or included values
         if (Object.keys(updatedData).length > 0) {
             axios.put(`${url}${collection}/update/${id}`, updatedData)
                 .then((response) => {
@@ -272,17 +272,7 @@ const EditItem = ({ url }) => {
         );
     };
 
-    return (
-        <div>
-            <h2>Edit {collection}</h2>
-            {renderForm()}
-        </div>
-    );
+    return <>{renderForm()}</>;
 };
 
 export default EditItem;
-
-const dropdownStyle = {
-    maxHeight: '100px',
-    overflowY: 'auto'
-};

@@ -33,6 +33,7 @@ function Header() {
         <div className="logo-container">
           <Link to="/admin">
             <img src={logo} alt="Logo" className="logo" />
+            <strong>Admin</strong>
           </Link>
         </div>
 
