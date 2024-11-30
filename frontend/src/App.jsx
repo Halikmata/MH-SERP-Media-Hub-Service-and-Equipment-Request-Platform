@@ -26,7 +26,7 @@ function App(){
     const isAdminPage = location.pathname.startsWith('/admin');
 
     const fakeUrl = 'http://127.0.0.1:3001';
-    const backendUrl = 'http://127.0.0.1:5000';
+    const backendUrl = import.meta.env.VITE_API_URL;
     const url = backendUrl;
     
     return (

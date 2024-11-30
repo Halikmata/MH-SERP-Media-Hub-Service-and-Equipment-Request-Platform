@@ -128,6 +128,7 @@ export const types = {
     },
     "organization": {
         "fk_org_id": {
+            "editable" : 1,
             "data_type": "text",
             "label": "Organization ID"
         },
@@ -168,12 +169,12 @@ export const types = {
         "acronym": {
             "editable" : 1,
             "data_type": "text",
-            "label": "Accronym"
+            "label": "Acronym"
         },
-        "type": {
+        "is_college": {
             "editable" : 1,
-            "data_type": "text",
-            "label": "Type"
+            "data_type": "bool",
+            "label": "College"
         },
     }
 }

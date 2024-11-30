@@ -20,5 +20,3 @@ db = mongodb_client['mh-serp']
 CORS(app, resources={r"/*": {"origins": "*", "supports_credentials": True}}) # must specify origins later on.
 #CORS(app)
 # CORS config is yet to be fully secured due to nature of HTTP. Config must be adjusted later on upon deployement (HTTPS)
-
-

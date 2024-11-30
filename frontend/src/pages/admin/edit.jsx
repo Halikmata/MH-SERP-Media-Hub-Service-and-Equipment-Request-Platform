@@ -37,11 +37,11 @@ const EditItem = ({ url }) => {
 
         foreignXorFields.forEach(([field, config]) => {
             const collectionOption = config.collection_option;
-            axios.get(`${url}${collectionOption}`)
+            axios.get(`${url}${collectionOption}?limit=0`)
                 .then((response) => {
                     setForeignOptions(prevState => ({
                         ...prevState,
-                        [field]: response.data
+                        [field]: response.data['data']
                     }));
                 })
                 .catch((error) => {
@@ -147,11 +147,29 @@ const EditItem = ({ url }) => {
                         )}
                     </>
                 );
+                case 'bool':
+                    return (
+                        <div className="form-check m-2">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                name={field}
+                                checked={formData[field] || false} // Default to `false` if the value is undefined
+                                onChange={(e) => handleCheckboxChange(e, field)}
+                            />
+                            <label className="form-check-label">{fieldConfig.label}</label>
+                        </div>
+                    );
 
 
             default:
                 return null;
         }
+    };
+
+    const handleCheckboxChange = (e, field) => {
+        const isChecked = e.target.checked;
+        setFormData({ ...formData, [field]: isChecked });
     };
 
     const handleChange = (e) => {
