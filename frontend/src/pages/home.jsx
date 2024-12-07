@@ -1,31 +1,29 @@
-import React from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Pagination, Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { FaRegCheckCircle, FaRegStar, FaRegUser } from 'react-icons/fa'; // Import icons
 import './home.css';
 import Footer from '../includes/footer.jsx';
 
-const Home = () => {
-  const newsData = [
-    {
-      id: 1,
-      title: "New Feature Added!",
-      description: "We've added a new feature that allows users to request equipment more easily.",
-      date: "April 19, 2024",
-    },
-    {
-      id: 2,
-      title: "Service Maintenance",
-      description: "Scheduled maintenance will be performed on our servers on April 25, 2024. Expect some downtime during this period.",
-      date: "April 18, 2024",
-    },
-    {
-      id: 3,
-      title: "Service Outage Resolved",
-      description: "The recent service outage has been resolved. All services are now operating normally.",
-      date: "April 16, 2024",
-    },
-  ];
+const Home = ({ url }) => {
 
+  // related for whats_new
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(3);
+  const [newsData, setNewsData] = useState([]);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  const currentItems = newsData.slice(indexOfFirstItem, indexOfLastItem);
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+  
+  useEffect(() => {
+    axios.get(`${url}/whats_new`, { params: { column: "date", sort: 1 } })
+      .then(response => setNewsData(response.data))
+      .catch(error => console.error(error));
+  }, [url]);
+  // related for whats_new -- end
+  
   const featureData = [
     {
       id: 1,
@@ -85,12 +83,12 @@ const Home = () => {
             </Col>
           </Row>
           <Row>
-            {newsData.map((newsItem) => (
-              <Col key={newsItem.id} sm={12} md={6} lg={4} className="mb-4">
+            {currentItems.map((newsItem) => (
+              <Col key={newsItem._id} sm={12} md={6} lg={4} className="mb-4">
                 <Card className="news-card shadow-lg h-100 animate__animated animate__fadeIn animate__delay-1s">
                   <Card.Body>
                     <Card.Title>{newsItem.title}</Card.Title>
-                    <Card.Text>{newsItem.description}</Card.Text>
+                    <Card.Text>{newsItem.details}</Card.Text>
                     <Card.Text>
                       <small className="text-muted">{newsItem.date}</small>
                     </Card.Text>
@@ -99,7 +97,20 @@ const Home = () => {
               </Col>
             ))}
           </Row>
+
+          <Pagination className="justify-content-center mt-4 pagination-container">
+            <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>&larr;</Pagination.Prev>
+            {Array.from({ length: Math.ceil(newsData.length / itemsPerPage) }, (_, i) => (
+              <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => paginate(i + 1)}>
+                {i + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(newsData.length / itemsPerPage)}>&rarr;</Pagination.Next>
+          </Pagination>
+          
         </Container>
+
+        
       </section>
 
       {/* Features Section */}
