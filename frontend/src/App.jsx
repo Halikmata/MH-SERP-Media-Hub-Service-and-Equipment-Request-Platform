@@ -30,7 +30,7 @@ function App() {
       {/* Render Header only if it's not an admin page */}
       {!isAdminPage && <Header />}
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home url={url} />} />
         <Route path="/*" element={<NoPage />} />
         <Route path="/equipment" element={<Equipment url={url} />} />
         <Route path="/myrequests" element={<Requests url={url} />} />
