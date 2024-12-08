@@ -130,3 +130,8 @@ body {
     transform: translateY(0);
   }
 }
+
+span.description-toggle {
+  color: #FF5733;
+  cursor: pointer;
+}
