@@ -11,6 +11,19 @@ function getMonthName(year, monthInt) {
     );
 }
 
+function isOccupied(date, requestData) {
+    for (let i = 0; i < requestData.length; i++) {
+        const startDate = new Date(requestData[i].event_start)
+        const endDate = new Date(requestData[i].event_end)
+        const currentDate = date
+        
+        if (currentDate >= startDate && currentDate <= endDate) {
+        return true
+        }
+    }
+    return false
+}
+  
 const CalendarRequests = ({ requestData }) => {
     
     if (!requestData) {
@@ -20,10 +33,7 @@ const CalendarRequests = ({ requestData }) => {
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear()) /* returns int i.e 2024 */
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()) /* returns int at index 0 */
     let total_d = getTotalDays(currentMonth, currentYear)
-    
-    const present_year = new Date().getFullYear()
-
-    
+    const color = [50,100,150] // three sets of different color that iterates for occupied days.
 
     function updateDays() {
         const total_days = getTotalDays(currentMonth, currentYear)
@@ -53,7 +63,7 @@ const CalendarRequests = ({ requestData }) => {
         updateDays()
     }
     
-    /* const toggleYear = (direction) => { // standby
+    const toggleYear = (direction) => { // standby
     switch (direction) {
         case "prev":
             if ((present_year - currentYear) < 20) {
@@ -67,14 +77,8 @@ const CalendarRequests = ({ requestData }) => {
             break
         }
         updateDays()
-    } */
-    
-    /* for (let i = 0; i < requestData.length; i++) {
-        const color = Math.floor((Math.random() * 200) + 1)
-        requestData[i].color = color
-    } */
+    } 
 
-    //console.log(`Days: ${total_d} Month: ${getMonthName(currentYear,currentMonth)} Year: ${currentYear}`)
     return (
         <div>
 
@@ -102,17 +106,12 @@ const CalendarRequests = ({ requestData }) => {
             </ul>
 
             <ul className='days'>
-                {/* {Array.from({ length: totalDays }, (_, index) => (
-                    occupiedDays.includes(index) ? 
-                        <li key={index} className='dayElement' onClick={255} style={{"backgroundColor": `rgb(238,238,${55})`, "cursor": "pointer"}}>{index}</li>
-                        : // else
-                        <li key={index} className='dayElement' style={{"backgroundColor": `rgb(238,238,238)`}}>{index}</li>
-                ))} */}
-
-                {Array.from({ length: total_d + 1}, (_, index) => (
-                    <li key={index} className='dayElement' style={{"backgroundColor": `rgb(238,238,238)`}}>{index}</li>
+                {Array.from({ length: total_d}, (_, index) => (
+                    isOccupied(new Date(currentYear, currentMonth, index), requestData) ?
+                    <li key={index + 1} className='dayElement' style={{"backgroundColor": `rgb(238,238,${(index + 1) % 2 == 0 ? color[0] : color[2]})`, "cursor": "pointer"}}>{index + 1}</li>
+                        :
+                    <li key={index + 1} className='dayElement' style={{"backgroundColor": `rgb(238,238,238)`}}>{index + 1}</li>
                 ))}
-
             </ul>
             
         </div>
