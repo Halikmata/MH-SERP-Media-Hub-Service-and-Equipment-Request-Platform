@@ -11,6 +11,8 @@ const Home = ({ url }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(3);
   const [newsData, setNewsData] = useState([]);
+  const [showFullDescription, setShowFullDescription] = useState({});
+  
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
@@ -22,6 +24,11 @@ const Home = ({ url }) => {
       .then(response => setNewsData(response.data))
       .catch(error => console.error(error));
   }, [url]);
+
+  const toggleDescription = (id) => {
+    setShowFullDescription(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+  
   // related for whats_new -- end
   
   const featureData = [
@@ -88,7 +95,21 @@ const Home = ({ url }) => {
                 <Card className="news-card shadow-lg h-100 animate__animated animate__fadeIn animate__delay-1s">
                   <Card.Body>
                     <Card.Title>{newsItem.title}</Card.Title>
-                    <Card.Text>{newsItem.details}</Card.Text>
+
+                    <Card.Text>
+                      {showFullDescription[newsItem.details] ? newsItem.details :` ${newsItem.details.substring(0, 50)}...`}
+                      {newsItem.details.length > 50 ? (
+                        <span
+                        className="description-toggle"
+                        onClick={() => toggleDescription(newsItem.details)}
+                        >
+                          {showFullDescription[newsItem.details] ? ' Show Less' : ' See More'}
+                        </span>
+
+                      ) : null }
+
+                    </Card.Text>
+
                     <Card.Text>
                       <small className="text-muted">{newsItem.date}</small>
                     </Card.Text>
