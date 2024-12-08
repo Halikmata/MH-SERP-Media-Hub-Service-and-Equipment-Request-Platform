@@ -94,7 +94,7 @@ const Equipment = ({ url }) => {
                   <Card.Text>
                     {showFullDescription[item.idequipment]
                       ? item.description
-                      : `${item.description.substring(0, 50)}...`}
+                      : `${item.description.substring(0, 50)}${item.description.length > 50 ? '...' : ''}`}
                     {item.description.length > 50 && (
                       <span
                         className="description-toggle"
