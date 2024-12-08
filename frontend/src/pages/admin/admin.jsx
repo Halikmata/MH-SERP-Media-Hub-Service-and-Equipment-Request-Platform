@@ -8,7 +8,7 @@ import Item from './edit_beta';
 import Delete from './delete';
 import axios from 'axios';
 import AnalyticsGraphs from './component/AnalyticsGraphs';
-import CalendarRequests from './component/CalendarRequests';
+import MyCalendar from './component/CalendarRequests';
 
 const Admin = ({ url }) => {
   const pathname = window.location.pathname;
@@ -192,7 +192,6 @@ const Admin = ({ url }) => {
   };
 
   const { collection, columns, parameters, controls } = collectionMap[pathname] || {};
-
   return (
     <div >
       {isAdminPage && <AdminHeader />}
@@ -200,7 +199,7 @@ const Admin = ({ url }) => {
         <div style={mainStyle}>
           <h1>Dashboard</h1>
           
-          <CalendarRequests requestData={calendarData}/>
+          <MyCalendar requestData={calendarData}/>
 
           {analyticsData ? (
             <AnalyticsGraphs analyticsData={analyticsData} />
