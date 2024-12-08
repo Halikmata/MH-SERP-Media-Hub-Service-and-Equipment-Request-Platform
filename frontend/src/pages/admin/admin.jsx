@@ -8,11 +8,15 @@ import Item from './edit_beta';
 import Delete from './delete';
 import axios from 'axios';
 import AnalyticsGraphs from './component/AnalyticsGraphs';
+import CalendarRequests from './component/CalendarRequests';
 
 const Admin = ({ url }) => {
   const pathname = window.location.pathname;
   const isAdminPage = pathname.startsWith('/admin');
   const [analyticsData, setAnalyticsData] = useState(null);
+
+  const [calendarData, setCalendarData] = useState(null);
+
 
   // Formatting
   const formatAmount = (value) => {
@@ -23,6 +27,17 @@ const Admin = ({ url }) => {
     const formattedAmount = `₱${value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
     return formattedAmount;
   };
+
+  useEffect(() => {
+    axios.get(`${url}/requests`)
+      .then((response) => {
+        setCalendarData(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching requests data:', error);
+      });
+  }, [url]);
+
 
   useEffect(() => {
     axios.get(`${url}/admin`)
@@ -184,6 +199,9 @@ const Admin = ({ url }) => {
       {pathname === '/admin' && (
         <div style={mainStyle}>
           <h1>Dashboard</h1>
+          
+          <CalendarRequests requestData={calendarData}/>
+
           {analyticsData ? (
             <AnalyticsGraphs analyticsData={analyticsData} />
           ) : (
