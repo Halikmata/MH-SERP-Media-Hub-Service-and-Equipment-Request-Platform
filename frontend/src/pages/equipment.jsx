@@ -21,9 +21,6 @@ const Equipment = ({ url }) => {
   
 
   useEffect(() => {
-
-    
-
     axios.get(`${url}/equipment`, { params: { column: currentSort, sort: currentOrder, column_instance: currentType == "All" ? null : currentType } })
       .then(response => setEquipment(response.data))
       .catch(error => console.error(error))
@@ -80,8 +77,8 @@ const Equipment = ({ url }) => {
 
   return (
 
-      <div className="container mt-5">
-        <div className="d-flex justify-content-start mb-4">
+      <div className="container mt-5" style={{height: '100vh'}}>{/* style is added to stick footers at the most bottom part. */}
+        <div className="d-flex justify-content-start mb-4"> 
           {
             currentSort == "equipment_type" ?
             <div className='me-3'>

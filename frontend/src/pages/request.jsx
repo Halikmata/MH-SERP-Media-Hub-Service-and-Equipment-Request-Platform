@@ -45,7 +45,7 @@ function Requests({ url }) {
   };
 
   return (
-    <div className='container mt-5'>
+    <div className='container mt-5' style={{height: '100vh'}}> {/* style is added to stick footers at the most bottom part. */}
       <Link className='btn custom-btn mb-4' to="/request">Create Request</Link>
       <h2 className="text-center mb-4">Your Requests</h2>
       <div className='row'>

@@ -91,7 +91,7 @@ function Login() {
     return (
         
         <div className='container'>
-            <div className='row justify-content-center'>
+            <div className='row justify-content-center' style={{height: '100vh'}}> {/* style is added to stick footers at the most bottom part. */}
                 <div className='col-md-6'>
                     <div className='card mt-5'>
                         <div className='card-body'>
