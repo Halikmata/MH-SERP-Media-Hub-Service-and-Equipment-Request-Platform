@@ -12,14 +12,24 @@ const Equipment = ({ url }) => {
   const [itemsPerPage] = useState(6);
   const [currentSort, setCurrentSort] = useState("equipment_type");
   const [currentOrder, setCurrentOrder] = useState("1");
+  const [currentType, setCurrentType] = useState("All");
   const [selectedEquipmentIds, setSelectedEquipmentIds] = useState([]);
   const [showFullDescription, setShowFullDescription] = useState({});
+  const [types, setTypes] = useState([])
 
   useEffect(() => {
-    axios.get(`${url}/equipment`, { params: { column: currentSort, sort: currentOrder } })
+    if (currentSort == "equipment_type") {
+      axios.get(`${url}/equipment/distinct`, { params: { column: currentSort } })
+    .then(response => setTypes(response.data))
+    .catch(error => console.error(error))
+    }
+  }, [currentSort])
+
+  useEffect(() => {
+    axios.get(`${url}/equipment`, { params: { column: currentSort, sort: currentOrder, column_instance: currentType == "All" ? null : currentType } })
       .then(response => setEquipment(response.data))
-      .catch(error => console.error(error));
-  }, [url, currentSort, currentOrder]);
+      .catch(error => console.error(error))
+  }, [url, currentSort, currentOrder, currentType]);
 
   useEffect(() => {
     const storedIds = sessionStorage.getItem('selectedEquipmentIds');
@@ -62,12 +72,26 @@ const Equipment = ({ url }) => {
 
       <div className="container mt-5">
         <div className="d-flex justify-content-start mb-4">
+          {
+            currentSort == "equipment_type" ?
+            <div className='me-3'>
+              <select className="form-select short-select" onChange={(e) => setCurrentType(e.target.value)}>
+              <option value="All">All</option>
+              {types.map((item, index) => (
+                <option key={index} value={item}>
+                  {item}
+                </option>
+              ))}
+              </select>
+            </div> : null
+          }
+          
+
           <div className="me-3">
             <select
               className="form-select short-select"
               onChange={(e) => setCurrentSort(e.target.value)}
             >
-              <option value="idequipment">All</option>
               <option value="equipment_type">Type</option>
               <option value="brand">Brand</option>
               <option value="model">Model</option>
@@ -86,6 +110,9 @@ const Equipment = ({ url }) => {
 
         <Row xs={1} md={2} lg={3} className="g-4">
           {currentItems.map(item => (
+
+            //currentType == "All" || currentType === item.equipment_type ?
+
             <Col key={item.idequipment}>
               <Card className={`equipment-card ${selectedEquipmentIds.includes(item.idequipment) ? 'selected' : ''}`}>
                 <ImageDisplay imageName={item.idequipment} />
@@ -117,7 +144,9 @@ const Equipment = ({ url }) => {
                   </div>
                 </Card.Body>
               </Card>
-            </Col>
+            </Col>// : null
+
+
           ))}
         </Row>
 

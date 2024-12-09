@@ -207,7 +207,24 @@ def get_table_attr(collection):
     
     return jsonify(attributes), 200
         
+
+@app.route('/<collection>/distinct', methods=['GET']) # gets distinct values of given column
+def get_col_distinct(collection):
+    if not verify_collection(collection):
+        return jsonify({"message": "Unknown URL"}), 404
+    else:
+        col_name = collection
+        collection = db[collection]
+        
+    column = request.args.get('column',default=None)
     
+    if (column is None):
+        return jsonify({"message": "column or instance value is missing"}), 404
+    
+    
+    values = collection.distinct(column)
+    return jsonify(values), 200
+
 @app.route('/<collection>/length', methods=['GET']) # gets the total amount of documents
 def get_table_length(collection):
     if not verify_collection(collection):
@@ -232,6 +249,7 @@ def index(collection):
     # URL inputs.
     page = int(request.args.get('page', default=1))
     column = request.args.get('column',default=None)
+    category = request.args.get('column_instance',default=None) # specific instance value
     search = request.args.get('search',default=None)
     sort = request.args.get('sort', default=None) # 1 = asc, -1 = desc
     id = request.args.get('id',default=None) # ID specification
@@ -261,7 +279,11 @@ def index(collection):
     # rows = collection.find().skip(offset).limit(limit_rows) # ඞ
     
     # will shorten
-    if search != None and column != None and sort != None: # problem with search is that it is case sensitive, and data type sensitive.
+    
+    if column != None and category != None and sort != None:
+        rows = collection.find({f"{column}": category}).skip(offset).limit(limit_rows).sort([(column, int(sort))])
+        
+    elif search != None and column != None and sort != None: # problem with search is that it is case sensitive, and data type sensitive.
         rows = collection.find({f"{column}": {"$regex":f"^{search}.*"}}).skip(offset).limit(limit_rows).sort([(column, int(sort))])
         
     elif search != None and column != None:
@@ -277,6 +299,13 @@ def index(collection):
         return jsonify({'message': 'May have given search value thrown but no column value, or vice versa.'}), 400 # must have both column and search values or both have none in value.
     rows_list = list(rows)
     
+    """ if column != None and category != None:
+        for x in list(rows):
+                
+            if x[column] == category:
+                rows_list.append(x) 
+    else:
+        rows_list = list(rows) """
     for x in rows_list: # turns ObjectID to str, to make it possible to jsonify.
         x['_id'] = str(x['_id'])
         
