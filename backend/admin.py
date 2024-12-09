@@ -183,11 +183,16 @@ def admin_update_row(collection, id):
     else:
         result = collection.find_one({'_id': ObjectId(id)})
         
+        # Check and decode any bytes fields in the result
         if result:
-            result['_id'] = str(result['_id'])  # Convert ObjectId to string
+            for key, value in result.items():
+                if isinstance(value, bytes):
+                    # Decode the bytes to base64 string or any appropriate representation
+                    result[key] = value.decode('utf-8')  # Or use base64.b64encode(value).decode('utf-8') if needed
+            result['_id'] = str(result['_id'])
             return jsonify(result), 200
         else:
-            return jsonify({"message": "No row found with the given ID"}), 404
+            return jsonify({"message": "Instance not found"}), 404
 
 
 @app.route('/admin/<collection>/delete/<id>', methods=['DELETE'])
