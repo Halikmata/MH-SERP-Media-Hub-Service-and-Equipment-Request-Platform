@@ -17,19 +17,29 @@ const Equipment = ({ url }) => {
   const [showFullDescription, setShowFullDescription] = useState({});
   const [types, setTypes] = useState([])
 
-  useEffect(() => {
-    if (currentSort == "equipment_type") {
-      axios.get(`${url}/equipment/distinct`, { params: { column: currentSort } })
-    .then(response => setTypes(response.data))
-    .catch(error => console.error(error))
-    }
-  }, [currentSort])
+  
+  
 
   useEffect(() => {
+
+    
+
     axios.get(`${url}/equipment`, { params: { column: currentSort, sort: currentOrder, column_instance: currentType == "All" ? null : currentType } })
       .then(response => setEquipment(response.data))
       .catch(error => console.error(error))
   }, [url, currentSort, currentOrder, currentType]);
+
+  useEffect(() => {
+
+    if (currentSort != "equipment_type") {
+      setCurrentType("All")
+    } else {
+      axios.get(`${url}/equipment/distinct`, { params: { column: currentSort } })
+      .then(response => setTypes(response.data))
+      .catch(error => console.error(error))
+    }
+    
+  }, [equipment])
 
   useEffect(() => {
     const storedIds = sessionStorage.getItem('selectedEquipmentIds');
