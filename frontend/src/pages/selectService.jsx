@@ -65,7 +65,7 @@ const SelectServices = ({ url }) => {
   };
 
   return (
-    <Container className="mt-5">
+    <Container className="mt-5" style={{height: '100vh'}}> {/* style is added to stick footers at the most bottom part. */}
       <h2 className="mb-4" style={{ color: '#FF5733' }}>Select Services</h2>
       <Card className="mb-4">
         <Card.Body>
