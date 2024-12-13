@@ -28,7 +28,8 @@ function Signup({ url }) {
   const [programs, setPrograms] = useState([]);
   const [otherOrgs, setOtherOrgs] = useState([]);
   const [isProgramDisabled, setIsProgramDisabled] = useState(true);
-  const [isTermsOpen, setIsTermsOpen] = useState(false); // For terms modal
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
   const navigate = useNavigate();
 
@@ -292,16 +293,26 @@ function Signup({ url }) {
                     />
                   </>
                 )}
-                {/* Form fields */}
-                <button
-                  type="button"
-                  className="btn btn-link"
-                  onClick={() => setIsTermsOpen(true)}
-                >
-                  Terms and Conditions
-                </button>
+                <div className="form-check mb-3">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="terms"
+                    checked={isTermsAccepted}
+                    onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                  />
+                  <label htmlFor="terms" className="form-check-label">
+                    I accept the <button
+                      type="button"
+                      className="btn btn-link p-0"
+                      onClick={() => setIsTermsOpen(true)}
+                    >
+                    Terms and Conditions
+                    </button>
+                  </label>
+                </div>
                 {/* Submit Button */}
-                <button type="submit" className="btn btn-primary w-100" style={{ backgroundColor: "orange" }}>
+                <button type="submit" className="btn btn-primary w-100" style={{ backgroundColor: "orange" }} disabled={!isTermsAccepted}>
                   Sign Up
                 </button>
               </form>
@@ -322,6 +333,13 @@ function Signup({ url }) {
             className="agreement-modal-box"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
           >
+            <button
+              className="btn-close"
+              onClick={() => setIsTermsOpen(false)}
+              style={{ position: "absolute", top: 10, right: 10 }}
+            >
+              &times;
+            </button>
             <h2><strong>AGREEMENTS</strong></h2>
             <p>
             <br />
@@ -483,12 +501,7 @@ function Signup({ url }) {
             Failure to adhere to these Terms may result in restricted access to MH-SERP or disciplinary action.
 
             </p> <br /> <br />
-            <button
-              className="btn btn-secondary"
-              onClick={() => setIsTermsOpen(false)}
-            >
-              Close
-            </button>
+            
           </div>
         </div>
       )}
