@@ -193,11 +193,34 @@ const AddItem = ({ url }) => {
         }
     };
 
+    function activity_log() {
+        const userData = JSON.parse(sessionStorage.getItem('userData'))
+        const get_date = new Date()
+        const todays_date = `${get_date.getMonth() + 1}-${get_date.getDate()}-${get_date.getFullYear()}`
+        const todays_time = `${get_date.getHours().toString().padStart(2, '0')}:${get_date.getMinutes().toString().padStart(2, '0')}`       
+        const activity_report = {
+          username: userData.username,
+          collection: collection,
+          action: "Added an Instance",
+          timestamp: `${todays_date} || ${todays_time}`,
+          details: formData
+        }
+        const newURL = url.includes("admin/") ? url.replace("admin/", "") : url
+        axios.post(`${newURL}/activity_log/create`, activity_report) // specific app route to manage object id and date.
+        .then(response => {
+          console.log('Action Logged successfully:', response.data)
+        })
+        .catch(error => {
+          console.error('Error creating a report for activity log:', error)
+        })
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault();
         axios.post(`${url}${collection}/add`, formData)
             .then((response) => {
                 console.log('Item added successfully:', response.data);
+                activity_log();
                 navigate(`/admin/${collection}`);
             })
             .catch((error) => {

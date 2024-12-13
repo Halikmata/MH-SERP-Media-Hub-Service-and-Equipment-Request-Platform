@@ -222,11 +222,38 @@ const EditItem = ({ url }) => {
             return acc;
         }, {});
 
+        function activity_log() {
+            const userData = JSON.parse(sessionStorage.getItem('userData'))
+            const get_date = new Date()
+            const todays_date = `${get_date.getMonth() + 1}-${get_date.getDate()}-${get_date.getFullYear()}`
+            const todays_time = `${get_date.getHours().toString().padStart(2, '0')}:${get_date.getMinutes().toString().padStart(2, '0')}`  
+            
+            const activity_report = {
+              username: userData.username,
+              collection: collection,
+              action: "Updated an Instance",
+              timestamp: `${todays_date} || ${todays_time}`,
+              details: {
+                old: originalData,
+                new: updatedData
+              }
+            }
+            const newURL = url.includes("admin/") ? url.replace("admin/", "") : url
+            axios.post(`${newURL}/activity_log/create`, activity_report) // specific app route to manage object id and date.
+            .then(response => {
+              console.log('Action Logged successfully:', response.data)
+            })
+            .catch(error => {
+              console.error('Error creating a report for activity log:', error)
+            })
+        }
+
         // Proceed to update if there are any changed or included values
         if (Object.keys(updatedData).length > 0) {
             axios.put(`${url}${collection}/update/${id}`, updatedData)
                 .then((response) => {
                     console.log('Item updated successfully:', response.data);
+                    activity_log();
                     navigate(`/admin/${collection}`);
                 })
                 .catch((error) => {
