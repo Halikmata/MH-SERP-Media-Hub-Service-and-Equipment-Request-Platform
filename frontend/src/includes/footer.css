@@ -2,10 +2,10 @@
 .footer-section {
     background-color: #333;
     color: #fff;
-    padding: 1rem 0; /* Adjusted padding */
+    padding: 0.5rem 0; /* Reduced padding for a smaller footer */
     text-align: center;
     position: relative;
-    width: 100%;
+    width: 102%;
     bottom: 0;
 }
 
@@ -27,13 +27,25 @@
     text-align: center;
 }
 
+/* Footer Links for Legal and Privacy */
+.footer-links {
+    margin-bottom: 0.25rem; /* Reduced margin to make space smaller */
+    font-size: 0.8rem; /* Smaller font size for privacy and terms links */
+}
+
+/* Separator Style */
+.separator {
+    margin: 0 5px;
+    color: #fff; /* White color for separator */
+}
+
 /* Social Icons */
 .social-icons {
-    margin-top: 1rem;
+    margin-top: 0.5rem; /* Reduced margin for social icons */
 }
 
 .social-icon {
-    margin: 0 10px;
+    margin: 0 8px;
     transition: transform 0.3s ease; /* Smooth transition on hover */
 }
 
@@ -41,13 +53,49 @@
     transform: scale(1.1); /* Scale icon on hover */
 }
 
+/* Copyright text */
+.footer-section p {
+    margin-top: 0.25rem; /* Reduced margin to make space smaller between the text */
+}
+
 /* Responsive Design for Footer */
 @media (max-width: 768px) {
     .footer-section {
-        padding: 1rem 0; /* Adjust padding for smaller screens */
+        padding: 0.5rem 0; /* Keep smaller padding for mobile */
+    }
+
+    .footer-links {
+        margin-top: 0.25rem; /* Adjust margin for mobile */
+        font-size: 0.7rem; /* Smaller font size for mobile */
     }
 
     .social-icons {
-        margin-top: 1.5rem; /* Adjust margin for mobile */
+        margin-top: 1rem; /* Adjust margin for mobile */
     }
 }
+/* Make the modal body scrollable */
+/* Make the modal body scrollable */
+.privacy-policy-body {
+    max-height: 400px; /* Adjust the height based on your preference */
+    overflow-y: auto;  /* Enable vertical scrolling */
+  }
+  
+  /* Optional: Adjust the modal header for better visibility */
+  .modal-header {
+    border-bottom: none;
+  }
+  
+  /* User Agreement Modal Body */
+  .user-agreement-body {
+    max-height: 400px; /* Adjust this to control the height of the modal content */
+    overflow-y: auto; /* Enables vertical scrolling */
+    padding-right: 15px; /* Ensures the scrollbar is visible without overlapping content */
+  }
+  
+  /* Terms and Conditions Modal Body */
+  .terms-body {
+    max-height: 400px; /* Set height for Terms modal */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    padding-right: 15px; /* Prevent content overlap with scrollbar */
+  }
+  

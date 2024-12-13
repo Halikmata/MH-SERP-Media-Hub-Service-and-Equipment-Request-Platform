@@ -118,16 +118,21 @@ const Home = ({ url }) => {
               </Col>
             ))}
           </Row>
+          
+          {
+            currentItems.length > 3 ?
 
-          <Pagination className="justify-content-center mt-4 pagination-container">
-            <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>&larr;</Pagination.Prev>
-            {Array.from({ length: Math.ceil(newsData.length / itemsPerPage) }, (_, i) => (
-              <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => paginate(i + 1)}>
-                {i + 1}
-              </Pagination.Item>
-            ))}
-            <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(newsData.length / itemsPerPage)}>&rarr;</Pagination.Next>
-          </Pagination>
+            <Pagination className="justify-content-center mt-4 pagination-container">
+              <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>&larr;</Pagination.Prev>
+              {Array.from({ length: Math.ceil(newsData.length / itemsPerPage) }, (_, i) => (
+                <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => paginate(i + 1)}>
+                  {i + 1}
+                </Pagination.Item>
+              ))}
+              <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(newsData.length / itemsPerPage)}>&rarr;</Pagination.Next>
+            </Pagination> : null
+          }
+          
           
         </Container>
 
