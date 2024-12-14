@@ -188,7 +188,9 @@ const AdminTable = ({ url, collection, columns, parameters = {}, properties = {}
                 <td key={field}>{cell ? cell(item[field]) : item[field]}</td>
               ))}
               <td>
-                <Link to={`${location.pathname}/delete/${item._id}`} className="btn btn-danger btn-sm">
+                <Link to={`${location.pathname}/delete/${item._id}`}
+                  className="btn btn-danger btn-sm"
+                  onClick={(e) => e.stopPropagation()}>
                   Delete
                 </Link>
               </td>

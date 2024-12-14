@@ -1,21 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+const SESSION_KEY = 'createRequestFormData';
+const SESSION_TIMESTAMP_KEY = 'createRequestFormTimestamp';
+const EXPIRATION_HOURS = 8; // Expire session storage after 8 hours
+
 const CreateRequest = ({ url }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { equipment, service } = location.state || {}; // Get the equipment or service data from the state
-  const [formData, setFormData] = useState({
-    organization: '',
-    event: '',
-    location: '',
-    details: '',
-    start_date: null,
-    end_date: null
+
+  // Initialize form data from session storage or default values
+  const [formData, setFormData] = useState(() => {
+    const savedData = sessionStorage.getItem(SESSION_KEY);
+    const savedTimestamp = sessionStorage.getItem(SESSION_TIMESTAMP_KEY);
+    if (savedData && savedTimestamp) {
+      const timeElapsed = (Date.now() - parseInt(savedTimestamp, 10)) / (1000 * 60 * 60); // Time in hours
+      if (timeElapsed < EXPIRATION_HOURS) {
+        return JSON.parse(savedData);
+      }
+    }
+    return {
+      organization: '',
+      event: '',
+      location: '',
+      details: '',
+      start_date: null,
+      end_date: null
+    };
   });
+
+  useEffect(() => {
+    // Save form data and timestamp to session storage whenever it changes
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(formData));
+    sessionStorage.setItem(SESSION_TIMESTAMP_KEY, Date.now().toString());
+  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,6 +45,9 @@ const CreateRequest = ({ url }) => {
   };
 
   const handleNext = () => {
+    // Reset session storage on submission
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_TIMESTAMP_KEY);
     navigate('/select_equipment', { state: { formData } });
   };
 
