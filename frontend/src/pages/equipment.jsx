@@ -77,7 +77,7 @@ const Equipment = ({ url }) => {
 
   return (
 
-      <div className="container mt-5" style={{height: '100vh'}}>{/* style is added to stick footers at the most bottom part. */}
+      <div className="container mt-5">{/* style is added to stick footers at the most bottom part. */}
         <div className="d-flex justify-content-start mb-4"> 
           {
             currentSort == "equipment_type" ?
