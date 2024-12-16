@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Form, Button, Accordion, Table, Dropdown, Container, Row, Col, Card } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaFilter } from 'react-icons/fa';
+import Equipment from './equipment';
 
 const SelectEquipment = ({ url }) => {
   const location = useLocation();
@@ -100,7 +101,7 @@ const SelectEquipment = ({ url }) => {
   return (
     <Container className="mt-5">
       <h2 className="mb-4" style={{ color: '#FF5733' }}>Select Equipment</h2>
-      <Card className="mb-4">
+      {/* <Card className="mb-4">
         <Card.Body>
           <Row className="mb-3">
             <Col>
@@ -171,7 +172,8 @@ const SelectEquipment = ({ url }) => {
             ))}
           </Accordion>
         </Card.Body>
-      </Card>
+      </Card> */}
+      <Equipment url={url}/>
       <Row className="justify-content-center">
         <Col md={6} className="text-center">
           <Button variant="secondary" onClick={handleBack} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', marginRight: '10px', borderRadius: '30px' }}>Back</Button>
