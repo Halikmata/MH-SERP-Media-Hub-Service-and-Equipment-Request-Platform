@@ -6,7 +6,13 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const SESSION_KEY = 'createRequestFormData';
 const SESSION_TIMESTAMP_KEY = 'createRequestFormTimestamp';
-const EXPIRATION_HOURS = 8; // Expire session storage after 8 hours
+
+// Function to get the timestamp for midnight of the next day
+const getMidnightTimestamp = () => {
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1); // Midnight of the next day
+  return midnight.getTime();
+};
 
 const CreateRequest = ({ url }) => {
   const navigate = useNavigate();
@@ -18,8 +24,9 @@ const CreateRequest = ({ url }) => {
     const savedData = sessionStorage.getItem(SESSION_KEY);
     const savedTimestamp = sessionStorage.getItem(SESSION_TIMESTAMP_KEY);
     if (savedData && savedTimestamp) {
-      const timeElapsed = (Date.now() - parseInt(savedTimestamp, 10)) / (1000 * 60 * 60); // Time in hours
-      if (timeElapsed < EXPIRATION_HOURS) {
+      const currentTime = Date.now();
+      const midnightTimestamp = getMidnightTimestamp();
+      if (currentTime < midnightTimestamp) {
         return JSON.parse(savedData);
       }
     }
@@ -34,9 +41,9 @@ const CreateRequest = ({ url }) => {
   });
 
   useEffect(() => {
-    // Save form data and timestamp to session storage whenever it changes
+    // Save form data and the midnight timestamp to session storage whenever it changes
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(formData));
-    sessionStorage.setItem(SESSION_TIMESTAMP_KEY, Date.now().toString());
+    sessionStorage.setItem(SESSION_TIMESTAMP_KEY, getMidnightTimestamp().toString());
   }, [formData]);
 
   const handleChange = (e) => {
@@ -68,32 +75,73 @@ const CreateRequest = ({ url }) => {
             <Col md={6}>
               <Form.Group className="mb-3" controlId="organization">
                 <Form.Label>Organizer/Contact Org</Form.Label>
-                <Form.Control type="text" name="organization" value={formData.organization} onChange={handleChange} required />
+                <Form.Control
+                  type="text"
+                  name="organization"
+                  value={formData.organization}
+                  onChange={handleChange}
+                  required
+                />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="event">
                 <Form.Label>Event Name</Form.Label>
-                <Form.Control type="text" name="event" value={formData.event} onChange={handleChange} required />
+                <Form.Control
+                  type="text"
+                  name="event"
+                  value={formData.event}
+                  onChange={handleChange}
+                  required
+                />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="location">
                 <Form.Label>Location</Form.Label>
-                <Form.Control type="text" name="location" value={formData.location} onChange={handleChange} required />
+                <Form.Control
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  required
+                />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="details">
                 <Form.Label>Details</Form.Label>
-                <Form.Control as="textarea" rows={3} name="details" value={formData.details} onChange={handleChange} placeholder='(optional)' />
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  name="details"
+                  value={formData.details}
+                  onChange={handleChange}
+                  placeholder="(optional)"
+                />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="start_date">
                 <Form.Label>Start Date</Form.Label>
-                <DatePicker selected={formData.start_date} onChange={date => setFormData({ ...formData, start_date: date })} dateFormat="dd/MM/yyyy" className="form-control" minDate={tomorrow} />
+                <DatePicker
+                  selected={formData.start_date}
+                  onChange={(date) =>
+                    setFormData({ ...formData, start_date: date })
+                  }
+                  dateFormat="dd/MM/yyyy"
+                  className="form-control"
+                  minDate={tomorrow}
+                />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="end_date">
                 <Form.Label>End Date</Form.Label>
-                <DatePicker selected={formData.end_date} onChange={date => setFormData({ ...formData, end_date: date })} dateFormat="dd/MM/yyyy" className="form-control" minDate={tomorrow} />
+                <DatePicker
+                  selected={formData.end_date}
+                  onChange={(date) =>
+                    setFormData({ ...formData, end_date: date })
+                  }
+                  dateFormat="dd/MM/yyyy"
+                  className="form-control"
+                  minDate={tomorrow}
+                />
               </Form.Group>
             </Col>
           </Row>
@@ -101,8 +149,29 @@ const CreateRequest = ({ url }) => {
       </Card>
       <Row className="justify-content-center">
         <Col md={6} className="text-center">
-          <Button variant="secondary" onClick={handleBack} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', marginRight: '10px', borderRadius: '30px' }}>Back</Button>
-          <Button variant="primary" onClick={handleNext} style={{ backgroundColor: '#FF5733', borderColor: '#FF5733', borderRadius: '30px' }}>Next</Button>
+          <Button
+            variant="secondary"
+            onClick={handleBack}
+            style={{
+              backgroundColor: '#FF5733',
+              borderColor: '#FF5733',
+              marginRight: '10px',
+              borderRadius: '30px',
+            }}
+          >
+            Back
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleNext}
+            style={{
+              backgroundColor: '#FF5733',
+              borderColor: '#FF5733',
+              borderRadius: '30px',
+            }}
+          >
+            Next
+          </Button>
         </Col>
       </Row>
     </Container>

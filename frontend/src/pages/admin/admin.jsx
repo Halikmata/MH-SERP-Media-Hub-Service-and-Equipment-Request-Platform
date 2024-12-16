@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import AdminTable from './component/AdminTable';
 import AdminHeader from './component/AdminHeader';
 import AddItem from './add';
@@ -11,43 +11,61 @@ import AnalyticsGraphs from './component/AnalyticsGraphs';
 import MyCalendar from './component/CalendarRequests';
 
 const Admin = ({ url }) => {
-  const pathname = window.location.pathname;
+  const location = useLocation(); // Hook to track the pathname changes
+  const pathname = location.pathname;
   const isAdminPage = pathname.startsWith('/admin');
   const [analyticsData, setAnalyticsData] = useState(null);
-
   const [calendarData, setCalendarData] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [isAuthorized, setIsAuthorized] = useState(true); // Track if user is authorized
+  const [loading, setLoading] = useState(true); // State to track loading state
 
+  useEffect(() => {
+    const storedUserData = sessionStorage.getItem('userData');
+    if (storedUserData) {
+      const user = JSON.parse(storedUserData);
+      setUserData(user);
+      // Check if the user is an admin
+      if (!user.admin) {
+        setIsAuthorized(false); // Not authorized if admin field is false
+      }
+    } else {
+      setIsAuthorized(false); // Not authorized if no userData exists
+    }
+  }, []);
 
-  // Formatting
+  useEffect(() => {
+    if (!isAuthorized) return;
+
+    const fetchData = async () => {
+      try {
+        const requestsResponse = await axios.get(`${url}/requests`);
+        setCalendarData(requestsResponse.data);
+        
+        const analyticsResponse = await axios.get(`${url}/admin`);
+        setAnalyticsData(analyticsResponse.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // You can set some state here to show error message to the user if needed
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [url, isAuthorized]);
+
+  if (!isAuthorized) {
+    return <Navigate to="/login" />;
+  }
+
   const formatAmount = (value) => {
     if (typeof value !== 'number' || isNaN(value)) {
       return 'Invalid amount';
     }
-
     const formattedAmount = `₱${value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
     return formattedAmount;
   };
-
-  useEffect(() => {
-    axios.get(`${url}/requests`)
-      .then((response) => {
-        setCalendarData(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching requests data:', error);
-      });
-  }, [url]);
-
-
-  useEffect(() => {
-    axios.get(`${url}/admin`)
-      .then((response) => {
-        setAnalyticsData(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching analytics data:', error);
-      });
-  }, [url]);
 
   const availability = (value) => {
     const isAvailable = value === 1;
@@ -60,7 +78,7 @@ const Admin = ({ url }) => {
         {isAvailable ? "Available" : "Not Available"}
       </div>
     );
-  }
+  };
 
   const formatDate = (value) => {
     if (!value) return 'N/A';
@@ -79,7 +97,6 @@ const Admin = ({ url }) => {
         {formattedTime}
         <br />
         {formattedDate}
-
       </>
     );
   };
@@ -163,7 +180,7 @@ const Admin = ({ url }) => {
           { field: 'first_name', label: 'Firstname' },
         ],
         filter: {
-          field: 'user_type', options: [{ 'Student': 'Student' }, { 'Faculty': 'Faculty' }, {'Staff': 'Staff'}]
+          field: 'user_type', options: [{ 'Student': 'Student' }, { 'Faculty': 'Faculty' }, { 'Staff': 'Staff' }]
         }
       }
     },
@@ -174,7 +191,14 @@ const Admin = ({ url }) => {
         { field: 'name', label: 'Name' },
         { field: 'program', label: 'Program' },
       ],
-      parameters: { sort: ["acronym"], order: ["asc"] }
+      parameters: { sort: ["acronym"], order: ["asc"] },
+      controls: {
+        sort: [
+          { field: 'acronym', label: 'Acronym' },
+          { field: 'name', label: 'Name' },
+          { field: 'idcollegeoffice', label: 'College' },
+        ]
+      }
     },
     '/admin/college_office': {
       collection: "college_office",
@@ -187,7 +211,16 @@ const Admin = ({ url }) => {
           }
         }
       ],
-      parameters: { sort: ["name"], order: ["asc"] }
+      parameters: { sort: ["name"], order: ["asc"] },
+      controls: {
+        sort: [
+          { field: 'acronym', label: 'Acronym' },
+          { field: 'name', label: 'Name' },
+        ],
+        filter: {
+          field: 'is_college', options: [{ true: 'College' }, { false: 'Office' }]
+        }
+      }
     }
   };
 
