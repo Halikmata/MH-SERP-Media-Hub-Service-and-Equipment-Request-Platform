@@ -1,71 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import pc from '../images/Photo Coverage.png';
-import sde from '../images/SDE.png';
-import sr from '../images/Studio Recording.png';
-import ss from '../images/Studio Shoot.png';
-import vc from '../images/Video Coverage.png';
-import ls from '../images/Live Streaming.png';
 import "./services.css";
 
-const serviceData = [
-  {
-    id: 1,
-    name: 'Photo Coverage',
-    imgSrc: pc,
-    description: 'This service provides official photo coverage for your organization\'s event, including post-production editing and sorting of photos.',
-  },
-  {
-    id: 2,
-    name: 'Live Streaming',
-    imgSrc: ls,
-    description: 'Live streaming of events on Facebook via Media Hub\'s official page, your organization\'s page, or cross-posting.',
-  },
-  {
-    id: 3,
-    name: 'Live Production',
-    imgSrc: ls,
-    description: 'Similar to live streaming, focusing on live feeds for events with LED screens. Excludes operating the lights and sound system.',
-  },
-  {
-    id: 4,
-    name: 'Studio Recording',
-    imgSrc: sr,
-    description: 'Studio recording for voice-over, song, or music production, requiring Media Hub\'s sound engineers and producers.',
-  },
-  {
-    id: 5,
-    name: 'Studio Shooting',
-    imgSrc: ss,
-    description: 'Utilize the Media Hub studio for photo shoots, including post-production sorting and editing of photos.',
-  },
-  {
-    id: 6,
-    name: 'SDE (Same Day Edit)',
-    imgSrc: sde,
-    description: 'Same-day-edit service, often for larger events involving external entities. Requires extensive planning and volunteers.',
-  },
-  {
-    id: 7,
-    name: 'Video Coverage',
-    imgSrc: vc,
-    description: 'Provides video coverage and a single video output for an event. Consult with Media Hub management for multiple outputs.',
-  }
-];
-
 const Services = ({ url }) => {
+  const [imageSrc, setImageSrc] = useState({});
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(6);
   const [services, setServices] = useState([]);
+  const [showFullDescription, setShowFullDescription] = useState({});
+  
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  const currentItems = services.slice(indexOfFirstItem, indexOfLastItem);
+  const paginate = pageNumber => setCurrentPage(pageNumber);
 
   useEffect(() => {
     axios.get(`${url}/services`)
-      .then(response => {
-        setServices(response.data);
-      })
+      .then(response => setServices(response.data))
       .catch(error => console.error(error));
   }, [url]);
 
+
+  useEffect(() => {
+    const loadImages = async () => {
+      const imgDir = {}; // Create a new object to store image paths
+  
+      const promises = services.map(async (service) => {
+        const module = await import(service.imgSrc);
+        imgDir[service.imgSrc] = module.default;
+      });
+  
+      await Promise.all(promises);
+      setImageSrc(imgDir);
+    };
+  
+    loadImages(); // Call the async function
+  }, [services]);
+
+
+  const toggleDescription = (id) => {
+    setShowFullDescription(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+  
   const handleRequestClick = (service) => {
     navigate('/request', { state: { service } });
   };
@@ -74,13 +54,26 @@ const Services = ({ url }) => {
     <div className="container services-container mt-5">
       <h2 className="text-center mb-4">Our Services</h2>
       <div className="row">
-        {serviceData.map(service => (
-          <div key={service.id} className="col-12 col-md-6 col-lg-4 mb-4">
-            <div className="service-card">
-              <img src={service.imgSrc} alt={service.name} className="service-image rounded-top" />
+        {currentItems.map(service => (
+          <div key={service.fk_idservice} className="col-12 col-md-6 col-lg-4 mb-4">
+            <div className="service-card">  {/* style={{ width: "100%" , height: "200px" }}, the classname config does not work with the new img import for some reason */}
+              <img src={imageSrc[service.imgSrc]} style={{ width: "100%" , height: "200px" }} alt={service.name} className="service-image rounded-top"/>
               <div className="service-card-body">
                 <h5 className="service-title">{service.name}</h5>
-                <p className="service-description">{service.description}</p>
+
+                <p className="service-description">
+                  {showFullDescription[service.description] ? service.description :` ${service.description.substring(0, 100)}${service.description.length > 100 ? '...' : ''}`}
+                  {service.description.length > 100 ? (
+                    <span
+                    className="description-toggle"
+                    onClick={() => toggleDescription(service.description)}
+                    >
+                      {showFullDescription[service.description] ? ' Show Less' : ' See More'}
+                    </span>
+
+                  ) : null }
+                </p>
+
                 <button 
                   className="btn btn-primary custom-btn w-100 mt-3"
                   onClick={() => handleRequestClick(service)}
@@ -92,6 +85,15 @@ const Services = ({ url }) => {
           </div>
         ))}
       </div>
+      <Pagination className="justify-content-center mt-4 pagination-container">
+        <Pagination.Prev onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>&larr;</Pagination.Prev>
+        {Array.from({ length: Math.ceil(services.length / itemsPerPage) }, (_, i) => (
+          <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => paginate(i + 1)}>
+            {i + 1}
+          </Pagination.Item>
+        ))}
+        <Pagination.Next onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(services.length / itemsPerPage)}>&rarr;</Pagination.Next>
+      </Pagination>
     </div>
   );
 }

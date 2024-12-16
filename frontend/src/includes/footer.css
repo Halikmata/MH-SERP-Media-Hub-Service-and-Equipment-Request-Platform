@@ -1,101 +1,100 @@
-/* Footer Section */
-.footer-section {
-    background-color: #333;
-    color: #fff;
-    padding: 0.5rem 0; /* Reduced padding for a smaller footer */
+/* General Footer Styling */
+.footer {
+    background-color: #202123;
+    color: #bf7917;
+    padding: 20px 0;
+    font-size: 14px;
+    border-top: 1px solid #34495E;
     text-align: center;
-    position: relative;
-    width: 102%;
-    bottom: 0;
-}
-
-.footer-section a {
-    color: #FF5733; /* Color for links */
-    text-decoration: none;
-}
-
-.footer-section a:hover {
-    color: #e04b2d; /* Hover color for links */
-}
-
-/* Ensure footer content is centered */
-.footer-section .text-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* Footer Links for Legal and Privacy */
-.footer-links {
-    margin-bottom: 0.25rem; /* Reduced margin to make space smaller */
-    font-size: 0.8rem; /* Smaller font size for privacy and terms links */
-}
-
-/* Separator Style */
-.separator {
-    margin: 0 5px;
-    color: #fff; /* White color for separator */
-}
-
-/* Social Icons */
-.social-icons {
-    margin-top: 0.5rem; /* Reduced margin for social icons */
-}
-
-.social-icon {
-    margin: 0 8px;
-    transition: transform 0.3s ease; /* Smooth transition on hover */
-}
-
-.social-icon:hover {
-    transform: scale(1.1); /* Scale icon on hover */
-}
-
-/* Copyright text */
-.footer-section p {
-    margin-top: 0.25rem; /* Reduced margin to make space smaller between the text */
-}
-
-/* Responsive Design for Footer */
-@media (max-width: 768px) {
-    .footer-section {
-        padding: 0.5rem 0; /* Keep smaller padding for mobile */
-    }
-
-    .footer-links {
-        margin-top: 0.25rem; /* Adjust margin for mobile */
-        font-size: 0.7rem; /* Smaller font size for mobile */
-    }
-
-    .social-icons {
-        margin-top: 1rem; /* Adjust margin for mobile */
-    }
-}
-/* Make the modal body scrollable */
-/* Make the modal body scrollable */
-.privacy-policy-body {
-    max-height: 400px; /* Adjust the height based on your preference */
-    overflow-y: auto;  /* Enable vertical scrolling */
   }
   
-  /* Optional: Adjust the modal header for better visibility */
+  /* Logo and Text Styling */
+  .footer-logo .logo-text {
+    font-weight: bold;
+    font-size: 22px;
+    color: #ECF0F1;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  
+  /* Footer Links */
+  .footer-links ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer-links ul li {
+    display: inline-block;
+    margin: 0 15px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-links ul li:hover {
+    color: #3498DB;
+  }
+  
+  /* Social Icons */
+  .footer-social a {
+    font-size: 20px;
+    color: #ECF0F1;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-social a:hover {
+    color: #3498DB;
+  }
+  
+  /* Modal Styling */
+  .modal-content {
+    background-color: #34495E;
+    color: #ECF0F1;
+  }
+  
   .modal-header {
-    border-bottom: none;
+    border-bottom: 1px solid #7F8C8D;
   }
   
-  /* User Agreement Modal Body */
-  .user-agreement-body {
-    max-height: 400px; /* Adjust this to control the height of the modal content */
-    overflow-y: auto; /* Enables vertical scrolling */
-    padding-right: 15px; /* Ensures the scrollbar is visible without overlapping content */
+  .modal-footer {
+    background-color: #2C3E50;
+    border-top: 1px solid #7F8C8D;
   }
   
-  /* Terms and Conditions Modal Body */
-  .terms-body {
-    max-height: 400px; /* Set height for Terms modal */
-    overflow-y: auto;  /* Enable vertical scrolling */
-    padding-right: 15px; /* Prevent content overlap with scrollbar */
+  .modal-footer .btn-secondary {
+    background-color: #7F8C8D;
+    border-color: #7F8C8D;
+  }
+  
+  .modal-footer .btn-secondary:hover {
+    background-color: #BDC3C7;
+    border-color: #BDC3C7;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .footer-logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  
+    .footer-links ul {
+      text-align: center;
+    }
+  
+    .footer-links ul li {
+      display: inline-block;
+      margin: 5px 10px;
+    }
+  
+    .footer-social {
+      text-align: center;
+      margin-top: 10px;
+    }
+  
+    .footer-social a {
+      font-size: 18px;
+    }
   }
   
