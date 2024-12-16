@@ -24,6 +24,13 @@ const AdminTable = ({ url, collection, columns, parameters = {}, properties = {}
   const location = useLocation();
   const navigate = useNavigate();
 
+
+  useEffect(() => {
+    setSortField(parameters.sort ? parameters.sort[0] : "");
+    setSortOrder(parameters.order ? parameters.order[0] : "asc");
+  }, [parameters, collection]);
+
+  
   useEffect(() => {
     fetchData();
   }, [collection, sortField, sortOrder, filters, page]);
