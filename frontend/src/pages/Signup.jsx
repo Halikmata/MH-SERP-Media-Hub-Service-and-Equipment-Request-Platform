@@ -35,7 +35,7 @@ function Signup({ url }) {
 
   useEffect(() => {
     axios
-      .get(`${url}/get_data/college_office?type=college`)
+      .get(`${url}/get_data/college_office?is_college=true`)
       .then((response) => setColleges(response.data))
       .catch((error) => console.error("Error fetching colleges:", error));
   }, [url]);

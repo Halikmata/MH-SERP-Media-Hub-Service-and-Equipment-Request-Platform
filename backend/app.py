@@ -13,6 +13,11 @@ import utils
 
 from foreign import apply_foreign
 
+import random
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 # doesn't have restrictions yet but login is partially prepared.
 
 from flask_jwt_extended import (
@@ -590,5 +595,161 @@ def get_distinct(collection_name, field_name):
 # add privilege checker for each app routes.
 
 
+@app.route('/recover_account', methods=['POST', 'OPTIONS'])
+def recover_account():
+    if request.method == 'OPTIONS':
+        return jsonify({"message": "OK"}), 200
+    data = request.json
+    email = data.get('email')
+    
+    accounts = db['accounts']
+    
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    # Find account by email
+    account = accounts.find_one({"email": email})
+    if not account:
+        return jsonify({"error": "Account not found"}), 404
+
+    # Generate a 6-digit recovery code
+    recovery_code = str(random.randint(100000, 999999))
+
+    # Send recovery code to email
+    try:
+        # Configure your email sender
+        sender_email = "202180195@psu.palawan.edu.ph"  # Replace with your email
+        sender_password = "psupsupsu"  # Replace with your email password 
+        smtp_server = "smtp.gmail.com"  # Replace with your SMTP server
+        smtp_port = 587  # Typically 587 for TLS
+
+        # Compose the email
+        subject = "Account Recovery Code"
+        body = f"Hello {account['first_name']},\n\nYour account recovery code is: {recovery_code}\n\nIf you did not request this, please ignore this email."
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Send the email
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, email, msg.as_string())
+
+        # Optionally store the recovery code in the database (e.g., in a temporary field)
+        accounts.update_one(
+            {"email": email},
+            {"$set": {"recovery_code": recovery_code}}
+        )
+
+        return jsonify({"message": "Recovery code sent to your email"}), 200
+
+    except Exception as e:
+        return jsonify({"error": "Failed to send email", "details": str(e)}), 500
+
+@app.route('/verify_code', methods=['POST', 'OPTIONS'])
+def verify_code():
+    if request.method == 'OPTIONS':
+        return jsonify({"message": "OK"}), 200
+
+    # Get JSON data from request
+    data = request.get_json()
+    email = data.get("email")
+    code = data.get("code")
+
+    # Get the accounts collection
+    accounts = db['accounts']
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    if not code:
+        return jsonify({"error": "Code is required"}), 400
+
+    # Find account by email
+    account = accounts.find_one({"email": email})
+    if not account:
+        return jsonify({"error": "Account not found"}), 404
+
+    # Check if the provided code matches the stored recovery code
+    if account.get("recovery_code") != code:
+        return jsonify({"error": "Invalid recovery code"}), 400
+
+    # If the code matches, generate a new 6-digit recovery code
+    recovery_code = str(random.randint(100000, 999999))
+
+    # Send recovery code to email
+    try:
+        # Configure your email sender credentials
+        sender_email = "202180195@psu.palawan.edu.ph"  # Replace with your email
+        sender_password = "psupsupsu"  # Replace with your email password securely
+        smtp_server = "smtp.gmail.com"
+        smtp_port = 587  # Port for TLS
+
+        # Compose the email
+        subject = "Test Account Recovery Code"
+        body = f"This is for testing purposes only, Hello {account['first_name']},\n\nYour account recovery code is: {recovery_code}\n\nIf you did not request this, please ignore this email."
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Send the email via SMTP server
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()  # Secure the connection
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, email, msg.as_string())
+
+        # Optionally store the recovery code in the database
+        accounts.update_one(
+            {"email": email},
+            {"$set": {"recovery_code": recovery_code}}
+        )
+
+        return jsonify({"message": "Recovery code sent to your email"}), 200
+
+    except Exception as e:
+        return jsonify({"error": "Failed to send email", "details": str(e)}), 500
+
+
+@app.route('/reset_password', methods=['POST', 'OPTIONS'])
+def reset_password():
+    if request.method == 'OPTIONS':
+        return jsonify({"message": "OK"}), 200
+
+    # Get JSON data from request
+    data = request.get_json()
+    email = data.get("email")
+    new_password = data.get("newPassword")
+
+    # Ensure email and new password are provided
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    if not new_password:
+        return jsonify({"error": "New password is required"}), 400
+
+    # Find the account by email
+    accounts = db['accounts']
+    account = accounts.find_one({"email": email})
+    if not account:
+        return jsonify({"error": "Account not found"}), 404
+
+    # Encrypt the new password (using your encrypt method)
+    encrypted_password = utils.encrypt(new_password)
+
+    # Update the password in the database
+    try:
+        accounts.update_one(
+            {"email": email},
+            {"$set": {"password": encrypted_password}}
+        )
+
+        return jsonify({"message": "Password has been reset successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to reset password", "details": str(e)}), 500
 
 app.register_blueprint(admin_routes)

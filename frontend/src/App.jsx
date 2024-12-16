@@ -15,7 +15,8 @@ import NoPage from './includes/noPage.jsx';
 import CreateRequest from './pages/createRequest';
 import SelectEquipment from './pages/selectEqmt.jsx';
 import SelectServices from './pages/selectService';
-import Footer from './includes/footer'; 
+import Footer from './includes/footer';
+import Recovery from './pages/admin/component/recovery.jsx';
 
 function App() {
   const location = useLocation();
@@ -42,6 +43,7 @@ function App() {
         <Route path="/request" element={<CreateRequest url={url} />} />
         <Route path="/select_equipment" element={<SelectEquipment url={url} />} />
         <Route path="/select_services" element={<SelectServices url={url} />} />
+        <Route path="/recovery" element={<Recovery />} />
       </Routes>
       <Footer />
     </div>

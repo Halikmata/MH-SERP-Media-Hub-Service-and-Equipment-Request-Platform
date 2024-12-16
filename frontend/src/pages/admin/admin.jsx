@@ -230,6 +230,7 @@ const Admin = ({ url }) => {
       {isAdminPage && <AdminHeader />}
       {pathname === '/admin' && (
         <div style={mainStyle}>
+          
           <h1>Dashboard</h1>
           
           <MyCalendar requestData={calendarData}/>

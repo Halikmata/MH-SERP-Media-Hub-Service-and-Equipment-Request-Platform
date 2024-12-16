@@ -73,12 +73,17 @@ function Login() {
         const url = 'http://localhost:5000/login';
         const headers = { "Content-type": "application/json" };
         const options = { headers, withCredentials: true };
-
+    
         try {
             const response = await axios.post(url, formData, options);
             if (response.data.msg === true) {
                 sessionStorage.setItem('userData', JSON.stringify(response.data.user));
-                navigate('/');
+                // Check if the user is an admin
+                if (response.data.user.admin === true) {
+                    navigate('/admin');  // Redirect to admin page if user is an admin
+                } else {
+                    navigate('/');  // Redirect to homepage if user is not an admin
+                }
             }
         } catch (error) {
             console.error("Login error:", error);
@@ -87,6 +92,7 @@ function Login() {
             }
         }
     };
+    
 
     return (
         
@@ -150,6 +156,7 @@ function Login() {
                                 </div>
                             </form>
                             <p className="text-center">Don't have an account? <Link to="/signup">Sign up</Link></p>
+                            <p className="text-center mt-2">Forgot Password? <Link to="/recovery">Reset password</Link></p>
                         </div>
                     </div>
                 </div>
