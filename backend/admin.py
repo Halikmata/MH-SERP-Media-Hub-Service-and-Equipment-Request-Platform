@@ -23,7 +23,6 @@ from flask_jwt_extended import (
 admin_routes = Blueprint('admin_routes', __name__)
 
 # -------------------ROUTES----------------------------
-
 @app.route('/admin/<collection>', methods=['GET'])
 def admin(collection):
     if not verify_collection(collection):
@@ -55,11 +54,17 @@ def admin(collection):
             field = key[7:]  # Remove 'filter_' prefix to get the actual field name
             if field not in filters:
                 filters[field] = []
-            # Convert filter value to integer if it's a number (for fields like `request_status`)
-            try:
-                filters[field].append(int(value))  # Attempt to convert to integer
-            except ValueError:
-                filters[field].append(value)  # If not a number, leave as string
+            # Handle booleans explicitly
+            if value.lower() == "true":
+                filters[field].append(True)  # Convert to boolean True
+            elif value.lower() == "false":
+                filters[field].append(False)  # Convert to boolean False
+            else:
+                # Convert filter value to integer if it's a number, otherwise leave as string
+                try:
+                    filters[field].append(int(value))
+                except ValueError:
+                    filters[field].append(value)
         # Handle custom filter formats like '0=filter_request_status=0'
         elif '=' in key and 'filter' in key:
             field_value = key.split('=')  # Split by equal sign
@@ -67,11 +72,16 @@ def admin(collection):
                 field, value = field_value
                 if field not in filters:
                     filters[field] = []
-                # Convert filter value to integer if it's a number
-                try:
-                    filters[field].append(int(value))  # Attempt to convert to integer
-                except ValueError:
-                    filters[field].append(value)  # If not a number, leave as string
+                # Handle booleans explicitly
+                if value.lower() == "true":
+                    filters[field].append(True)
+                elif value.lower() == "false":
+                    filters[field].append(False)
+                else:
+                    try:
+                        filters[field].append(int(value))  # Attempt to convert to integer
+                    except ValueError:
+                        filters[field].append(value)
 
     # Convert list of values into $in query for multiple values in filters
     for field, values in filters.items():
@@ -121,7 +131,6 @@ def admin(collection):
         "limit": limit if limit > 0 else "none",  # Return "none" if no limit is set
         "data": results
     })
-
 
 
 @app.route('/admin/<collection>/<id>', methods=["GET"])
