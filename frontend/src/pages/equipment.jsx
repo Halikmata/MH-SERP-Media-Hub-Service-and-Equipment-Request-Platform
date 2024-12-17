@@ -99,12 +99,11 @@ const Equipment = ({ url }) => {
   };
 
   const paginationRange = (currentPage, totalPages) => {
-    const totalButtons = 5; // Number of page buttons to display
+    const totalButtons = 5;
     const halfRange = Math.floor(totalButtons / 2);
     let startPage = Math.max(1, currentPage - halfRange);
     let endPage = Math.min(totalPages, currentPage + halfRange);
-  
-    // Adjust range if pages are fewer than the max buttons
+
     if (endPage - startPage < totalButtons - 1) {
       if (startPage === 1) {
         endPage = Math.min(totalPages, startPage + totalButtons - 1);
@@ -112,14 +111,13 @@ const Equipment = ({ url }) => {
         startPage = Math.max(1, endPage - totalButtons + 1);
       }
     }
-  
+
     const range = [];
     for (let i = startPage; i <= endPage; i++) {
       range.push(i);
     }
     return range;
   };
-  
 
   return (
     <div className="container mt-5">
@@ -172,7 +170,17 @@ const Equipment = ({ url }) => {
               <Card className={`equipment-card ${selectedEquipmentIds.includes(item.idequipment) ? 'selected' : ''}`}>
                 <ImageDisplay imageName={item.idequipment} />
                 <Card.Body>
-                  <Card.Title>{item.brand} {item.model}</Card.Title>
+                  <Card.Title>
+                    {item.brand ? (
+                      item.brand
+                    ) : item.model ? (
+                      item.model
+                    ) : item.type ? (
+                      item.type
+                    ) : (
+                      'Not Specified'
+                    )}
+                  </Card.Title>
                   <Card.Text>
                     {showFullDescription[item.idequipment]
                       ? item.description

@@ -136,19 +136,33 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  position: fixed; /* Make it fixed at the bottom right */
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000; /* Ensure it's on top of other content */
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  z-index: 1000;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(45deg, #eee6e5, #e8bc81); /* Gradient background */
+  border-radius: 50%; /* Circular button */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .cart-icon img {
-  width: 50px; /* Set width for the cart icon */
-  height: 50px; /* Set height for the cart icon */
+  width: 40px; /* Icon size */
+  height: 40px; /* Icon size */
+  object-fit: contain;
+  transition: transform 0.3s ease;
 }
 
 .cart-icon:hover {
-  transform: scale(1.1); /* Optional: Button enlarges slightly on hover */
+  transform: scale(1.1); /* Slightly enlarge button on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.15); /* Shadow on hover */
+  background: linear-gradient(45deg, #e0d9d7, #c4725d); /* Reverse gradient on hover */
+}
+
+.cart-icon:active {
+  transform: scale(1); /* Slight reduction in size when clicked */
 }
 
 /* Cart Badge Notification */
@@ -156,9 +170,47 @@
   position: absolute;
   top: -5px;
   right: -5px;
-  background-color: red;
+  background-color: #FF5733; /* Bright red-orange background */
   color: white;
+  font-size: 14px;
+  font-weight: bold;
   border-radius: 50%;
-  padding: 5px 10px;
-  font-size: 12px;
+  padding: 4px 8px;
+  border: 2px solid #fff; /* White border around the badge */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Light shadow */
+  animation: bounce 1s infinite alternate; /* Bounce animation */
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 576px) {
+  .cart-icon {
+    width: 55px;
+    height: 55px;
+  }
+
+  .cart-icon img {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cart-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .cart-icon img {
+    width: 40px;
+    height: 40px;
+  }
 }
