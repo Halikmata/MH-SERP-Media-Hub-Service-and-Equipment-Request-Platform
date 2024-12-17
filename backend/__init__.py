@@ -5,6 +5,7 @@ from pymongo.server_api import ServerApi
 from faker import Faker
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+
 fake = Faker() # rechanges secret key every server restart
 
 app = Flask(__name__)

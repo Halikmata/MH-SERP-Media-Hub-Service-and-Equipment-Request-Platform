@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { types } from './types.js';
-import { Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { Button, Card, Col, Container, Row, Alert } from 'react-bootstrap';
 
 const AddItem = ({ url }) => {
     const { collection } = useParams();
@@ -11,6 +11,7 @@ const AddItem = ({ url }) => {
     const [foreignOptions, setForeignOptions] = useState({});
     const [dropdownOptions, setDropdownOptions] = useState({});
     const [showOtherInput, setShowOtherInput] = useState({});
+    const [error, setError] = useState(null);  // New state to store errors
 
     const collectionTypes = types[collection] || {};
 
@@ -225,6 +226,9 @@ const AddItem = ({ url }) => {
             })
             .catch((error) => {
                 console.error('Error adding item:', error);
+                
+                const errorMessage = error.response?.data?.message || "An error occurred while adding the item. Please try again.";
+                setError(errorMessage);
             });
     };
 
@@ -235,6 +239,7 @@ const AddItem = ({ url }) => {
                     <Col md={6}>
                         <Card>
                             <Card.Body>
+                                {error && <Alert variant="danger">{error}</Alert>}  {/* Display error message */}
                                 <form onSubmit={handleSubmit}>
                                     {Object.entries(collectionTypes).map(([field, config]) => (
                                         <div key={field} className="mb-3">
@@ -253,15 +258,11 @@ const AddItem = ({ url }) => {
         );
     };
 
-    return (
-        <div>
-            <h2>Add {collection}</h2>
-            {renderForm()}
-        </div>
-    );
+    return renderForm();
 };
 
 export default AddItem;
+
 
 const dropdownStyle = {
     maxHeight: '100px',

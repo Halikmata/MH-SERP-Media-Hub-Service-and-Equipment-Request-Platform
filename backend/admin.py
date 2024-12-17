@@ -4,6 +4,8 @@ from bson.decimal128 import Decimal128
 from bson.binary import Binary
 from datetime import datetime, timezone, timedelta
 import re
+from pymongo.errors import DuplicateKeyError
+
 
 import jwt
 from __init__ import app, db
@@ -151,9 +153,9 @@ def get_row(collection, id):
             return jsonify({"message": "Invalid ID format"}), 400
         
 
-@app.route('/admin/<collection>/add', methods=["GET","POST"])
-#@jwt_required()
-def admin_add_row(collection):   
+@app.route('/admin/<collection>/add', methods=["GET", "POST"])
+# @jwt_required()
+def admin_add_row(collection):
     if not verify_collection(collection):
         return jsonify({"message": "Unknown URL"}), 404
     else:
@@ -161,13 +163,31 @@ def admin_add_row(collection):
     
     if request.method == "POST":
         json_input = request.get_json()
-        # json_input = json_input.pop('_id')
-        result = collection.insert_one(json_input)
-        return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
-    else:
         
+        try:
+            result = collection.insert_one(json_input)
+            return jsonify({"message": "Row added successfully", "id": str(result.inserted_id)}), 201
+        
+        except DuplicateKeyError as e:
+            # Extract the duplicated value from the error message
+            error_message = str(e)
+            duplicated_value = None
+            
+            # Check if the error message contains a reference to a duplicated value
+            if "dup key" in error_message:
+                # Example: 'E11000 duplicate key error collection: db.collection index: field_1 dup key: { : "value" }'
+                start = error_message.find("dup key:") + len("dup key:")
+                end = error_message.find("}", start)
+                duplicated_value = error_message[start:end].split(":")[-1].strip().replace('"', '')
+            
+            return jsonify({
+                "message": f"Duplicate key error: '{duplicated_value}' is duplicated.",
+                "error": error_message,
+                "value": duplicated_value
+            }), 400
+
+    else:
         pass
-        # will add GET request for acquiring choose-able options
 
 
 @app.route('/admin/<collection>/update/<id>', methods=['GET', 'PUT'])
